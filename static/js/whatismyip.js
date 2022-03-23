@@ -37,7 +37,8 @@ $(document).ready(function () {
 		// Make AJAX call to the API to get the ipv4 address
 		$.ajax({
 			type: "GET",
-			url: "https://whatismyipv4.unc.edu/hostinfo.php",
+			//url: "https://whatismyipv4.unc.edu/hostinfo.php",
+			url: "http://whatismyipv4.unc.edu:5000/hostinfo",
 			dataType: "json",
 			success: function (result, status, xhr) {
 				//console.log(result);

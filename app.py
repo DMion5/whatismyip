@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, make_response
 from dotenv import load_dotenv
 from utils import *
 
@@ -42,7 +42,13 @@ def hostinfo():
     data['protocol'] = request.environ.get("SERVER_PROTOCOL")
     data['agent']    = request.environ.get("HTTP_USER_AGENT")
     data['network']  = ''
-    return jsonify(data)
+    
+    message = jsonify(data)
+    response = make_response(message)
+    response.headers.add("Access-Control-Allow-Origin", "http://whatismyip.unc.edu:5000")
+    response.headers.add('Access-Control-Allow-Headers', "GET")
+    response.headers.add('Access-Control-Allow-Methods', "origin, x-requested-with, content-type, accept")
+    return response
 
 @app.route("/about")
 def about():

@@ -24,6 +24,7 @@
     </div>
   </div>
   <div class="row p-1">
+    {% if context.address_list %}
     <div class="col-md">
       <p>Your Address:</p>
       <ul class="list-group">
@@ -32,6 +33,8 @@
         <li class="list-group-item"><strong>Status:</strong> {{ context.address_list.status }}</li>
       </ul>
     </div>
+    {% endif %}
+    {% if context.network_cidr %}
     <div class="col-md">
       <p>Your Network:</p>
       <ul class="list-group">
@@ -40,6 +43,8 @@
         <li class="list-group-item"><strong>Vlan:</strong> {% if context.vlan_id %}{{ context.vlan_id }} ({{ context.vlan_name }}){% endif %}</li>
       </ul>
     </div>
+    {% endif %}
+    {% if context.ipwhois.asn %}
     <div class="col-md">
       <p>Your ISP:</p>
       <ul class="list-group">
@@ -48,6 +53,7 @@
         <li class="list-group-item"><strong>Country:</strong> {{ context.ipwhois.asn_country_code }}</li>
       </ul>
     </div>
+    {% endif %}
   </div>
   <div class="row p-1">
     <div class="col">

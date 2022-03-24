@@ -26,7 +26,7 @@
   <div class="row p-1">
     {% if context.address_records %}
     <div class="col">
-      <p>Address Details:</p>
+      <h4>Address Details:</h4>
       <table class="table table-sm table-responsive">
         <tbody>
           <tr>
@@ -63,22 +63,50 @@
   <div class="row p-1">
     {% if context.network_cidr %}
     <div class="col-md">
-      <p>Your Network:</p>
-      <ul class="list-group">
-        <li class="list-group-item"><strong>Network:</strong> {{ context.network_cidr }} {% if context.network_comment %}({{ context.network_comment }}){% endif %}</li>
-        <li class="list-group-item"><strong>Network Type:</strong> {{ context.network_type }}</li>
-        <li class="list-group-item"><strong>Vlan:</strong> {% if context.vlan_id %}{{ context.vlan_id }} ({{ context.vlan_name }}){% endif %}</li>
-      </ul>
+      <h4>Your Network:</h4>
+      <table class="table table-sm table-responsive">
+        <tbody>
+          <tr>
+            <th>Network<th>
+            <td>{{ context.network_cidr }} {% if context.network_comment %}({{ context.network_comment }}){% endif %}</td>
+          </tr>
+          <tr>
+            <th>Network Type<th>
+            <td>{{ context.network_type }}</td>
+          </tr>
+          <tr>
+            <th>Vlan<th>
+            <td>{% if context.vlan_id %}{{ context.vlan_id }} ({{ context.vlan_name }}){% endif %}</td>
+          </tr>
+          {% for key, value in context.network.items() %}
+          <tr>
+            <th>{{ key }}<th>
+            <td>{{ value }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
     {% endif %}
     {% if context.ipwhois.asn %}
     <div class="col-md">
-      <p>Your ISP:</p>
-      <ul class="list-group">
-        <li class="list-group-item"><strong>ASN:</strong> {{ context.ipwhois.asn }}</li>
-        <li class="list-group-item"><strong>ISP:</strong> {{ context.ipwhois.asn_description }}</li>
-        <li class="list-group-item"><strong>Country:</strong> {{ context.ipwhois.asn_country_code }}</li>
-      </ul>
+      <h4>Your ISP:</h4>
+      <table class="table table-sm table-responsive">
+        <tbody>
+          <tr>
+            <th>ASN<th>
+            <td>{{ context.ipwhois.asn }}</td>
+          </tr>
+          <tr>
+            <th>ISP<th>
+            <td>{{ context.ipwhois.asn_description }}</td>
+          </tr>
+          <tr>
+            <th>Country<th>
+            <td>{{ context.ipwhois.asn_country_code }}</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
     {% endif %}
   </div>

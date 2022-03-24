@@ -98,4 +98,4 @@ def getAddressObjects( ip ):
 		return address_list
 
 	else:
-		return {}
+		return []

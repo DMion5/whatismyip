@@ -44,9 +44,10 @@ def home():
 
     # collect information about the network for this address
     network = getNetwork( context['client_address'] )
+    context['network'] = network
     if network:
         # collect network data to display
-        context['network'] = network.get('network',None)
+        context['network_cidr'] = network.get('network',None)
         context['network_comment'] = network.get('comment',None)
         context['network_type'] = network.get('extattrs',{}).get('Purpose',{}).get('value',None)
         context['network_router'] = network.get('extattrs',{}).get('Router Device',{}).get('value',None)

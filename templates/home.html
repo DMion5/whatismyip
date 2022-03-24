@@ -23,108 +23,131 @@
       <h2 id="address2_sm" class="text-center allowCopy">loading...</h2>
     </div>
   </div>
-  <div class="row p-1">
-    {% if context.address_records %}
+  <div class="row row-cols-1 row-cols-md-2 g-4 p-1">
     <div class="col">
-      <h4>Address Details:</h4>
-      <table class="table table-sm table-responsive">
-        <tbody>
-          <tr>
-            <th>Name<th>
-            <td>{% for name in context.address_records.names %}{{ name }} {% endfor %}</td>
-          </tr>
-          <tr>
-            <th>MAC Address<th>
-            <td>{{ context.address_records.mac_address }}</td>
-          </tr>
-          <tr>
-            <th>Status<th>
-            <td>{{ context.address_records.status }}</td>
-          </tr>
-          <tr>
-            <th>Lease State<th>
-            <td>{{ context.address_records.lease_state }}</td>
-          </tr>
-          <tr>
-            <th>Username<th>
-            <td>{{ context.address_records.username }}</td>
-          </tr>
-          {% for key, value in context.address_records.items() %}
-          <tr>
-            <th>{{ key }}<th>
-            <td>{{ value }}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+
+      {% if context.address_records %}
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Address Details</h5>
+          <h6 class="card-subtitle mb-2 text-muted">campus address</h6>
+          <table class="table table-sm">
+            <tbody>
+              <tr>
+                <th>Name<th>
+                <td>{% for name in context.address_records.names %}{{ name }} {% endfor %}</td>
+              </tr>
+              <tr>
+                <th>MAC Address<th>
+                <td>{{ context.address_records.mac_address }}</td>
+              </tr>
+              <tr>
+                <th>Status<th>
+                <td>{{ context.address_records.status }}</td>
+              </tr>
+              <tr>
+                <th>Lease State<th>
+                <td>{{ context.address_records.lease_state }}</td>
+              </tr>
+              <tr>
+                <th>Username<th>
+                <td>{{ context.address_records.username }}</td>
+              </tr>
+              {% for key, value in context.address_records.items() %}
+              <!-- <tr>
+                <th>{{ key }}<th>
+                <td>{{ value }}</td>
+              </tr> -->
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      {% endif %}
+
     </div>
-    {% endif %}
-  </div>
-  <div class="row p-1">
-    {% if context.network_cidr %}
-    <div class="col-md">
-      <h4>Your Network:</h4>
-      <table class="table table-sm table-responsive">
-        <tbody>
-          <tr>
-            <th>Network<th>
-            <td>{{ context.network_cidr }} {% if context.network_comment %}({{ context.network_comment }}){% endif %}</td>
-          </tr>
-          <tr>
-            <th>Network Type<th>
-            <td>{{ context.network_type }}</td>
-          </tr>
-          <tr>
-            <th>Vlan<th>
-            <td>{% if context.vlan_id %}{{ context.vlan_id }} ({{ context.vlan_name }}){% endif %}</td>
-          </tr>
-          {% for key, value in context.network.items() %}
-          <tr>
-            <th>{{ key }}<th>
-            <td>{{ value }}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+    <div class="col">
+
+      {% if context.network_cidr %}
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Network Details</h5>
+          <h6 class="card-subtitle mb-2 text-muted">campus network</h6>
+          <table class="table table-sm">
+            <tbody>
+              <tr>
+                <th>Network<th>
+                <td>{{ context.network_cidr }} {% if context.network_comment %}({{ context.network_comment }}){% endif %}</td>
+              </tr>
+              <tr>
+                <th>Network Type<th>
+                <td>{{ context.network_type }}</td>
+              </tr>
+              <tr>
+                <th>Vlan<th>
+                <td>{% if context.vlan_id %}{{ context.vlan_id }} ({{ context.vlan_name }}){% endif %}</td>
+              </tr>
+              {% for key, value in context.network.items() %}
+              <!-- <tr>
+                <th>{{ key }}<th>
+                <td>{{ value }}</td>
+              </tr> -->
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      {% endif %}
+
     </div>
-    {% endif %}
-    {% if context.ipwhois.asn %}
-    <div class="col-md">
-      <h4>Your ISP:</h4>
-      <table class="table table-sm table-responsive">
-        <tbody>
-          <tr>
-            <th>ASN<th>
-            <td>{{ context.ipwhois.asn }}</td>
-          </tr>
-          <tr>
-            <th>ISP<th>
-            <td>{{ context.ipwhois.asn_description }}</td>
-          </tr>
-          <tr>
-            <th>Country<th>
-            <td>{{ context.ipwhois.asn_country_code }}</td>
-          </tr>
-          {% for key, value in context.ipwhois.items() %}
-          <tr>
-            <th>{{ key }}<th>
-            <td>{{ value }}</td>
-          </tr>
-          {% endfor %}
-          <tr>
-            <th></th>
-            <td></td>
-          </tr>
-          {% for key, value in context.iplocation.items() %}
-          <tr>
-            <th>{{ key }}<th>
-            <td>{{ value }}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+    <div class="col">
+
+      {% if context.ipwhois.asn %}
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">ISP Details</h5>
+          <h6 class="card-subtitle mb-2 text-muted">internet</h6>
+          <table class="table table-sm table-responsive">
+            <tbody>
+              <tr>
+                <th>ISP<th>
+                <td>{{ context.iplocation.isp }}</td>
+              </tr>
+              <tr>
+                <th>Country<th>
+                <td>{{ context.iplocation.country_name }}</td>
+              </tr>
+              <tr>
+                <th>ASN<th>
+                <td>{{ context.ipwhois.asn }}</td>
+              </tr>
+              <tr>
+                <th>ISP<th>
+                <td>{{ context.ipwhois.asn_description }}</td>
+              </tr>
+              <tr>
+                <th>Country<th>
+                <td>{{ context.ipwhois.asn_country_code }}</td>
+              </tr>
+              {% for key, value in context.ipwhois.items() %}
+              <!-- <tr>
+                <th>{{ key }}<th>
+                <td>{{ value }}</td>
+              </tr> -->
+              {% endfor %}
+              {% for key, value in context.iplocation.items() %}
+              <!-- <tr>
+                <th>{{ key }}<th>
+                <td>{{ value }}</td>
+              </tr> -->
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      {% endif %}
+
     </div>
-    {% endif %}
   </div>
   <div class="row p-1">
     <div class="col">

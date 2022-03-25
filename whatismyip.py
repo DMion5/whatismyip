@@ -40,6 +40,7 @@ def home():
         context['client_address'] = remote_address
     #context['client_address'] = '152.2.198.50'
     #context['client_address'] = '152.2.198.240'
+    #context['client_address'] = '152.23.198.240'
     #context['client_address'] = '172.17.32.38'
     #context['client_address'] = '75.183.206.183'
 

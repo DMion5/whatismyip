@@ -1,200 +1,224 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="container">
-  <div class="row">
-    <div class="col">
-      <div class="p-5 text-center">
-        <h2 class="mb-2"><i class="bi bi-hdd-network"></i>Your IP address is:</h2>
-      </div>
+<div class="row">
+  <div class="col">
+    <div class="py-5 text-center">
+      <h3 class="mb-2">Your address is:</h3>
     </div>
   </div>
-  <div class="row p-1">
-    <div class="col">
-      <div class="card bg-primary shadow">
-        <div class="card-body">
-          <div id="address_box" class="unc-ip">
-            <h1 id="address" class="display-4 text-center allowCopy">{{ context.client_address }}</h1>
-          </div>
+</div>
+<div class="row p-1">
+  <div class="col">
+    <div class="card bg-primary shadow">
+      <div class="card-body">
+        <div id="address_box" class="unc-ip">
+          <h1 id="address" class="display-4 text-center allowCopy mb-0">{{ context.client_address }}</h1>
         </div>
       </div>
     </div>
   </div>
-  <div class="row p-1" style="display:none;">
-    <div class="col">
-      <div class="card bg-primary shadow">
-        <div class="card-body">
-          <div id="additional_ip" class="unc-ip">
-            <h1 id="address2" class="display-4 text-center allowCopy">loading...</h1>
-          </div>
+</div>
+<div class="row p-1" style="display:none;">
+  <div class="col">
+    <div class="card bg-primary shadow">
+      <div class="card-body">
+        <div id="additional_ip" class="unc-ip">
+          <h1 id="address2" class="display-4 text-center allowCopy mb-0">loading...</h1>
         </div>
       </div>
     </div>
   </div>
-  <div class="row p-1">
-    <div class="col">
+</div>
+<div class="row p-1 my-3">
+  <div class="col">
+    <p>This is the IP address used by your computer when accessing campus resources.
+    {% if context.network_cidr %}
       {% if context.network_type %}
         {% if 'VPN' in context.network_type %}
-        <p>You are connected to campus through the VPN.</p>
+        It is part of a campus VPN network.
         {% elif 'Wireless' in context.network_type %}
-        <p>You are connected to campus wireless.</p>
-        {% elif context.network_type %}
-        <p>You are connected to campus network.</p>
+        It is part of the campus wireless network.
+        {% else %}
+        It is part of a local campus network.
         {% endif %}
       {% else %}
-        <p>You are connected to campus from the Internet.</p>
+      It is part of a local campus network.
       {% endif %}
-    </div>
-  </div>
-  <div class="row row-cols-1 row-cols-md-2 g-4 p-1">
-
-    {% if context.address_records %}
-    <div class="col">
-      <div class="card shadow">
-        <div class="card-body">
-          <h5 class="card-title">Address Details</h5>
-          <h6 class="card-subtitle mb-2 text-muted">Campus IPAM information</h6>
-          <div class="table-responsive">
-            <table class="table table-sm">
-              <tbody>
-                {% if context.address_records %}
-                <tr>
-                  <th>Name</th>
-                  <td>
-                    <ul class="list-group list-group-flush">
-                      {% for name in context.address_records.names %}
-                      <li class="list-group-item p-0">{{ name }}</li> 
-                      {% endfor %}
-                    </ul>
-                  </td>
-                </tr>
-                {% for key, value in context.address_records.extattrs.items() %}
-                <tr>
-                  <th>{{ key }}</th>
-                  <td>{{ value.value }}</td>
-                </tr>
-                {% endfor %}
-                {% if context.address_records.mac_address %}
-                <tr>
-                  <th>MAC Address</th>
-                  <td>{{ context.address_records.mac_address }}</td>
-                </tr>
-                {% endif %}
-                {% if 'LEASE' in context.address_records.types %}
-                <tr>
-                  <th>DHCP Lease</th>
-                  <td>{{ context.address_records.lease_state }}</td>
-                </tr>
-                <tr>
-                  <th>Username</th>
-                  <td>{{ context.address_records.username }}</td>
-                </tr>
-                {% endif %}
-                <tr>
-                  <th>Status</th>
-                  <td>{{ context.address_records.status }}</td>
-                </tr>
-                {% for key, value in context.address_records.items() %}
-                <!-- <tr>
-                  <th>{{ key }}</th>
-                  <td>{{ value }}</td>
-                </tr> -->
-                {% endfor %}
-                {% endif %}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
+    {% else %}
+    It is off-campus and part of the public Internet.
     {% endif %}
+    </p>
+  </div>
+</div>
+<div class="row row-cols-1 row-cols-xl-2 g-4 p-1">
 
-    <div class="col">
-      <div class="card shadow">
-        <div class="card-body">
-          <h5 class="card-title">Network Details</h5>
-          <h6 class="card-subtitle mb-2 text-muted">Campus IPAM information</h6>
-          <div class="table-responsive">
+  {% if context.address_records %}
+  <div class="col">
+    <div class="card shadow">
+      <div class="card-body">
+        <h5 class="card-title">Address Details</h5>
+        <h6 class="card-subtitle mb-2 text-muted">Campus IPAM information</h6>
+        <div class="table-responsive">
           <table class="table table-sm">
             <tbody>
-              {% if context.network_cidr %}
-                {% if context.vlan_id %}
-                <tr>
-                  <th>Vlan</th>
-                  <td>{{ context.vlan_id }} "{{ context.vlan_name }}"</td>
-                </tr>
-                {% endif %}
-                <tr>
-                  <th>Network</th>
-                  <td>{{ context.network_cidr }} {% if context.network_comment %}({{ context.network_comment }}){% endif %}</td>
-                </tr>
-                {% if context.network_type %}
-                <tr>
-                  <th>Usage</th>
-                  <td>{{ context.network_type }}</td>
-                </tr>
-                {% endif %}
-                {% for key, value in context.network.extattrs.items() %}
-                <tr>
-                  <th>{{ key }}</th>
-                  <td>{{ value.value }}</td>
-                </tr>
-                {% endfor %}
-              {% endif %}
-              {% if context.iplocation.isp %}
+              {% if context.address_records %}
               <tr>
-                <th>ISP</th>
-                <td>{{ context.iplocation.isp }}</td>
+                <th>Name</th>
+                <td>
+                  <ul class="list-group list-group-flush">
+                    {% for name in context.address_records.names %}
+                    <li class="list-group-item p-0">{{ name }}</li> 
+                    {% endfor %}
+                  </ul>
+                </td>
               </tr>
+              {% for key, value in context.address_records.extattrs.items() %}
+              <!-- <tr>
+                <th>{{ key }}</th>
+                <td>{{ value.value }}</td>
+              </tr> -->
+              {% endfor %}
+              {% if context.address_records.mac_address %}
               <tr>
-                <th>Country</th>
-                <td>{{ context.iplocation.country_name }}</td>
+                <th>MAC Address</th>
+                <td>{{ context.address_records.mac_address }}</td>
               </tr>
               {% endif %}
-              {% for key, value in context.network.items() %}
+              {% if 'LEASE' in context.address_records.types %}
+              <tr>
+                <th>DHCP Lease</th>
+                <td>{{ context.address_records.lease_state }}</td>
+              </tr>
+              {% endif %}
+              {% if context.address_records.username %}
+              <tr>
+                <th>Username</th>
+                <td>{{ context.address_records.username }}</td>
+              </tr>
+              {% endif %}
+              {% if context.address_records.extattrs['Device Type'] %}
+              <tr>
+                <th>Device Type</th>
+                <td>{{ context.address_records.extattrs['Device Type'].value }}</td>
+              </tr>
+              {% endif %}
+              <tr>
+                <th>Status</th>
+                <td>{{ context.address_records.status }}</td>
+              </tr>
+              {% for key, value in context.address_records.items() %}
               <!-- <tr>
                 <th>{{ key }}</th>
                 <td>{{ value }}</td>
               </tr> -->
               {% endfor %}
-              {% for key, value in context.ipwhois.items() %}
-              <!-- <tr>
-                <th>{{ key }}</th>
-                <td>{{ value }}</td>
-              </tr> -->
-              {% endfor %}
-              {% for key, value in context.iplocation.items() %}
-              <!-- <tr>
-                <th>{{ key }}</th>
-                <td>{{ value }}</td>
-              </tr> -->
-              {% endfor %}
+              {% endif %}
             </tbody>
           </table>
-          </div>
         </div>
       </div>
     </div>
+  </div>
+  {% endif %}
 
+  <div class="col">
+    <div class="card shadow">
+      <div class="card-body">
+        <h5 class="card-title">Network Details</h5>
+        <h6 class="card-subtitle mb-2 text-muted">Campus IPAM information</h6>
+        <div class="table-responsive">
+        <table class="table table-sm">
+          <tbody>
+            {% if context.network_cidr %}
+              {% if context.vlan_id %}
+              <tr>
+                <th>Vlan</th>
+                <td>{{ context.vlan_id }} "{{ context.vlan_name }}"</td>
+              </tr>
+              {% endif %}
+              <tr>
+                <th>Network</th>
+                <td>{{ context.network_cidr }} {% if context.network_comment %}({{ context.network_comment }}){% endif %}</td>
+              </tr>
+              {% if context.network_type %}
+              <tr>
+                <th>Usage</th>
+                <td>{{ context.network_type }}</td>
+              </tr>
+              {% endif %}
+              {% if context.network.extattrs['Admin Onyen'] %}
+              <tr>
+                <th>Admin Onyen</th>
+                <td>{{ context.network.extattrs['Admin Onyen'].value }}</td>
+              </tr>
+              {% endif %}
+              {% if context.network.extattrs['Cost Center'] %}
+              <tr>
+                <th>Cost Center</th>
+                <td>{{ context.network.extattrs['Cost Center'].value }}</td>
+              </tr>
+              {% endif %}
+              {% for key, value in context.network.extattrs.items() %}
+              <!-- <tr>
+                <th>{{ key }}</th>
+                <td>{{ value.value }}</td>
+              </tr> -->
+              {% endfor %}
+            {% endif %}
+            {% if context.iplocation.isp %}
+            <tr>
+              <th>ISP</th>
+              <td>{{ context.iplocation.isp }}</td>
+            </tr>
+            <tr>
+              <th>Country</th>
+              <td>{{ context.iplocation.country_name }}</td>
+            </tr>
+            {% endif %}
+            {% for key, value in context.network.items() %}
+            <!-- <tr>
+              <th>{{ key }}</th>
+              <td>{{ value }}</td>
+            </tr> -->
+            {% endfor %}
+            {% for key, value in context.ipwhois.items() %}
+            <!-- <tr>
+              <th>{{ key }}</th>
+              <td>{{ value }}</td>
+            </tr> -->
+            {% endfor %}
+            {% for key, value in context.iplocation.items() %}
+            <!-- <tr>
+              <th>{{ key }}</th>
+              <td>{{ value }}</td>
+            </tr> -->
+            {% endfor %}
+          </tbody>
+        </table>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <div class="row p-1">
-    <div class="col">
-      <p><button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample" id="more-info">Show More Information</button></p>
-      <div class="collapse" id="collapseExample">
-          <div class="card shadow card-body">
-          <p>environ</p>
-          <ul class="list-group">
-            {% for key, value in environ.items() %}
-            <li class="list-group-item"><strong>{{ key }}</strong> <span> {{ value }}</span></li>
-            {% endfor  %}
-          </ul>
-          <p>headers</p>
-          <ul class="list-group">
-            {% for key, value in headers.items() %}
-            <li class="list-group-item"><strong>{{ key }}</strong> <span> {{ value }}</span></li>
-            {% endfor  %}
-          </ul>
-        </div>
+</div>
+
+<div class="row p-1 mt-2">
+  <div class="col">
+    <p><button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample" id="more-info">Show More Information</button></p>
+    <div class="collapse" id="collapseExample">
+        <div class="card shadow card-body">
+        <p>environ</p>
+        <ul class="list-group">
+          {% for key, value in environ.items() %}
+          <li class="list-group-item"><strong>{{ key }}</strong> <span> {{ value }}</span></li>
+          {% endfor  %}
+        </ul>
+        <p>headers</p>
+        <ul class="list-group">
+          {% for key, value in headers.items() %}
+          <li class="list-group-item"><strong>{{ key }}</strong> <span> {{ value }}</span></li>
+          {% endfor  %}
+        </ul>
       </div>
     </div>
   </div>

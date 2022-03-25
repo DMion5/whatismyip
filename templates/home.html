@@ -57,7 +57,7 @@
             <table class="table table-sm">
               <tbody>
                 <tr>
-                  <th>Name<th>
+                  <th>Name</th>
                   <td>
                     <ul class="list-group list-group-flush">
                       {% for name in context.address_records.names %}
@@ -68,27 +68,27 @@
                 </tr>
                 {% if context.address_records.mac_address %}
                 <tr>
-                  <th>MAC Address<th>
+                  <th>MAC Address</th>>
                   <td>{{ context.address_records.mac_address }}</td>
                 </tr>
                 {% endif %}
                 {% if 'LEASE' in context.address_records.types %}
                 <tr>
-                  <th>DHCP Lease<th>
+                  <th>DHCP Lease</th>>
                   <td>{{ context.address_records.lease_state }}</td>
                 </tr>
                 <tr>
-                  <th>Username<th>
+                  <th>Username</th>>
                   <td>{{ context.address_records.username }}</td>
                 </tr>
                 {% endif %}
                 <tr>
-                  <th>Status<th>
+                  <th>Status</th>>
                   <td>{{ context.address_records.status }}</td>
                 </tr>
                 {% for key, value in context.address_records.items() %}
                 <!-- <tr>
-                  <th>{{ key }}<th>
+                  <th>{{ key }}</th>
                   <td>{{ value }}</td>
                 </tr> -->
                 {% endfor %}
@@ -110,21 +110,31 @@
           <div class="table-responsive">
           <table class="table table-sm">
             <tbody>
+              {% if context.vlan_id %}
               <tr>
-                <th>Network<th>
+                <th>Vlan</th>
+                <td>{{ context.vlan_id }} "{{ context.vlan_name }}"</td>
+              </tr>
+              {% endif %}
+              <tr>
+                <th>Network</th>
                 <td>{{ context.network_cidr }} {% if context.network_comment %}({{ context.network_comment }}){% endif %}</td>
               </tr>
+              {% if context.network_type %}
               <tr>
-                <th>Network Type<th>
+                <th>Usage</th>
                 <td>{{ context.network_type }}</td>
               </tr>
+              {% endif %}
+              {% if context.iplocation.isp %}
               <tr>
-                <th>Vlan<th>
-                <td>{% if context.vlan_id %}{{ context.vlan_id }} ({{ context.vlan_name }}){% endif %}</td>
+                <th>ISP</th>
+                <td>{{ context.iplocation.isp }}</td>
               </tr>
+              {% endif %}
               {% for key, value in context.network.items() %}
               <!-- <tr>
-                <th>{{ key }}<th>
+                <th>{{ key }}</th>
                 <td>{{ value }}</td>
               </tr> -->
               {% endfor %}
@@ -147,34 +157,34 @@
           <table class="table table-sm table-responsive">
             <tbody>
               <tr>
-                <th>ISP<th>
+                <th>ISP</th>>
                 <td>{{ context.iplocation.isp }}</td>
               </tr>
               <tr>
-                <th>Country<th>
+                <th>Country</th>>
                 <td>{{ context.iplocation.country_name }}</td>
               </tr>
               <tr>
-                <th>ASN<th>
+                <th>ASN</th>>
                 <td>{{ context.ipwhois.asn }}</td>
               </tr>
               <tr>
-                <th>ISP<th>
+                <th>ISP</th>>
                 <td>{{ context.ipwhois.asn_description }}</td>
               </tr>
               <tr>
-                <th>Country<th>
+                <th>Country</th>>
                 <td>{{ context.ipwhois.asn_country_code }}</td>
               </tr>
               {% for key, value in context.ipwhois.items() %}
               <!-- <tr>
-                <th>{{ key }}<th>
+                <th>{{ key }}</th>
                 <td>{{ value }}</td>
               </tr> -->
               {% endfor %}
               {% for key, value in context.iplocation.items() %}
               <!-- <tr>
-                <th>{{ key }}<th>
+                <th>{{ key }}</th>
                 <td>{{ value }}</td>
               </tr> -->
               {% endfor %}

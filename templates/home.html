@@ -23,6 +23,19 @@
       <h2 id="address2_sm" class="text-center allowCopy">loading...</h2>
     </div>
   </div>
+  <div class="row p-1">
+    <div class="col">
+      {% if 'VPN' in context.network_type %}
+      <p>You are connected to campus through the VPN.</p>
+      {% elif 'Wireless' in context.network_type %}
+      <p>You are connected to campus wireless.</p>
+      {% elif context.network_type %}
+      <p>You are connected to campus network.</p>
+      {% else %}
+      <p>You are connected to campus from the Internet.</p>
+      {% endif %}
+    </div>
+  </div>
   <div class="row row-cols-1 row-cols-md-2 g-4 p-1">
     <div class="col">
 

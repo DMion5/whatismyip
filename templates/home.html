@@ -25,14 +25,16 @@
   </div>
   <div class="row p-1">
     <div class="col">
-      {% if 'VPN' in context.network_type %}
-      <p>You are connected to campus through the VPN.</p>
-      {% elif 'Wireless' in context.network_type %}
-      <p>You are connected to campus wireless.</p>
-      {% elif context.network_type %}
-      <p>You are connected to campus network.</p>
+      {% if context.network_type %}
+        {% if 'VPN' in context.network_type %}
+        <p>You are connected to campus through the VPN.</p>
+        {% elif 'Wireless' in context.network_type %}
+        <p>You are connected to campus wireless.</p>
+        {% elif context.network_type %}
+        <p>You are connected to campus network.</p>
+        {% endif %}
       {% else %}
-      <p>You are connected to campus from the Internet.</p>
+        <p>You are connected to campus from the Internet.</p>
       {% endif %}
     </div>
   </div>

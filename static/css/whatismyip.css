@@ -24,6 +24,11 @@ body {
   font-size: .9em;
   font-family: "Times New Roman",serif;;
 }
+
+.unc-page-title {
+  color: #4B9CD3;
+}
+
 /* Modify the background color */
 .navbar-unc {
   background-color: #4B9CD3;

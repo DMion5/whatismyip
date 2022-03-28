@@ -3,9 +3,13 @@ import requests
 import ipaddress
 from ipwhois import IPWhois
 
+from flask import current_app as app
+
+
 # test ip if campus
 def isCampusIP( ip ):
-  prefixes = [ 
+	app.logger.debug("isCampusIP {}".format(ip))
+	prefixes = [ 
 	'152.2.','152.19.','152.23.',
 	'172.16.','172.17.','172.18.','172.19.',
 	'172.20.','172.21.','172.22.','172.23.',
@@ -15,16 +19,17 @@ def isCampusIP( ip ):
 	'204.84.','204.85.',
 	'2610:28:3090:','2610:28:3091:',
 	'2610:2701:4000:'
-  ]
-  
-  for prefix in prefixes:
-    if ip.startswith( prefix ):
-        return True
-  return False
+	]
+
+	for prefix in prefixes:
+		if ip.startswith( prefix ):
+			return True
+	return False
 
 def getISP( ip ):
 	"""Lookup ISP information"""
 	ipaddr = ipaddress.ip_address(ip)
+	app.logger.debug("getISP {}".format(ip))
 
 	if not ipaddr.is_private:
 		obj = IPWhois( ip )
@@ -37,6 +42,7 @@ def getISP( ip ):
 def getNetwork( ip ):
 	# find the network information for a given ip address
 	print("Check ip {}".format(ip))
+	app.logger.debug("getNetwork {}".format(ip))
 
 	if ( isCampusIP( ip ) ):
 		# Do the lookup only if we think this is a campus address
@@ -73,6 +79,7 @@ def getNetwork( ip ):
 def getAddressObjects( ip ):
 	"""Find Infoblox records"""
 	print("Check ip {}".format(ip))
+	app.logger.debug("getAddressObjects {}".format(ip))
 
 	if ( isCampusIP( ip ) ):
 		# Do the lookup only if we think this is a campus address
@@ -106,6 +113,7 @@ def getAddressObjects( ip ):
 def getIPLocation( ip ):
 	"""geolocate"""
 	ipaddr = ipaddress.ip_address(ip)
+	app.logger.info("getIPLocation {}".format(ip))
 
 	if not ipaddr.is_private:
 		api_url = "https://api.iplocation.net/?ip="

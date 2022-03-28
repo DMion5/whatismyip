@@ -1,9 +1,10 @@
 import os
 from flask import Flask, render_template, request, jsonify, make_response
 from dotenv import load_dotenv
+from user_agents import parse
+
 from utils import *
 #from dns import resolver, reversename
-from user_agents import parse
 
 # load dotenv in the base root
 APP_ROOT = os.path.join(os.path.dirname(__file__), '..')   # refers to application_top
@@ -51,6 +52,7 @@ def home():
     #context['client_address'] = '152.23.198.240'
     #context['client_address'] = '172.17.32.38'
     #context['client_address'] = '75.183.206.183'
+    app.logger.debug("Parsed headers")
 
     # collect device information
     user_agent = parse(http_user_agent)
@@ -58,6 +60,7 @@ def home():
     # context['user_browser'] = "{} {}".format(user_agent.browser.family,user_agent.browser.version_string)
     # context['user_os'] = "{} {}".format(user_agent.os.family,user_agent.os.version_string)
     #context['user_device'] = "{} {}".format(user_agent.device.brand,user_agent.device.model)
+    app.logger.debug("Parsed user_agent")
 
     # collect dns data
     #reverse_addr = reversename.from_address( context['client_address'] )
@@ -71,10 +74,12 @@ def home():
     # collect isp info
     iplocation = getIPLocation( context['client_address'])
     context['iplocation'] = iplocation
+    app.logger.debug("Parsed ip location")
 
     # collect isp info
     ipwhois = getISP( context['client_address'])
     context['ipwhois'] = ipwhois
+    app.logger.debug("Parsed ip whois")
 
     # collect information about the network for this address
     network = getNetwork( context['client_address'] )
@@ -91,10 +96,12 @@ def home():
         if vlan_list:
             context['vlan_id'] = vlan_list[0].get('id',None)
             context['vlan_name'] = vlan_list[0].get('name',None)
+    app.logger.debug("Parsed network")
 
     # Find any address objects
     address_records = getAddressObjects( context['client_address'] )
     context['address_records'] = address_records
+    app.logger.debug("Parsed address records")
 
     return render_template("home.html", context = context, headers = headers, environ = environ, network=network)
     

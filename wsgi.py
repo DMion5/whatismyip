@@ -2,19 +2,15 @@
 WSGI config for project
 
 """
-
-#import sys
-#import site
-
-#site.addsitedir('/var/www/hitme/lib/python3.6/site-packages')
-
-#sys.path.insert(0, '/var/www/hitme')
-
 import os
+# from dotenv import load_dotenv
+
 from whatismyip import app as application
+
+# load dotenv in the base root
+# APP_ROOT = os.path.join(os.path.dirname(__file__), '..')   # refers to application_top
+# dotenv_path = os.path.join(APP_ROOT, '.env')
+# load_dotenv(dotenv_path)
 
 if __name__ == "__main__":
     application.run()
-    #from wsgiref.simple_server import make_server
-    #httpd = make_server('localhost', 8051, application)
-    #httpd.serve_forever()

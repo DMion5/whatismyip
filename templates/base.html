@@ -90,6 +90,7 @@
 
 		<script type="text/javascript" src="{{ url_for('static', filename='js/jquery-3.6.0.min.js') }}"></script>
 		<script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
-		<script src="{{ url_for('static', filename='js/whatismyip.js') }}"></script>
+		{% block javascript %}
+		{% endblock %}
  </body>
 </html>

@@ -65,12 +65,6 @@
                   </ul>
                 </td>
               </tr>
-              {% for key, value in context.address_records.extattrs.items() %}
-              <!-- <tr>
-                <th>{{ key }}</th>
-                <td>{{ value.value }}</td>
-              </tr> -->
-              {% endfor %}
               {% if context.address_records.mac_address %}
               <tr>
                 <th>MAC Address</th>
@@ -99,12 +93,6 @@
                 <th>Status</th>
                 <td>{{ context.address_records.status }}</td>
               </tr>
-              {% for key, value in context.address_records.items() %}
-              <!-- <tr>
-                <th>{{ key }}</th>
-                <td>{{ value }}</td>
-              </tr> -->
-              {% endfor %}
               {% endif %}
             </tbody>
           </table>
@@ -151,12 +139,6 @@
                 <td>{{ context.network.extattrs['Cost Center'].value }}</td>
               </tr>
               {% endif %}
-              {% for key, value in context.network.extattrs.items() %}
-              <!-- <tr>
-                <th>{{ key }}</th>
-                <td>{{ value.value }}</td>
-              </tr> -->
-              {% endfor %}
             {% endif %}
             {% if context.iplocation.isp %}
             <tr>
@@ -168,24 +150,6 @@
               <td>{{ context.iplocation.country_name }}</td>
             </tr>
             {% endif %}
-            {% for key, value in context.network.items() %}
-            <!-- <tr>
-              <th>{{ key }}</th>
-              <td>{{ value }}</td>
-            </tr> -->
-            {% endfor %}
-            {% for key, value in context.ipwhois.items() %}
-            <!-- <tr>
-              <th>{{ key }}</th>
-              <td>{{ value }}</td>
-            </tr> -->
-            {% endfor %}
-            {% for key, value in context.iplocation.items() %}
-            <!-- <tr>
-              <th>{{ key }}</th>
-              <td>{{ value }}</td>
-            </tr> -->
-            {% endfor %}
           </tbody>
         </table>
         </div>
@@ -222,21 +186,13 @@
             </tr>
           </tbody>
         </table>
-        <!-- <p>environ</p>
-        <ul class="list-group">
-          {% for key, value in environ.items() %}
-          <li class="list-group-item"><strong>{{ key }}</strong> <span> {{ value }}</span></li>
-          {% endfor  %}
-        </ul>
-        <p>headers</p>
-        <ul class="list-group">
-          {% for key, value in headers.items() %}
-          <li class="list-group-item"><strong>{{ key }}</strong> <span> {{ value }}</span></li>
-          {% endfor  %}
-        </ul> -->
       </div>
     </div>
   </div>
 </div>
 
+{% endblock %}
+
+{% block javascript %}
+<script src="{{ url_for('static', filename='js/whatismyip.js') }}"></script>
 {% endblock %}

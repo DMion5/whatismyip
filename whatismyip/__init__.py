@@ -3,8 +3,9 @@ from flask import Flask, render_template, request, jsonify, make_response
 from dotenv import load_dotenv
 from user_agents import parse
 
-from utils import *
+from whatismyip.utils import *
 #from dns import resolver, reversename
+#from whatismyip import views
 
 # load dotenv in the base root
 APP_ROOT = os.path.join(os.path.dirname(__file__), '..')   # refers to application_top

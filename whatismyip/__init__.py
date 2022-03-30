@@ -2,6 +2,7 @@ import os
 from flask import Flask, render_template, request, jsonify, make_response, send_from_directory
 from dotenv import load_dotenv
 from user_agents import parse
+import logging
 
 from whatismyip.utils import *
 #from dns import resolver, reversename
@@ -12,17 +13,13 @@ APP_ROOT = os.path.join(os.path.dirname(__file__), '..')   # refers to applicati
 dotenv_path = os.path.join(APP_ROOT, '.env')
 load_dotenv(dotenv_path)
 
+#logging.basicConfig(level=logging.INFO)
 app = Flask(__name__)
 if app.config["ENV"] == "production":
     app.config.from_object("config.ProductionConfig")
 else:
     app.config.from_object("config.DevelopmentConfig")
-# app.secret_key = os.getenv(
-#     'FLASK_SECRET_KEY',
-#     # safe value used for development when FLASK_SECRET_KEY might not be set
-#     '9e4@&tw46$l31)zrqe3wi+-slqm(ruvz&se0^%9#6(_w3ui!c0'
-# )
-
+app.logger.setLevel(logging.INFO)
 
 # Routes
 

@@ -149,6 +149,7 @@ def hostinfo():
     #response.headers.add('Access-Control-Allow-Methods', "origin, x-requested-with, content-type, accept")
     return response
 
+@app.route("/health")
 @app.route("/about")
 def about():
     # Display a basic webpage with about information.

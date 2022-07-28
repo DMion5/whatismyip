@@ -15,14 +15,12 @@ APP_ROOT = os.path.join(os.path.dirname(__file__), '..')   # refers to applicati
 dotenv_path = os.path.join(APP_ROOT, '.env')
 load_dotenv(dotenv_path)
 
-#logging.basicConfig(level=logging.INFO)
 app = Flask(__name__)
 if app.config["ENV"] == "production":
     app.config.from_object("config.ProductionConfig")
 else:
     app.config.from_object("config.DevelopmentConfig")
-app.logger.setLevel(logging.DEBUG)
-#app.logger.setLevel(logging.INFO)
+app.logger.setLevel(logging.INFO)
 
 CORS(app, resources={r"/hostinfo": {"origins": ["https://whatismyip.unc.edu"]}})
 fa = FontAwesome(app)

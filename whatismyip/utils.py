@@ -48,10 +48,10 @@ def getForwardedAddress( forwarded_for ):
 	if len(fwd_list) > 2:
 		# multiple proxy detected, only trust the last 2 for campus
 		# the last for cloudapps and second to last for client
-		client_address = fwd_list[-2] 
+		client_address = fwd_list[-2].strip()
 	else:
 		# normal: the last for cloudapps and second to last for client
-		client_address = fwd_list[0]
+		client_address = fwd_list[0].strip()
 	return client_address
 
 def getNetwork( ip ):

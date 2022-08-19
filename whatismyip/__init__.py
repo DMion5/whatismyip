@@ -50,7 +50,7 @@ def home():
         # # Proxy was used, client IP should be first in the list
         # fwd_list = forwarded_for.split(',')
         # context['client_address'] = fwd_list[0]
-        context['client_address'] = getForwardedAddress( forwarded_for )
+        context['client_address'], context['proxy_detected'] = getForwardedAddress( forwarded_for )
     else:
         # No proxy was used
         context['client_address'] = remote_address
@@ -134,7 +134,7 @@ def hostinfo():
         # Proxy was used
         # fwd_list = data['forwarded_for'].split(',')
         # data['address'] = fwd_list[0]   # the original client should be the first ip
-        data['address'] = getForwardedAddress( data['forwarded_for'] )
+        data['address'], data['proxy_detected'] = getForwardedAddress( data['forwarded_for'] )
     else:
         # No proxy was used
         data['address'] = data['remote_address']

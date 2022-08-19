@@ -76,44 +76,49 @@
                 <td>{{ context.client_address }}</td>
               </tr>
               {% if context.address_records %}
-              <tr>
-                <th style="width: 20%;">Name</th>
-                <td>
-                  <ul class="list-group list-group-flush">
-                    {% for name in context.address_records.names %}
-                    <li class="list-group-item p-0">{{ name }}</li> 
-                    {% endfor %}
-                  </ul>
-                </td>
-              </tr>
-              {% if context.address_records.mac_address %}
-              <tr>
-                <th>MAC Address</th>
-                <td>{{ context.address_records.mac_address }}</td>
-              </tr>
-              {% endif %}
-              {% if 'LEASE' in context.address_records.types %}
-              <tr>
-                <th>DHCP Lease</th>
-                <td>{{ context.address_records.lease_state }}</td>
-              </tr>
-              {% endif %}
-              {% if context.address_records.username %}
-              <tr>
-                <th>Username</th>
-                <td>{{ context.address_records.username }}</td>
-              </tr>
-              {% endif %}
-              {% if context.address_records.extattrs['Device Type'] %}
-              <tr>
-                <th>Device Type</th>
-                <td>{{ context.address_records.extattrs['Device Type'].value }}</td>
-              </tr>
-              {% endif %}
-              <tr>
-                <th>Status</th>
-                <td>{{ context.address_records.status }}</td>
-              </tr>
+                <tr>
+                  <th style="width: 20%;">Name</th>
+                  <td>
+                    <ul class="list-group list-group-flush">
+                      {% for name in context.address_records.names %}
+                      <li class="list-group-item p-0">{{ name }}</li> 
+                      {% endfor %}
+                    </ul>
+                  </td>
+                </tr>
+                {% if context.address_records.mac_address %}
+                  <tr>
+                    <th>MAC Address</th>
+                    <td>{{ context.address_records.mac_address }}</td>
+                  </tr>
+                {% endif %}
+                {% if 'LEASE' in context.address_records.types %}
+                  <tr>
+                    <th>DHCP Lease</th>
+                    <td>{{ context.address_records.lease_state }}</td>
+                  </tr>
+                {% endif %}
+                {% if context.address_records.username %}
+                  <tr>
+                    <th>Username</th>
+                    <td>{{ context.address_records.username }}</td>
+                  </tr>
+                {% endif %}
+                {% if context.address_records.extattrs['Device Type'] %}
+                  <tr>
+                    <th>Device Type</th>
+                    <td>{{ context.address_records.extattrs['Device Type'].value }}</td>
+                  </tr>
+                {% endif %}
+                  <tr>
+                    <th>Status</th>
+                    <td>{{ context.address_records.status }}</td>
+                  </tr>
+              {% else %}
+                <tr>
+                  <th>DNS Name</th>
+                  <td>{{ context.ptr }}</td>
+                </tr>
               {% endif %}
             </tbody>
           </table>

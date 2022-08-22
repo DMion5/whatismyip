@@ -73,16 +73,6 @@ def home():
     # context['user_os'] = "{} {}".format(user_agent.os.family,user_agent.os.version_string)
     #context['user_device'] = "{} {}".format(user_agent.device.brand,user_agent.device.model)
 
-    # collect dns data
-    reverse_addr = reversename.from_address( context['client_address'] )
-    try:
-       dns_response = resolver.query(reverse_addr, "PTR")
-       for val in dns_response:
-           app.logger.debug("PTR {}".format(val.to_text()))
-       context['ptr'] = val.to_text()
-    except:
-       app.logger.warn("reverse DNS lookup failed")
-
     # collect isp info
     iplocation = getIPLocation( context['client_address'])
     context['iplocation'] = iplocation
@@ -111,6 +101,16 @@ def home():
     # Find any address objects
     address_records = getAddressObjects( context['client_address'] )
     context['address_records'] = address_records
+    if not address_records:
+        # collect dns data if we don't have Infoblox address data
+        reverse_addr = reversename.from_address( context['client_address'] )
+        try:
+            dns_response = resolver.query(reverse_addr, "PTR")
+            for val in dns_response:
+                app.logger.debug("PTR {}".format(val.to_text()))
+            context['ptr'] = val.to_text()
+        except:
+            app.logger.warn("reverse DNS lookup failed")
 
     return render_template("home.html", context = context, headers = headers, environ = environ, network=network)
     

@@ -61,6 +61,7 @@ def home():
     #context['client_address'] = '172.17.32.38'
     #context['client_address'] = '75.183.206.183'
     #context['client_address'] = '198.85.230.11'
+    #context['client_address'] = '198.85.230.124'
     #context['client_address'] = '2610:28:3091:1000:2::a'
     #context['client_address'] = '2610:28:3090:1000::d6:e1'
     #context['client_address'] = '2603:6081:7041:8101:cd13:7d19:ae:20ed'
@@ -112,7 +113,8 @@ def home():
         except:
             app.logger.warn("reverse DNS lookup failed")
 
-    return render_template("home.html", context = context, headers = headers, environ = environ, network=network)
+    #return render_template("home.html", context = context, headers = headers, environ = environ, network=network)
+    return render_template("home.html", context = context, headers = headers)
     
 @app.route("/hostinfo.php")
 @app.route("/hostinfo")

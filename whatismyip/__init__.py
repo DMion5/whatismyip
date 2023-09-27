@@ -1,6 +1,10 @@
+"""
+Basic App
+"""
 import os
 import logging
 from flask import Flask, render_template, request, jsonify, make_response, send_from_directory
+from flask.logging import create_logger
 from flask_cors import CORS
 from flask_fontawesome import FontAwesome
 from dotenv import load_dotenv
@@ -20,8 +24,10 @@ if app.config["ENV"] == "production":
     app.config.from_object("config.ProductionConfig")
 else:
     app.config.from_object("config.DevelopmentConfig")
-app.logger.setLevel(logging.INFO)
+logger = create_logger(app)
+logger.setLevel(logging.INFO)
 #app.logger.setLevel(logging.DEBUG)
+
 
 CORS(app, resources={r"/hostinfo": {"origins": ["https://whatismyip.unc.edu"]}})
 fa = FontAwesome(app)
@@ -35,14 +41,14 @@ def home():
 
     # variables to help debug
     headers = dict(request.headers)
-    environ = dict(request.environ)
+    # environ = dict(request.environ)
 
     # get the request headers
     forwarded_for   = request.environ.get("HTTP_X_FORWARDED_FOR",None)
     remote_address  = request.environ.get("REMOTE_ADDR",None)
-    remote_port     = request.environ.get("REMOTE_PORT",None)
-    request_method  = request.environ.get("REQUEST_METHOD",None)
-    server_protocol = request.environ.get("SERVER_PROTOCOL",None)
+    # remote_port     = request.environ.get("REMOTE_PORT",None)
+    # request_method  = request.environ.get("REQUEST_METHOD",None)
+    # server_protocol = request.environ.get("SERVER_PROTOCOL",None)
     http_user_agent      = request.environ.get("HTTP_USER_AGENT",None)
 
     # Parse out the actual client ip address from header data
@@ -65,7 +71,7 @@ def home():
     #context['client_address'] = '2610:28:3091:1000:2::a'
     #context['client_address'] = '2610:28:3090:1000::d6:e1'
     #context['client_address'] = '2603:6081:7041:8101:cd13:7d19:ae:20ed'
-    app.logger.info(f"web finding information for {context['client_address']} with forwarded_for {forwarded_for}")
+    logger.info(f"web finding information for {context['client_address']} with forwarded_for {forwarded_for}")
 
     # collect device information
     user_agent = parse(http_user_agent)
@@ -108,10 +114,10 @@ def home():
         try:
             dns_response = resolver.query(reverse_addr, "PTR")
             for val in dns_response:
-                app.logger.debug(f"PTR {val.to_text()}")
+                logger.debug(f"PTR {val.to_text()}")
             context['ptr'] = val.to_text()
-        except:
-            app.logger.warn("reverse DNS lookup failed")
+        except Exception:
+            logger.warn("reverse DNS lookup failed")
 
     #return render_template("home.html", context = context, headers = headers, environ = environ, network=network)
     return render_template("home.html", context = context, headers = headers)
@@ -151,17 +157,17 @@ def hostinfo():
     #data['client_address'] = '2610:28:3091:1000:2::a'
     #data['address'] = '2610:28:3090:1000::d6:e1'
     #context['client_address'] = '2603:6081:7041:8101:cd13:7d19:ae:20ed'
-    app.logger.info(f"hostinfo finding information for {data['address']} with forwarded_for {data['forwarded_for']}")
+    logger.info(f"hostinfo finding information for {data['address']} with forwarded_for {data['forwarded_for']}")
 
     # collect dns data
     reverse_addr = reversename.from_address( data['address'] )
     try:
         dns_response = resolver.query(reverse_addr, "PTR")
         for val in dns_response:
-            app.logger.debug(f"PTR {val.to_text()}")
+            logger.debug(f"PTR {val.to_text()}")
         data['ptr'] = val.to_text()
-    except:
-        app.logger.warn("reverse DNS lookup failed")
+    except Exception:
+        logger.warn("reverse DNS lookup failed")
 
     # collect isp info
     iplocation = get_ip_location( data['address'])
@@ -183,13 +189,13 @@ def hostinfo():
 @app.route("/health")
 @app.route("/about")
 def about():
-    # Display a basic webpage with about information.
+    """ Display a basic webpage with about information. """
     return render_template("about.html")
 
 @app.route('/robots.txt')
 @app.route('/sitemap.xml')
 def static_from_root():
-    # Support basic robots and sitemap files
+    """ Support basic robots and sitemap files """
     return send_from_directory(app.static_folder, request.path[1:])
 
 if __name__ == "__main__":

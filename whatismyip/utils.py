@@ -2,9 +2,9 @@
 Utility functions
 """
 import os
-import requests
 import time
 import ipaddress
+import requests
 #from ipwhois import IPWhois
 
 from flask import current_app as app
@@ -47,7 +47,7 @@ def is_campus_ip( ip ):
 # 	return {}
 
 def get_forwarded_address( forwarded_for ):
-    # A proxy will populate the X-Forwarded-For header, so find the client
+    """ A proxy will populate the X-Forwarded-For header, so find the client """
     proxy_detected = None
     fwd_list = forwarded_for.split(',')
     if len(fwd_list) > 2:
@@ -61,7 +61,7 @@ def get_forwarded_address( forwarded_for ):
     return client_address, proxy_detected
 
 def get_network( ip ):
-    # Find the network for this address in IPAM.
+    """ Find the network for this address in IPAM. """
     start_time = time.time()
     app.logger.debug(f"get_network {ip}")
 
@@ -117,7 +117,7 @@ def get_network( ip ):
 
 
 def get_address_objects( ip ):
-    # Find Infoblox records
+    """ Find Infoblox records """
     start_time = time.time()
     app.logger.debug(f"get_address_objects {ip}")
 
@@ -170,9 +170,11 @@ def get_address_objects( ip ):
         return {}
 
 def get_ip_location( ip ):
-    # Get location data for the IP
-    # Currently using https://iplocation.net
-    # Other options: https://ipapi.co/
+    """ 
+    Get location data for the IP
+    Currently using https://iplocation.net
+    Other options: https://ipapi.co/
+    """
     start_time = time.time()
     app.logger.debug(f"get_ip_location {ip}")
 

@@ -1,10 +1,6 @@
 whatismyip
 =======
 
-This is a simple flask application to host a "whatismyip" type of website.
-
-## Description
-
 This is a simple Flask application to provide a basic "What is my IP?" kind of website.
 
 ## Getting Started

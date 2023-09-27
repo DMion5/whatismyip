@@ -20,7 +20,6 @@ class ProductionConfig(Config): # pylint: disable=too-few-public-methods
     """
     Production flask config
     """
-    pass
 
 class DevelopmentConfig(Config):    # pylint: disable=too-few-public-methods
     """

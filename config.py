@@ -1,7 +1,12 @@
-# Basic configuration file
+"""
+Basic configuration file
+"""
 import os
 
-class Config(object):
+class Config(object):   # pylint: disable=too-few-public-methods 
+    """
+    Basic flask config
+    """
     DEBUG = False
     TESTING = False
 
@@ -11,11 +16,11 @@ class Config(object):
         '9e4@&tw46$l31)zrqe3wi+-slqm(ruvz&se0^%9#6(_w3ui!c0'
     )
 
-class ProductionConfig(Config):
+class ProductionConfig(Config): # pylint: disable=too-few-public-methods    
     pass
 
-class DevelopmentConfig(Config):
+class DevelopmentConfig(Config):    # pylint: disable=too-few-public-methods 
     DEBUG = True
 
-class TestingConfig(Config):
+class TestingConfig(Config):    # pylint: disable=too-few-public-methods 
     TESTING = True

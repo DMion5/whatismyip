@@ -1,7 +1,7 @@
 whatismyip
 =======
 
-This is a simpl flask application to host a "whatismyip" type of website.
+This is a simple flask application to host a "whatismyip" type of website.
 
 ## Description
 

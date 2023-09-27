@@ -7,7 +7,7 @@ import ipaddress
 from flask import current_app as app
 
 
-def isCampusIP( ip ):
+def is_campus_ip( ip ):
     # Check if the IP address is in a campus block.
     # If so, further testing can take place.
 
@@ -42,7 +42,7 @@ def isCampusIP( ip ):
     
 # 	return {}
 
-def getForwardedAddress( forwarded_for ):
+def get_forwarded_address( forwarded_for ):
     # A proxy will populate the X-Forwarded-For header, so find the client
     proxy_detected = None
     fwd_list = forwarded_for.split(',')
@@ -56,10 +56,10 @@ def getForwardedAddress( forwarded_for ):
         client_address = fwd_list[0].strip()
     return client_address, proxy_detected
 
-def getNetwork( ip ):
+def get_network( ip ):
     # Find the network for this address in IPAM.
-    startTime = time.time()
-    app.logger.debug(f"getNetwork {ip}")
+    start_time = time.time()
+    app.logger.debug(f"get_network {ip}")
 
     # make sure we have a valid ip address
     try:
@@ -68,7 +68,7 @@ def getNetwork( ip ):
         app.logger.warn(f"{ip} is not a valid ip address")
         return {}
 
-    if ( isCampusIP( ip ) ):
+    if ( is_campus_ip( ip ) ):
         # Do the lookup only if we think this is a campus address
         ib_server = os.environ.get('IB_SERVER')
         ib_username = os.environ.get('IB_USERNAME')
@@ -98,24 +98,24 @@ def getNetwork( ip ):
             app.logger.debug(f"network details: {network_list}")
 
         if (len(network_list) == 1):
-            executionTime = (time.time() - startTime)
-            app.logger.debug(f"getNetwork complete in {executionTime} seconds")
+            execution_time = (time.time() - start_time)
+            app.logger.debug(f"get_network complete in {execution_time} seconds")
             return network_list[0]
         else:
-            executionTime = (time.time() - startTime)
-            app.logger.debug(f"getNetwork complete in {executionTime} seconds")
+            execution_time = (time.time() - start_time)
+            app.logger.debug(f"get_network complete in {execution_time} seconds")
             return {}
 
     else:
-        executionTime = (time.time() - startTime)
-        app.logger.debug(f"getNetwork complete in {executionTime} seconds")
+        execution_time = (time.time() - start_time)
+        app.logger.debug(f"get_network complete in {execution_time} seconds")
         return {}
 
 
-def getAddressObjects( ip ):
+def get_address_objects( ip ):
     # Find Infoblox records
-    startTime = time.time()
-    app.logger.debug(f"getAddressObjects {ip}")
+    start_time = time.time()
+    app.logger.debug(f"get_address_objects {ip}")
 
     # make sure we have a valid ip address
     try:
@@ -124,7 +124,7 @@ def getAddressObjects( ip ):
         app.logger.warn(f"{ip} is not a valid ip address")
         return {}
 
-    if ( isCampusIP( ip ) ):
+    if ( is_campus_ip( ip ) ):
         # Do the lookup only if we think this is a campus address
         ib_server = os.environ.get('IB_SERVER')
         ib_username = os.environ.get('IB_USERNAME')
@@ -152,25 +152,25 @@ def getAddressObjects( ip ):
             app.logger.debug(f"{object_type} details: {address_list}")
 
         if (len(address_list) == 1):
-            executionTime = (time.time() - startTime)
-            app.logger.debug(f"getAddressObject complete in {executionTime} seconds")
+            execution_time = (time.time() - start_time)
+            app.logger.debug(f"getAddressObject complete in {execution_time} seconds")
             return address_list[0]
         else:
-            executionTime = (time.time() - startTime)
-            app.logger.debug(f"getAddressObject complete in {executionTime} seconds")
+            execution_time = (time.time() - start_time)
+            app.logger.debug(f"getAddressObject complete in {execution_time} seconds")
             return {}
 
     else:
-        executionTime = (time.time() - startTime)
-        app.logger.debug(f"getAddressObject complete in {executionTime} seconds")
+        execution_time = (time.time() - start_time)
+        app.logger.debug(f"getAddressObject complete in {execution_time} seconds")
         return {}
 
-def getIPLocation( ip ):
+def get_ip_location( ip ):
     # Get location data for the IP
     # Currently using https://iplocation.net
     # Other options: https://ipapi.co/
-    startTime = time.time()
-    app.logger.debug(f"getIPLocation {ip}")
+    start_time = time.time()
+    app.logger.debug(f"get_ip_location {ip}")
 
     # make sure we have a valid ip address
     try:
@@ -191,16 +191,16 @@ def getIPLocation( ip ):
             return {}
         if response.status_code != 200:
             app.logger.warn(f"iplocation query failed {response}")
-            executionTime = (time.time() - startTime)
-            app.logger.debug(f"getIPLocation complete in {executionTime} seconds")
+            execution_time = (time.time() - start_time)
+            app.logger.debug(f"get_ip_location complete in {execution_time} seconds")
             return {}
         else:
             iplocation = response.json()
             app.logger.debug(f"iplocation details: {iplocation}")
-            executionTime = (time.time() - startTime)
-            app.logger.debug(f"getIPLocation complete in {executionTime} seconds")
+            execution_time = (time.time() - start_time)
+            app.logger.debug(f"get_ip_location complete in {execution_time} seconds")
             return iplocation
     else:
-        executionTime = (time.time() - startTime)
-        app.logger.debug(f"getIPLocation complete in {executionTime} seconds")
+        execution_time = (time.time() - start_time)
+        app.logger.debug(f"get_ip_location complete in {execution_time} seconds")
         return {}

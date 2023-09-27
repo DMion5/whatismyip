@@ -1,8 +1,7 @@
 """
 WSGI config for project
-
 """
-import os
+# import os
 # from dotenv import load_dotenv
 
 from whatismyip import app as application

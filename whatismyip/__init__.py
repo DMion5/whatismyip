@@ -10,6 +10,7 @@ from flask_fontawesome import FontAwesome
 from dotenv import load_dotenv
 from user_agents import parse
 from dns import resolver, reversename
+import dns.exception
 
 from whatismyip.utils import *
 #from whatismyip import views
@@ -55,7 +56,7 @@ def home():
         # # Proxy was used, client IP should be first in the list
         # fwd_list = forwarded_for.split(',')
         # context['client_address'] = fwd_list[0]
-        context['client_address'], context['proxy_detected'] = get_forwarded_address( forwarded_for )
+        context['client_address'], context['proxy_detected'] = get_forwarded_address( forwarded_for )   # pylint: disable=line-too-long
     else:
         # No proxy was used
         context['client_address'] = remote_address
@@ -70,12 +71,12 @@ def home():
     #context['client_address'] = '2610:28:3091:1000:2::a'
     #context['client_address'] = '2610:28:3090:1000::d6:e1'
     #context['client_address'] = '2603:6081:7041:8101:cd13:7d19:ae:20ed'
-    logger.info(f"web finding information for {context['client_address']} with forwarded_for {forwarded_for}")
+    logger.info(f"web finding information for {context['client_address']} with forwarded_for {forwarded_for}")  # pylint: disable=line-too-long, logging-fstring-interpolation
 
     # collect device information
     user_agent = parse(http_user_agent)
     context['user_device'] = str(user_agent)
-    # context['user_browser'] = "{} {}".format(user_agent.browser.family,user_agent.browser.version_string)
+    # context['user_browser'] = "{} {}".format(user_agent.browser.family,user_agent.browser.version_string) # pylint: disable=line-too-long
     # context['user_os'] = "{} {}".format(user_agent.os.family,user_agent.os.version_string)
     #context['user_device'] = "{} {}".format(user_agent.device.brand,user_agent.device.model)
 
@@ -113,8 +114,8 @@ def home():
         try:
             dns_response = resolver.query(reverse_addr, "PTR")
             for val in dns_response:
-                logger.debug(f"PTR {val.to_text()}")
-            context['ptr'] = val.to_text()
+                logger.debug(f"PTR {val.to_text()}")    # pylint: disable=logging-fstring-interpolation
+                context['ptr'] = val.to_text()
         except dns.exception.DNSException:
             logger.warning("reverse DNS lookup failed")
 
@@ -156,15 +157,15 @@ def hostinfo():
     #data['client_address'] = '2610:28:3091:1000:2::a'
     #data['address'] = '2610:28:3090:1000::d6:e1'
     #context['client_address'] = '2603:6081:7041:8101:cd13:7d19:ae:20ed'
-    logger.info(f"hostinfo finding information for {data['address']} with forwarded_for {data['forwarded_for']}")
+    logger.info(f"hostinfo finding information for {data['address']} with forwarded_for {data['forwarded_for']}")   # pylint: disable=line-too-long, logging-fstring-interpolation
 
     # collect dns data
     reverse_addr = reversename.from_address( data['address'] )
     try:
         dns_response = resolver.query(reverse_addr, "PTR")
         for val in dns_response:
-            logger.debug(f"PTR {val.to_text()}")
-        data['ptr'] = val.to_text()
+            logger.debug(f"PTR {val.to_text()}")    # pylint: disable=logging-fstring-interpolation
+            data['ptr'] = val.to_text()
     except dns.exception.DNSException:
         logger.warning("reverse DNS lookup failed")
 

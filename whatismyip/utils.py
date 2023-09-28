@@ -11,7 +11,7 @@ import urllib3
 from flask import current_app as app
 
 
-def is_campus_ip( ip ):
+def is_campus_ip( ip_address ):
     """ 
     Check if the IP address is in a campus block. If so, further testing can take place.
     """
@@ -29,7 +29,7 @@ def is_campus_ip( ip ):
     ]
 
     for prefix in prefixes:
-        if ip.startswith( prefix ):
+        if ip_address.startswith( prefix ):
             return True
     return False
 
@@ -61,19 +61,19 @@ def get_forwarded_address( forwarded_for ):
         client_address = fwd_list[0].strip()
     return client_address, proxy_detected
 
-def get_network( ip ):
+def get_network( ip_address ):
     """ Find the network for this address in IPAM. """
     start_time = time.time()
-    app.logger.debug(f"get_network {ip}")
+    app.logger.debug(f"get_network {ip_address}")
 
     # make sure we have a valid ip address
     try:
-        ipaddr = ipaddress.ip_address(ip)
+        ipaddr = ipaddress.ip_address(ip_address)
     except ValueError:
-        app.logger.warn(f"{ip} is not a valid ip address")
+        app.logger.warn(f"{ip_address} is not a valid ip address")
         return {}
 
-    if is_campus_ip( ip ):
+    if is_campus_ip( ip_address ):
         # Do the lookup only if we think this is a campus address
         ib_server = os.environ.get('IB_SERVER')
         ib_username = os.environ.get('IB_USERNAME')
@@ -87,15 +87,15 @@ def get_network( ip ):
         params = {
             '_return_fields': 'comment,network,network_view,members,extattrs,vlans.id,options',
             '_inheritance': True,
-            'contains_address': ip,
+            'contains_address': ip_address,
         }
         if ipaddr.version == 6:
             object_type = 'ipv6network'
         else:
             object_type = 'network'
         #print("Using {} with {}".format(url,params))
-        #response = session.get("{}network".format(url), params=params, auth=(ib_username, ib_password), verify=False)
-        response = session.get(f"{url}{object_type}", params=params, auth=(ib_username, ib_password), verify=False)
+        #response = session.get("{}network".format(url), params=params, auth=(ib_username, ib_password), verify=False)  # pylint: disable=line-too-long
+        response = session.get(f"{url}{object_type}", params=params, auth=(ib_username, ib_password), verify=False) # pylint: disable=line-too-long
         app.logger.debug(f"{response}")
         if response.status_code != 200:
             app.logger.warning(f"query failed {response}")
@@ -124,19 +124,19 @@ def get_network( ip ):
     return {}
 
 
-def get_address_objects( ip ):
+def get_address_objects( ip_address ):
     """ Find Infoblox records """
     start_time = time.time()
-    app.logger.debug(f"get_address_objects {ip}")
+    app.logger.debug(f"get_address_objects {ip_address}")
 
     # make sure we have a valid ip address
     try:
-        ipaddr = ipaddress.ip_address(ip)
+        ipaddr = ipaddress.ip_address(ip_address)
     except ValueError:
-        app.logger.warn(f"{ip} is not a valid ip address")
+        app.logger.warn(f"{ip_address} is not a valid ip address")
         return {}
 
-    if is_campus_ip( ip ):
+    if is_campus_ip( ip_address ):
         # Do the lookup only if we think this is a campus address
         ib_server = os.environ.get('IB_SERVER')
         ib_username = os.environ.get('IB_USERNAME')
@@ -149,14 +149,14 @@ def get_address_objects( ip ):
         params = {
             'network_view': 'default',
             '_return_fields+': 'discovered_data,extattrs,fingerprint,ms_ad_user_data',
-            'ip_address': ip
+            'ip_address': ip_address
         }
         if ipaddr.version == 6:
             object_type = 'ipv6address'
         else:
             object_type = 'ipv4address'
-        #response = session.get("{}ipv4address".format(url), params=params, auth=(ib_username, ib_password), verify=False)
-        response = session.get(f"{url}{object_type}", params=params, auth=(ib_username, ib_password), verify=False)
+        #response = session.get("{}ipv4address".format(url), params=params, auth=(ib_username, ib_password), verify=False)  # pylint: disable=line-too-long
+        response = session.get(f"{url}{object_type}", params=params, auth=(ib_username, ib_password), verify=False) # pylint: disable=line-too-long
         app.logger.debug(f"{response}")
         if response.status_code != 200:
             app.logger.warn(f"{object_type} query failed {response}")
@@ -184,20 +184,20 @@ def get_address_objects( ip ):
     app.logger.debug(f"getAddressObject complete in {execution_time} seconds")
     return {}
 
-def get_ip_location( ip ):
+def get_ip_location( ip_address ):
     """ 
     Get location data for the IP
     Currently using https://iplocation.net
     Other options: https://ipapi.co/
     """
     start_time = time.time()
-    app.logger.debug(f"get_ip_location {ip}")
+    app.logger.debug(f"get_ip_location {ip_address}")
 
     # make sure we have a valid ip address
     try:
-        ipaddr = ipaddress.ip_address(ip)
+        ipaddr = ipaddress.ip_address(ip_address)
     except ValueError:
-        app.logger.warn(f"{ip} is not a valid ip address")
+        app.logger.warn(f"{ip_address} is not a valid ip address")
         return {}
 
     if not ipaddr.is_private:
@@ -205,7 +205,7 @@ def get_ip_location( ip ):
         api_url = "https://api.iplocation.net/?ip="
         session = requests.Session()
         try:
-            response = session.get(f"{api_url}{ip}", timeout=3)
+            response = session.get(f"{api_url}{ip_address}", timeout=3)
         except requests.ReadTimeout:
             # Something went wrong, return no data
             app.logger.warn("unable to query location api")

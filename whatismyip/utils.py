@@ -158,6 +158,7 @@ def get_address_objects( ip_address ):
         response = session.get(f"{url}{object_type}", params=params, auth=(ib_username, ib_password), verify=False) # pylint: disable=line-too-long
         app.logger.debug(f"{response}")
         if response.status_code != 200:
+            address_list = None
             app.logger.warn(f"{object_type} query failed {response}")
         else:
             address_list = response.json()

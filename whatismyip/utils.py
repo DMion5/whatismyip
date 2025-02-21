@@ -24,7 +24,7 @@ def is_campus_ip( ip_address ):
     '198.85.230.','198.85.231.',
     '204.84.','204.85.',
     '2610:28:3090:','2610:28:3091:',
-    '2610:2701:4000:'
+    '2610:2701:4000:', '2606:f640:'
     ]
 
     for prefix in prefixes:
@@ -158,6 +158,7 @@ def get_address_objects( ip_address ):
         response = session.get(f"{url}{object_type}", params=params, auth=(ib_username, ib_password), verify=False) # pylint: disable=line-too-long
         app.logger.debug(f"{response}")
         if response.status_code != 200:
+            address_list = None
             app.logger.warn(f"{object_type} query failed {response}")
         else:
             address_list = response.json()

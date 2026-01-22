@@ -36,6 +36,7 @@ $(document).ready(function () {
 
 	/* extract the default ip detected */
 	var address = $('#address').text();
+	console.log("Connection from " + address);
 
 	if (address.indexOf(':') != -1) {
 		// default is IPv6 connection
@@ -52,7 +53,7 @@ $(document).ready(function () {
 			url: test_url + "/hostinfo",
 			dataType: "json",
 			success: function (result, status, xhr) {
-				$('#connect-ipv6').text("Successful " + result["address"]);
+				$('#connect-ipv4').text("Successful " + result["address"]);
 				//console.log(result);
 				$('#address2').text(result["address"]);
 				$('#v6_help_text').show();

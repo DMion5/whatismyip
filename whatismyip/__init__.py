@@ -76,6 +76,12 @@ def home():
         f"web finding information for {data['client_address']} with forwarded_for {forwarded_for}"
     )  # pylint: disable=line-too-long, logging-fstring-interpolation
 
+    # Version check first
+    ip = ipaddress.ip_address(str(data["client_address"]))
+    data["ip_version"] = ip.version
+    data["ip_private"] = ip.is_private
+    data["ip_global"] = ip.is_global
+
     # collect device information
     user_agent = parse(http_user_agent)
     data["user_device"] = str(user_agent)

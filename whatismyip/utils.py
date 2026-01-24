@@ -70,18 +70,27 @@ def is_campus_ip(ip_address):
 
 
 def get_forwarded_address(forwarded_for):
-    """A proxy will populate the X-Forwarded-For header, so find the client"""
+    """
+    In general the X-Forwarded-For header is a comma separated list of IP 
+    addresses but the header format is not formally standardized.  We will
+    only trust the last two addresses for security concerns.
+
+    Example value: "2610:28:3091:1000:2::a,172.22.158.131"
+    """
     proxy_detected = None
-    fwd_list = forwarded_for.split(",")
+    proxy_address = None
+    client_address = None
+
+    # Remove spaces and split on commas
+    fwd_list = forwarded_for.replace(" ", "").split(",")
     if len(fwd_list) > 2:
-        # multiple proxy detected, only trust the last 2 for campus
-        # the last for cloudapps and second to last for client
-        client_address = fwd_list[-2].strip()
+        proxy_address = fwd_list[-1]
+        client_address = fwd_list[-2]
         proxy_detected = ",".join(fwd_list[:-2])
     else:
         # normal: the last for cloudapps and second to last for client
-        client_address = fwd_list[0].strip()
-    return client_address, proxy_detected
+        client_address = fwd_list[-2]
+    return client_address
 
 
 def get_network(ip_address):

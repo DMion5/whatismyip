@@ -52,24 +52,22 @@ def home():
     """Display the base homepage with IP address information."""
     data = {}
     client_address = None
+    proxy_detected = None
 
     # get the request headers
     forwarded_for = request.environ.get("HTTP_X_FORWARDED_FOR", None)
     remote_address = request.environ.get("REMOTE_ADDR", None)
-    remote_port = request.environ.get("REMOTE_PORT", None)
-    request_method = request.environ.get("REQUEST_METHOD", None)
-    server_protocol = request.environ.get("SERVER_PROTOCOL", None)
-    http_user_agent = request.environ.get("HTTP_USER_AGENT", None)
 
     # Check for PROXY usage
-    if forwarded_for:
-        client_address, proxy_detected = get_forwarded_address(forwarded_for)
+    tmp_forwarded_for = os.getenv("FORWARDED_FOR", None)
+    if tmp_forwarded_for:
+        client_address = get_forwarded_address(tmp_forwarded_for)
+    elif forwarded_for:
+        client_address = get_forwarded_address(forwarded_for)
     else:
         client_address = remote_address
-        proxy_detected = None
     data["client_address"] = os.getenv("CLIENT_ADDRESS", client_address)
-    data["proxy_detected"] = os.getenv("PROXY_DETECTED", proxy_detected)
-    app.logger.warning( f"Home view from {data['client_address']} with forwarded_for {forwarded_for}")
+    app.logger.warning( f"Home view from {data['client_address']} with forwarded_for {tmp_forwarded_for}")
 
     # Add the ipv4/ipv6 specific test urls
     data["ipv4_url"] = app.config["IPV4_SERVER_URL"]
@@ -112,9 +110,7 @@ def hostinfo():
         # Proxy was used
         # fwd_list = data['forwarded_for'].split(',')
         # data['address'] = fwd_list[0]   # the original client should be the first ip
-        data["address"], data["proxy_detected"] = get_forwarded_address(
-            data["forwarded_for"]
-        )
+        data["address"] = get_forwarded_address( data["forwarded_for"])
     else:
         # No proxy was used
         data["address"] = data["remote_address"]

@@ -3,6 +3,7 @@ Basic App
 """
 
 import os
+import logging
 from flask import (
     Flask,
     render_template,
@@ -63,76 +64,16 @@ def home():
     # Parse out the actual client ip address from header data
     if forwarded_for:
         # Proxy was used, client IP should be first in the list
-        client_address, proxy_detected = get_forwarded_address(
-            forwarded_for
-        )  # pylint: disable=line-too-long
+        client_address, proxy_detected = get_forwarded_address( forwarded_for)
     else:
         # No proxy was used
         client_address = remote_address
         proxy_detected = None
     data["client_address"] = os.getenv("CLIENT_ADDRESS", client_address)
     data["proxy_detected"] = os.getenv("PROXY_DETECTED", proxy_detected)
-    app.logger.info(
-        f"web finding information for {data['client_address']} with forwarded_for {forwarded_for}"
-    )  # pylint: disable=line-too-long, logging-fstring-interpolation
+    app.logger.info( f"Home view from {data['client_address']} with forwarded_for {forwarded_for}")
 
-    # Version check first
-    # ip = ipaddress.ip_address(str(data["client_address"]))
-    # data["ip_version"] = ip.version
-    # data["ip_private"] = ip.is_private
-    # data["ip_global"] = ip.is_global
-
-    # collect device information
-    # user_agent = parse(http_user_agent)
-    # data["user_device"] = str(user_agent)
-
-    # collect isp info
-    # iplocation = get_ip_location(data["client_address"])
-    # data["iplocation"] = iplocation
-
-    # collect isp info
-    # ipwhois = getISP( data['client_address'])
-    # data['ipwhois'] = ipwhois
-    # app.logger.debug("Parsed ip whois")
-
-    # collect information about the network for this address
-    # network = get_network(data["client_address"])
-    # data["network"] = network
-    # if network:
-    #     # collect network data to display
-    #     data["network_cidr"] = network.get("network", None)
-    #     data["network_comment"] = network.get("comment", None)
-    #     data["network_type"] = (
-    #         network.get("extattrs", {}).get("Purpose", {}).get("value", None)
-    #     )
-    #     data["network_router"] = (
-    #         network.get("extattrs", {}).get("Router Device", {}).get("value", None)
-    #     )
-
-    #     # collect vlan data to display
-    #     vlan_list = network.get("vlans", None)
-    #     if vlan_list:
-    #         data["vlan_id"] = vlan_list[0].get("id", None)
-    #         data["vlan_name"] = vlan_list[0].get("name", None)
-
-    # Find any address objects
-    # address_records = get_address_objects(data["client_address"])
-    # data["address_records"] = address_records
-    # if not address_records:
-    #     # collect dns data if we don't have Infoblox address data
-    #     reverse_addr = reversename.from_address(data["client_address"])
-    #     try:
-    #         dns_response = resolver.query(reverse_addr, "PTR")
-    #         for val in dns_response:
-    #             app.logger.debug(
-    #                 f"PTR {val.to_text()}"
-    #             )  # pylint: disable=logging-fstring-interpolation
-    #             data["ptr"] = val.to_text()
-    #     except dns.exception.DNSException:
-    #         app.logger.info(f"reverse DNS lookup failed on {reverse_addr}")
-
-    # Add the ipv4 version of the test site if it is needed
-    # data['ipv4_url'] = 'https://whatismyipv4.unc.edu'
+    # Add the ipv4/ipv6 specific test urls
     data["ipv4_url"] = app.config["IPV4_SERVER_URL"]
     data["ipv6_url"] = app.config["IPV6_SERVER_URL"]
 
@@ -182,9 +123,7 @@ def hostinfo():
         data["address"] = data["remote_address"]
     # data["address"] = os.getenv("CLIENT_ADDRESS", data['remote_address'])
     # data["proxy_detected"] = os.getenv("PROXY_DETECTED", data['proxy_detected'])
-    app.logger.info(
-        f"hostinfo finding information for {data['address']} with forwarded_for {data['forwarded_for']}"
-    )  # pylint: disable=line-too-long, logging-fstring-interpolation
+    app.logger.info( f"hostinfo view from {data['address']} with forwarded_for {data['forwarded_for']}")
 
     # calculate the IP address basics at the start
     ip = ipaddress.ip_address(str(data["address"]))

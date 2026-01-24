@@ -36,7 +36,7 @@ $(document).ready(function () {
 
 	/* extract the default ip detected */
 	var default_address = $('#address1').text();
-	console.log("Connection from " + default_address);
+	//console.log("Connection from " + default_address);
 
 	default_version = 6;
 	if (default_address.indexOf(':') != -1) {
@@ -61,7 +61,7 @@ $(document).ready(function () {
 		dataType: "json",
 		success: function (result, status, xhr) {
 			$('#connect-ipv4').text("Supported");
-			console.log("Host check from " + result["address"]);
+			//console.log("Host check from " + result["address"]);
 
 			if ( default_version == 4 ) {
 				$('#address1').text(result["address"]);
@@ -137,7 +137,7 @@ $(document).ready(function () {
 		},
 		error: function (xhr, status, error) {
 			$('#connect-ipv4').text("Not supported");
-			console.log(error);
+			//console.log(error);
 		}
 	});
 
@@ -150,7 +150,7 @@ $(document).ready(function () {
 		success: function (result, status, xhr) {
 			$('#second_address_section').show()
 			$('#connect-ipv6').text("Supported");
-			console.log("Host check from " + result["address"]);
+			//console.log("Host check from " + result["address"]);
 
 			if ( default_version == 6 ) {
 				$('#address1').text(result["address"]);
@@ -225,7 +225,7 @@ $(document).ready(function () {
 		},
 		error: function (xhr, status, error) {
 			$('#connect-ipv6').text("Not supported");
-			console.log(error);
+			//console.log(error);
 		}
 	});
 

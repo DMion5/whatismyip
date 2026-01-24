@@ -33,6 +33,7 @@ class ProductionConfig(Config):  # pylint: disable=too-few-public-methods
     """
     Production flask config
     """
+    LOG_LEVEL = "WARNING"
 
 
 class DevelopmentConfig(Config):  # pylint: disable=too-few-public-methods
@@ -41,6 +42,7 @@ class DevelopmentConfig(Config):  # pylint: disable=too-few-public-methods
     """
 
     DEBUG = True
+    LOG_LEVEL = "DEBUG"
 
 
 class TestingConfig(Config):  # pylint: disable=too-few-public-methods
@@ -49,3 +51,4 @@ class TestingConfig(Config):  # pylint: disable=too-few-public-methods
     """
 
     TESTING = True
+    LOG_LEVEL = "DEBUG"

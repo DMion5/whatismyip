@@ -180,8 +180,8 @@ def hostinfo():
     else:
         # No proxy was used
         data["address"] = data["remote_address"]
-    data["address"] = os.getenv("CLIENT_ADDRESS", data['remote_address'])
-    data["proxy_detected"] = os.getenv("PROXY_DETECTED", data['proxy_detected'])
+    # data["address"] = os.getenv("CLIENT_ADDRESS", data['remote_address'])
+    # data["proxy_detected"] = os.getenv("PROXY_DETECTED", data['proxy_detected'])
     app.logger.info(
         f"hostinfo finding information for {data['address']} with forwarded_for {data['forwarded_for']}"
     )  # pylint: disable=line-too-long, logging-fstring-interpolation

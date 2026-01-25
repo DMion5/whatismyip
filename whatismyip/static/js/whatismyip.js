@@ -75,7 +75,9 @@ $(document).ready(function () {
 
 			if ( result['address_details']["names"] ) {
 				$('#addr1-names-row').show();
-				$('#addr1-names').text(result['address_details']["names"]);
+				for (address_name of result['address_details']['names']) {
+					$('#addr1-names').append(`<li class="list-group-item p-0">${address_name}</li>`);
+				}
 			} else if ( result['address_details']["ptr"] ) {
 				$('#addr1-ptr-row').show();
 				$('#addr1-ptr').text(result['address_details']["ptr"]);
@@ -163,7 +165,9 @@ $(document).ready(function () {
 
 			if ( result['address_details']["names"] ) {
 				$('#addr2-names-row').show();
-				$('#addr2-names').text(result['address_details']["names"]);
+				for (address_name of result['address_details']['names']) {
+					$('#addr2-names').append(`<li class="list-group-item p-0">${address_name}</li>`);
+				}
 			} else if ( result['address_details']["ptr"] ) {
 				$('#addr2-ptr-row').show();
 				$('#addr2-ptr').text(result['address_details']["ptr"]);

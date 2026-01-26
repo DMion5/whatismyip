@@ -34,6 +34,12 @@ function set_intro_text(is_campus, network_purpose) {
 function test_primary_url(default_version) {
 	// call the test url and display address information
 
+	// handle starting state
+	if ( default_version == 4 ) {
+		$('#connect-default').text("IPv4");
+		$('#connect-ipv4').text("Testing...");
+	}
+
 	// Make AJAX call to the API to get the ipv4 address
 	var test_url = $('#connect-test').data('ipv4_url')
 	$.ajax({
@@ -133,6 +139,12 @@ function test_primary_url(default_version) {
 
 function test_secondary_url(default_version) {
 	// test secondary url
+
+	// handle starting state
+	if ( default_version == 6 ) {
+		$('#connect-default').text("IPv6");
+		$('#connect-ipv6').text("Testing...");
+	}
 
 	// Make AJAX call to the API to get the ipv6 address
 	var test_url = $('#connect-test').data('ipv6_url')
@@ -237,17 +249,12 @@ $(document).ready(function () {
 	var default_address = $('#address1').text();
 	//console.log("Connection from " + default_address);
 
-	default_version = 6;
+	default_version = null;
 	if (default_address.indexOf(':') != -1) {
 		// default is IPv6 connection
-		$('#connect-default').text("IPv6");
-		$('#connect-ipv6').text("Supported");
-		$('#connect-ipv4').text("Testing...");
+		default_version = 6;
 	} else {
 		// default is IPv4 connection
-		$('#connect-default').text("IPv4");
-		$('#connect-ipv6').text("Testing...");
-		$('#connect-ipv4').text("Supported");
 		default_version = 4;
 	}
 

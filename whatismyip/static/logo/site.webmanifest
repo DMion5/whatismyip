@@ -1,31 +1,31 @@
 {
-  "name": "Snipinsta",
-  "short_name": "Snipinsta",
-  "description": "Snipinsta - Progressive Web App",
+  "name": "What is my IP?",
+  "short_name": "WhatIsMyIP",
+  "description": "What is my IP? is a service offered by UNC Chapel Hill to provide information about your connection, as seen from the campus network.",
   "icons": [
     {
-      "src": "android-chrome-192x192.png",
+      "src": "/static/logo/android-chrome-192x192.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "android-chrome-512x512.png",
+      "src": "/static/logo/android-chrome-512x512.png",
       "sizes": "512x512",
       "type": "image/png"
     },
     {
-      "src": "android-chrome-512x512-maskable.png",
+      "src": "/static/logo/android-chrome-512x512-maskable.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "apple-touch-icon.png",
+      "src": "/static/logo/apple-touch-icon.png",
       "sizes": "180x180",
       "type": "image/png"
     }
   ],
-  "theme_color": "#ffffff",
+  "theme_color": "#4b9cd3",
   "background_color": "#ffffff",
   "display": "standalone",
   "start_url": "/",

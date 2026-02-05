@@ -51,6 +51,16 @@ app.logger.debug(
 fa = FontAwesome(app)
 
 
+@app.context_processor
+def inject_site_name():
+    """Inject site urls into templates."""
+    return dict(
+        site_url=app.config["SERVER_URL"],
+        ipv4_url=app.config["IPV4_SERVER_URL"],
+        ipv6_url=app.config["IPV6_SERVER_URL"],
+    )
+
+
 # Routes
 @app.route("/")
 def home():
@@ -309,6 +319,7 @@ def about():
     return render_template("about.html")
 
 
+@app.route("/favicon.ico")
 @app.route("/robots.txt")
 @app.route("/sitemap.xml")
 def static_from_root():

@@ -149,8 +149,7 @@ function test_primary_url(default_version, map) {
 function pin_to_map(map, lat, lon, label) {
 	// add device marker to the map
 	console.log(map);
-	var campusMarker = L.marker([35.9103, -79.0555]);
-	// var deviceMarker = L.marker([35.9825, -78.5376]).addTo(map).bindPopup("Your IP location");
+	var campusMarker = L.marker([35.9114, -79.0509]); // South Building
 	var deviceMarker = L.marker([lat, lon]).addTo(map).bindPopup(label);
 	var group = new L.featureGroup([campusMarker, deviceMarker])
 	map.fitBounds(group.getBounds());
@@ -267,55 +266,55 @@ function test_secondary_url(default_version) {
 
 }
 
-function initMap() {
-  const myLatlng = { lat: 35.9103, lng: -79.0555 }; // Example: Chapel Hill, NC
-  const map = new google.maps.Map(document.getElementById("map"), {
-    zoom: 4,
-    center: myLatlng,
-  });
+// function initMap() {
+//   const myLatlng = { lat: 35.9103, lng: -79.0555 }; // Example: Chapel Hill, NC
+//   const map = new google.maps.Map(document.getElementById("map"), {
+//     zoom: 4,
+//     center: myLatlng,
+//   });
 
-  // Add a marker
-  new google.maps.Marker({
-    position: myLatlng,
-    map,
-    title: "Hello World!",
-  });
-}
+//   // Add a marker
+//   new google.maps.Marker({
+//     position: myLatlng,
+//     map,
+//     title: "Hello World!",
+//   });
+// }
 
 
-function getLocation() {
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(showPosition, showError);
-  } else {
-    // Geolocation is not supported by the browser
-  }
-}
+// function getLocation() {
+//   if (navigator.geolocation) {
+//     navigator.geolocation.getCurrentPosition(showPosition, showError);
+//   } else {
+//     // Geolocation is not supported by the browser
+//   }
+// }
 
-function showPosition(position) {
-  const latitude = position.coords.latitude;
-  const longitude = position.coords.longitude;
-  // Use latitude and longitude (e.g., display on a map)
-  console.log("Latitude: " + latitude + ", Longitude: " + longitude);
-	L.marker([latitude, longitude]).addTo(map)
-		.bindPopup('Your Location');
-}
+// function showPosition(position) {
+//   const latitude = position.coords.latitude;
+//   const longitude = position.coords.longitude;
+//   // Use latitude and longitude (e.g., display on a map)
+//   console.log("Latitude: " + latitude + ", Longitude: " + longitude);
+// 	L.marker([latitude, longitude]).addTo(map)
+// 		.bindPopup('Your Location');
+// }
 
-function showError(error) {
-  switch(error.code) {
-    case error.PERMISSION_DENIED:
-      console.error("User denied the request for Geolocation.");
-      break;
-    case error.POSITION_UNAVAILABLE:
-      console.error("Location information is unavailable.");
-      break;
-    case error.TIMEOUT:
-      console.error("The request to get user location timed out.");
-      break;
-    case error.UNKNOWN_ERROR:
-      console.error("An unknown error occurred.");
-      break;
-  }
-}
+// function showError(error) {
+//   switch(error.code) {
+//     case error.PERMISSION_DENIED:
+//       console.error("User denied the request for Geolocation.");
+//       break;
+//     case error.POSITION_UNAVAILABLE:
+//       console.error("Location information is unavailable.");
+//       break;
+//     case error.TIMEOUT:
+//       console.error("The request to get user location timed out.");
+//       break;
+//     case error.UNKNOWN_ERROR:
+//       console.error("An unknown error occurred.");
+//       break;
+//   }
+// }
 
 $(document).ready(function () {
 
@@ -324,11 +323,11 @@ $(document).ready(function () {
 	//console.log("Connection from " + default_address);
 
 	/* setup the map view */
-	var map = L.map('map').setView([35.9103, -79.0555], 13);
+	var map = L.map('map').setView([35.9114, -79.0509], 13);
 	L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
 		attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 	}).addTo(map);
-	var campusMarker = L.marker([35.9103, -79.0555]).addTo(map).bindPopup('UNC Campus').openPopup();
+	var campusMarker = L.marker([35.9114, -79.0509]).addTo(map).bindPopup('UNC Campus').openPopup();
 	// var userMarker;
 	// map.locate({ setView: true, maxZoom: 16, watch: true })
 	// 	.on('locationfound', function(e) {

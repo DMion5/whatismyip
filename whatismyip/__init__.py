@@ -157,8 +157,8 @@ def hostinfo():
             "isp": "University of North Carolina at Chapel Hill",
             "response_code": None,
             "response_message": None,
-            "lat": 35.9103, 
-            "lon": -79.055,
+            "lat": 35.9034, 
+            "lon": -79.0484,
         }
     data["iplocation"] = iplocation
 

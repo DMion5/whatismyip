@@ -306,6 +306,13 @@ def hostinfo():
 
     data["address_details"] = addr_details
 
+    # # collect NAC data to display
+    # nac_data = get_endSystemInfo(client_address, addr_details["mac"])
+    # if nac_data:
+    #     data["nac"] = nac_data
+    # else:
+    #     data["nac"] = {}
+
     # build the json response
     message = jsonify(data)
     response = make_response(message)

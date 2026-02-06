@@ -228,6 +228,13 @@
 
 <div class="row p-1 mt-2">
   <div class="col">
+  <div id="map" style="height: 400px; width: 100%;"></div>
+  <script src="https://maps.googleapis.com" async defer></script>
+  </div>
+</div>
+
+<div class="row p-1 mt-2">
+  <div class="col">
     <p>Run a speed test using the closest Speedtest server, which is selected by default, 
       or manually choose “UNC Chapel Hill” to test your connection to the UNC campus.
     </p>
@@ -244,6 +251,16 @@
 
 {% endblock %}
 
+{% block head_ext %}
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+        crossorigin=""/>
+{% endblock %}
+
 {% block javascript %}
 <script src="{{ url_for('static', filename='js/whatismyip.js') }}"></script>
+ <!-- Make sure you put this AFTER Leaflet's CSS -->
+ <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+     crossorigin=""></script>
 {% endblock %}

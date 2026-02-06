@@ -10,7 +10,7 @@ import urllib3
 # from ipwhois import IPWhois
 
 from flask import current_app as app
-
+from whatismyip.extreme import XMC_NBI
 
 def is_campus_ip(ip_address):
     """
@@ -303,3 +303,37 @@ def get_ip_location(ip_address):
     execution_time = time.time() - start_time
     app.logger.debug(f"get_ip_location complete in {execution_time} seconds")
     return {}
+
+def get_endSystemInfo(ip_address, mac):
+    '''
+    Docstring for get_endSystemInfo
+    
+    :param ip_address: Description 
+    :param mac: Description 
+    '''
+    start_time = time.time()
+    app.logger.debug(f"get_endSystemInfo {ip_address} {mac}")
+    nac_data = {}
+
+    if is_campus_ip(ip_address):
+        app.logger.debug(f"Connecting to XiQ to get end system info")
+        # session = XMC_NBI(app.config['XMC_SERVER'], app.config['XMC_CLIENT_ID'], app.config['XMC_SECRET'], test=False)
+        # if session.error:
+        #     app.logger.error( "ERROR: '%s'" % session.message )
+        #     exit(1)
+        # app.logger.debug("XMC session created")
+        
+        # nac_data['ip'] = session.getEndSystemByIp(ip_address)
+        # if session.error:
+        #     app.logger.error( "ERROR: get devices failed '%s'" % session.message )
+        # app.logger.debug(f"data_ip: {nac_data['ip']}")
+
+        # if mac:
+        #     nac_data['mac'] = session.getMacAddress2(mac)
+        #     if session.error:
+        #         app.logger.error( "ERROR: get devices failed '%s'" % session.message )
+        #     app.logger.debug(f"data_mac: {nac_data['mac']}")
+
+    execution_time = time.time() - start_time
+    app.logger.debug(f"get_endSystemInfo complete in {execution_time} seconds")
+    return nac_data

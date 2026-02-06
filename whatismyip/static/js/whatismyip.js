@@ -157,7 +157,7 @@ function pin_to_map(lat, lon, label) {
 
 	// var map = L.map('map').setView([35.9114, -79.0509], 13);
 	console.log(`updating map ${lat}, ${lon}`);
-	var map = L.map('map').setView([lat, lon], 10);
+	var map = L.map('map').setView([lat, lon], 11);
 	L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
 		attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 	}).addTo(map);

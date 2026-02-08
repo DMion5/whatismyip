@@ -11,46 +11,62 @@
     <div id="intro_text"></div>
   </div>
 </div>
-<div id="first_address_section" class="row p-1 my-3">
-  <div class="col">
-    <div class="card bg-primary shadow">
-      <div class="card-body">
 
-        <div id="address_box" class="row unc-ip">
-          <div class="col-md-10 offset-md-1 text-center">
-            <h2 id="address1" class="display-6 text-center mb-0">{{ context.client_address }}</h2>
-          </div>
-          <div class="col-md-1 text-end">
-            <button onclick="copyAddress(address)" class="btn" aria-label="Copy IP Address">
-              <i class="fa fa-copy text-white" data-toggle="tooltip" title="copy to clipboard" aria-hidden="true"> </i>
-            </button>
+<div class="row">
+  <div class="col align-middle">
+
+    <div id="first_address_section" class="row p-1 my-3">
+      <div class="col">
+        <div class="card bg-primary shadow">
+          <div class="card-body">
+
+            <div id="address_box" class="row unc-ip">
+              <div class="col-md-10 offset-md-1 text-center">
+                <h2 id="address1" class="display-7 text-center mb-0">{{ context.client_address }}</h2>
+              </div>
+              <div class="col-md-1 text-end">
+                <button onclick="copyAddress(address)" class="btn btn-sm" aria-label="Copy IP Address">
+                  <i class="fa fa-copy text-white" data-toggle="tooltip" title="copy to clipboard" aria-hidden="true"> </i>
+                </button>
+              </div>
+            </div>
+
           </div>
         </div>
+      </div>
+    </div>
+    <div id="second_address_section" class="row p-1 my-3" style="display:none;">
+      <div class="col">
+        <div class="card bg-primary shadow">
+          <div class="card-body">
 
+            <div id="additional_ip" class="row unc-ip">
+              <div class="col-md-10 offset-md-1 text-center">
+                <h2 id="address2" class="display-7 text-center mb-0">loading...</h2>
+              </div>
+              <div class="col-md-1 text-end">
+                <button onclick="copyAddress(address2)" class="btn btn-sm" aria-label="Copy IP Address">
+                  <i class="fa fa-copy text-white" data-toggle="tooltip" title="copy to clipboard" aria-hidden="true"> </i>
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="col-xl-3 align-middle">
+    <div class="card shadow">
+      <div class="card-body p-0 m-0">
+        <div id="map" style="height: 250px; width: 100%;" style="display:none;"></div>
       </div>
     </div>
   </div>
-</div>
-<div id="second_address_section" class="row p-1 my-3" style="display:none;">
-  <div class="col">
-    <div class="card bg-primary shadow">
-      <div class="card-body">
 
-        <div id="additional_ip" class="row unc-ip">
-          <div class="col-md-10 offset-md-1 text-center">
-            <h2 id="address2" class="display-6 text-center mb-0">loading...</h2>
-          </div>
-          <div class="col-md-1 text-end">
-            <button onclick="copyAddress(address2)" class="btn" aria-label="Copy IP Address">
-              <i class="fa fa-copy text-white" data-toggle="tooltip" title="copy to clipboard" aria-hidden="true"> </i>
-            </button>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </div>
-</div>
+</div> <!-- end of address row -->
 
 <div class="row g-4 p-1">
 
@@ -79,7 +95,7 @@
         </div>
       </div>
     </div>
-  
+
   </div> <!-- end of column 1 -->
 
   <div id="address1-details" class="col-xl">
@@ -140,6 +156,10 @@
               <tr id="net1-isp-row" style="display:none;">
                 <th>ISP</th>
                 <td id="net1-isp"></td>
+              </tr>
+              <tr id="net1-city-row" style="display:none;">
+                <th>City</th>
+                <td id="net1-city"></td>
               </tr>
               <tr id="net1-country-row" style="display:none;">
                 <th>Country</th>
@@ -212,6 +232,10 @@
                 <th>ISP</th>
                 <td id="net2-isp"></td>
               </tr>
+              <tr id="net2-city-row" style="display:none;">
+                <th>City</th>
+                <td id="net2-city"></td>
+              </tr>
               <tr id="net2-country-row" style="display:none;">
                 <th>Country</th>
                 <td id="net2-country"></td>
@@ -225,6 +249,12 @@
   </div> <!-- end of column 3 -->
 
 </div> <!-- end of row -->
+
+<!-- <div class="row p-1 mt-2">
+  <div class="col">
+  <div id="map" style="height: 400px; width: 100%;"></div>
+  </div>
+</div> -->
 
 <div class="row p-1 mt-2">
   <div class="col">
@@ -244,6 +274,16 @@
 
 {% endblock %}
 
+{% block head_ext %}
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+        crossorigin=""/>
+{% endblock %}
+
 {% block javascript %}
 <script src="{{ url_for('static', filename='js/whatismyip.js') }}"></script>
+ <!-- Make sure you put this AFTER Leaflet's CSS -->
+ <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+     crossorigin=""></script>
 {% endblock %}

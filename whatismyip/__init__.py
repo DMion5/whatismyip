@@ -11,6 +11,7 @@ from flask import (
     jsonify,
     make_response,
     send_from_directory,
+    abort,
 )
 from flask_cors import CORS
 from flask_fontawesome import FontAwesome
@@ -157,6 +158,9 @@ def hostinfo():
             "isp": "University of North Carolina at Chapel Hill",
             "response_code": None,
             "response_message": None,
+            "city": "Chapel Hill",
+            "lat": 35.9034,
+            "lon": -79.0484,
         }
     data["iplocation"] = iplocation
 
@@ -306,6 +310,55 @@ def hostinfo():
 
     data["address_details"] = addr_details
 
+    # # collect NAC data to display
+    # nac_data = get_endSystemInfo(client_address, addr_details["mac"])
+    # if nac_data:
+    #     data["nac"] = nac_data
+    # else:
+    #     data["nac"] = {}
+
+    # build the json response
+    message = jsonify(data)
+    response = make_response(message)
+    return response
+
+
+@app.route("/nacinfo")
+def nacinfo():
+    """
+    Return JSON structure with IP address information.
+    """
+
+    # get the request headers
+    forwarded_for = request.environ.get("HTTP_X_FORWARDED_FOR", None)
+    remote_address = request.environ.get("REMOTE_ADDR", None)
+
+    # Check for PROXY usage
+    tmp_forwarded_for = os.getenv("FORWARDED_FOR", forwarded_for)
+    tmp_client_address = get_client_address(remote_address, tmp_forwarded_for)
+    client_address = os.getenv("CLIENT_ADDRESS", tmp_client_address)
+    app.logger.info(
+        f"Hostinfo view from {client_address} with forwarded_for {tmp_forwarded_for}"
+    )
+
+    # calculate the IP address basics at the start
+    ip = ipaddress.ip_address(client_address)
+
+    # build the main data dictionary
+    data = {
+        "client_address": client_address,
+    }
+
+    # Check if campus address before checking anything more detailed
+    # if is_campus_ip(client_address):
+    app.logger.debug(
+        f"Client address {client_address} is campus IP, collecting NAC data"
+    )
+    # collect NAC data to display
+    nac_data = get_endSystemInfo(client_address)
+    if nac_data:
+        data["nac"] = nac_data
+
     # build the json response
     message = jsonify(data)
     response = make_response(message)
@@ -325,6 +378,24 @@ def about():
 def static_from_root():
     """Support basic robots and sitemap files"""
     return send_from_directory(app.static_folder, request.path[1:])
+
+
+# Custom handler for 404 Not Found errors
+@app.errorhandler(404)
+def page_not_found(e):
+    # The handler function receives the exception instance
+    return render_template("404.html"), 404
+
+
+# Custom handler for 500 Internal Server Errors
+@app.errorhandler(500)
+def internal_server_error(e):
+    return render_template("500.html"), 500
+
+
+@app.route("/trigger-500")
+def trigger_500():
+    abort(500)  # Manually trigger a 500 error for testing
 
 
 if __name__ == "__main__":

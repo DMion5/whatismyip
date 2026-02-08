@@ -322,6 +322,7 @@ def hostinfo():
     response = make_response(message)
     return response
 
+
 @app.route("/nacinfo")
 def nacinfo():
     """
@@ -350,7 +351,9 @@ def nacinfo():
 
     # Check if campus address before checking anything more detailed
     # if is_campus_ip(client_address):
-    app.logger.debug(f"Client address {client_address} is campus IP, collecting NAC data")
+    app.logger.debug(
+        f"Client address {client_address} is campus IP, collecting NAC data"
+    )
     # collect NAC data to display
     nac_data = get_endSystemInfo(client_address)
     if nac_data:
@@ -360,6 +363,7 @@ def nacinfo():
     message = jsonify(data)
     response = make_response(message)
     return response
+
 
 @app.route("/health")
 @app.route("/about")
@@ -380,16 +384,19 @@ def static_from_root():
 @app.errorhandler(404)
 def page_not_found(e):
     # The handler function receives the exception instance
-    return render_template('404.html'), 404
+    return render_template("404.html"), 404
+
 
 # Custom handler for 500 Internal Server Errors
 @app.errorhandler(500)
 def internal_server_error(e):
-    return render_template('500.html'), 500
+    return render_template("500.html"), 500
 
-@app.route('/trigger-500')
+
+@app.route("/trigger-500")
 def trigger_500():
-    abort(500) # Manually trigger a 500 error for testing
+    abort(500)  # Manually trigger a 500 error for testing
+
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))

@@ -316,33 +316,40 @@ def get_endSystemInfo(ip_address):
     start_time = time.time()
     app.logger.debug(f"get_endSystemInfo {ip_address}")
     data = {
-        'nac_ip': None,
-        'nac_mac': None,
+        "nac_ip": None,
+        "nac_mac": None,
     }
 
     if is_campus_ip(ip_address):
         app.logger.debug(f"Connecting to XiQ to get end system info")
-        session = XMC_NBI(app.config['XMC_SERVER'], app.config['XMC_CLIENT_ID'], app.config['XMC_SECRET'], test=False)
+        session = XMC_NBI(
+            app.config["XMC_SERVER"],
+            app.config["XMC_CLIENT_ID"],
+            app.config["XMC_SECRET"],
+            test=False,
+        )
         if session.error:
-            app.logger.error( "ERROR: '%s'" % session.message )
+            app.logger.error("ERROR: '%s'" % session.message)
             exit(1)
         app.logger.debug("XMC session created")
 
         app.logger.debug(f"Looking up end system info for ip {ip_address}")
         ip_data = session.getEndSystemByIp(ip_address)
         if session.error:
-            app.logger.error( "ERROR: get devices failed '%s'" % session.message )
+            app.logger.error("ERROR: get devices failed '%s'" % session.message)
         app.logger.debug(f"nac ip: {ip_data}")
-        data['nac_ip'] = ip_data
+        data["nac_ip"] = ip_data
 
         # if 'macAddress' in ip_data and ip_data['macAddress']:
-        if ip_data and ip_data['macAddress']:
-            app.logger.debug(f"Looking up end system info for mac {ip_data['macAddress']}")
-            mac_data = session.getMacAddress(ip_data['macAddress'])
+        if ip_data and ip_data["macAddress"]:
+            app.logger.debug(
+                f"Looking up end system info for mac {ip_data['macAddress']}"
+            )
+            mac_data = session.getMacAddress(ip_data["macAddress"])
             if session.error:
-                app.logger.error( "ERROR: get devices failed '%s'" % session.message )
+                app.logger.error("ERROR: get devices failed '%s'" % session.message)
             app.logger.debug(f"nac_mac: {mac_data}")
-            data['nac_mac'] = mac_data
+            data["nac_mac"] = mac_data
 
     execution_time = time.time() - start_time
     app.logger.debug(f"get_endSystemInfo complete in {execution_time} seconds")

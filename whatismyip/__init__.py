@@ -11,6 +11,7 @@ from flask import (
     jsonify,
     make_response,
     send_from_directory,
+    abort,
 )
 from flask_cors import CORS
 from flask_fontawesome import FontAwesome
@@ -374,6 +375,21 @@ def static_from_root():
     """Support basic robots and sitemap files"""
     return send_from_directory(app.static_folder, request.path[1:])
 
+
+# Custom handler for 404 Not Found errors
+@app.errorhandler(404)
+def page_not_found(e):
+    # The handler function receives the exception instance
+    return render_template('404.html'), 404
+
+# Custom handler for 500 Internal Server Errors
+@app.errorhandler(500)
+def internal_server_error(e):
+    return render_template('500.html'), 500
+
+@app.route('/trigger-500')
+def trigger_500():
+    abort(500) # Manually trigger a 500 error for testing
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))

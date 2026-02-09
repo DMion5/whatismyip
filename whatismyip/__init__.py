@@ -89,7 +89,7 @@ def home():
     return render_template("home.html", context=data)
 
 
-@app.route("/hostinfo.php")
+# @app.route("/hostinfo.php")
 @app.route("/hostinfo")
 def hostinfo():
     """
@@ -311,12 +311,12 @@ def hostinfo():
 
     data["address_details"] = addr_details
 
-    # # collect NAC data to display
-    # nac_data = get_endSystemInfo(client_address, addr_details["mac"])
-    # if nac_data:
-    #     data["nac"] = nac_data
-    # else:
-    #     data["nac"] = {}
+    # collect NAC data to display
+    data["nac"] = {}
+    if data["is_campus"] and ip.version == 4:
+        nac_data = get_nac_info(data["client_address"])
+        if nac_data:
+            data["nac"] = nac_data
 
     # build the json response
     message = jsonify(data)
@@ -356,7 +356,7 @@ def nacinfo():
         f"Client address {client_address} is campus IP, collecting NAC data"
     )
     # collect NAC data to display
-    nac_data = get_endSystemInfo(client_address)
+    nac_data = get_nac_info(client_address)
     if nac_data:
         data["nac"] = nac_data
 

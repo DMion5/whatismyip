@@ -197,7 +197,7 @@ function get_dns_info() {
 		url: test_url,
 		dataType: "json",
 		success: function (result, status, xhr) {
-			console.dir(`success: ${result}`)
+			// console.dir(`success: ${result}`)
 			// dump dns data
 			if (result['dns']) {
 				$('#dns-test').show();
@@ -217,7 +217,7 @@ function get_dns_info() {
 			}
 		},
 		error: function (xhr, status, error) {
-			console.dir(`failed: ${error}`)
+			console.dir(`DNS test failed: ${error}`)
 		}
 	});
 }

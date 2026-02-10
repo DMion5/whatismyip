@@ -445,6 +445,10 @@ $(document).ready(function () {
 
 	test_secondary_url(default_version);
 
-	get_dns_info();
+	const is_campus = JSON.parse(document.getElementById('campus_id').textContent);
+	if (is_campus) {
+		// Do additional tests for campus
+		get_dns_info();
+	}
 
 });

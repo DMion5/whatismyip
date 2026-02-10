@@ -211,21 +211,27 @@ function get_dns_info() {
 			// console.dir(`success: ${result}`)
 			// dump dns data
 			if (result['dns']) {
-				$('#dns-test').show();
-				for (const [key, value] of Object.entries(result['dns'])) {
-					if ( value ) {
-						$('#dns-table tbody').append(`<tr><th>${key}</th><td>${value}</td></tr>`);
-					}
+				let geo = result['dns']['geo']
+				if ( geo.includes('Akamai') ) {
+					$('#dns-table tbody').append(`<tr><th>DNS Security Filtering</th><td><i class="fa-solid fa-circle-check text-success"></i> Active</td></tr>`);
+				} else {
+					$('#dns-table tbody').append(`<tr><th>DNS Security Filtering</th><td><i class="fa-solid fa-circle-xmark text-danger"></i> Inactive</td></tr>`);
 				}
-			}
-			if (result['edns']) {
 				$('#dns-test').show();
-				for (const [key, value] of Object.entries(result['edns'])) {
-					if ( value ) {
-						$('#dns-table tbody').append(`<tr><th>${key}</th><td>${value}</td></tr>`);
-					}
-				}
+				// for (const [key, value] of Object.entries(result['dns'])) {
+				// 	if ( value ) {
+				// 		$('#dns-table tbody').append(`<tr><th>${key}</th><td>${value}</td></tr>`);
+				// 	}
+				// }
 			}
+			// if (result['edns']) {
+			// 	$('#dns-test').show();
+			// 	for (const [key, value] of Object.entries(result['edns'])) {
+			// 		if ( value ) {
+			// 			$('#dns-table tbody').append(`<tr><th>${key}</th><td>${value}</td></tr>`);
+			// 		}
+			// 	}
+			// }
 		},
 		error: function (xhr, status, error) {
 			console.dir(`DNS test failed: ${error}`)
@@ -461,5 +467,6 @@ $(document).ready(function () {
 		// Do additional tests for campus
 		get_dns_info();
 	}
+	get_dns_info();
 
 });

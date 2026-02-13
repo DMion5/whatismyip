@@ -354,10 +354,40 @@ def get_nac_info(ip_address):
             app.logger.debug(f"nac_mac: {mac_data}")
             data["endSystemInfo"] = mac_data
 
+        if ip_data and 'switchIP' in ip_data and ip_data['switchIP']:
+            app.logger.debug(f"NAC data includes switch IP {ip_data['switchIP']}, collecting switch info")
+            data['nit_building'] = get_nit_building(ip_data['switchIP'])
+            app.logger.debug(f"NIT building data: {data['nit_building']}")
+
     execution_time = time.time() - start_time
     app.logger.debug(f"get_endSystemInfo complete in {execution_time} seconds")
     return data
 
+
+def get_nit_building(switch_ip):
+    """
+    Get building information from NIT about this device IP (switch, ap, or ups).
+    """
+    start_time = time.time()
+    app.logger.debug(f"get_nit_switch_info {switch_ip}")
+    data = {}
+
+    url = f"http://{app.config['NIT_SERVER']}:8081/buildings.cgi"
+    params = {
+        "authentication": app.config["NIT_AUTH"],
+        "ip": switch_ip,
+    }
+    response = requests.get(url, params=params, timeout=5)
+    if response.status_code != 200:
+        app.logger.warning(f"NIT query failed {response}")
+        execution_time = time.time() - start_time
+        app.logger.debug(f"get_nit_switch_info complete in {execution_time} seconds")
+        return {}
+    data = response.json()
+
+    execution_time = time.time() - start_time
+    app.logger.debug(f"get_nit_switch_info complete in {execution_time} seconds")
+    return data['building'] if 'building' in data else {}
 
 def parse_extreme_vsa(vsa_string):
     parsed_data = {"Extreme-Dynamic-Config": []}

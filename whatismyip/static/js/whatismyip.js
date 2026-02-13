@@ -161,6 +161,16 @@ function test_primary_url(default_version) {
 					}
 				}
 			}
+
+			// dump building data
+			if (result['nac']['nit_building']) {
+				$('#bldg-col').show();
+				for (const [key, value] of Object.entries(result['nac']['nit_building'])) {
+					if ( value ) {
+						$('#bldg-table tbody').append(`<tr><th>${key}</th><td>${value}</td></tr>`);
+					}
+				}
+			}
 		},
 		error: function (xhr, status, error) {
 			// $('#connect-ipv4').text("Not supported");

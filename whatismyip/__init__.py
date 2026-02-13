@@ -309,7 +309,7 @@ def hostinfo():
     # collect NAC data to display
     data["nac"] = {}
     if data["is_campus"] and ip.version == 4:
-        nac_data = get_nac_info(data["client_address"])
+        nac_data = get_nac_info(data["client_address"], mac=addr_details["mac"])
         if nac_data:
             data["nac"] = nac_data
 

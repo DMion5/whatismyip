@@ -3,10 +3,14 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
 <url>
     <loc>https://whatismyip.unc.edu/</loc>
-    <lastmod>2026-02-13</lastmod>
+    <lastmod>2026-02-16</lastmod>
 </url>
 <url>
     <loc>https://whatismyip.unc.edu/about/</loc>
-    <lastmod>2025-02-13</lastmod>
+    <lastmod>2025-02-16</lastmod>
+</url>
+<url>
+    <loc>https://whatismyip.unc.edu/faq/</loc>
+    <lastmod>2025-02-16</lastmod>
 </url>
 </urlset> 

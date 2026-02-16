@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+  <div class="row p-1">
+    <div class="col">
+
+      <h2>Frequently Asked Questions</h2>
+
+      <ul class="list-group my-3">
+
+        <li class="list-group-item"><b>If I am on campus, what can this tool tell me?</b>
+          <p>Users on campus are the primary audience of this tool and will see the most information.
+             You will see the following, if available:
+          </p>
+          <ul>
+            <li>Your device's IPv4 address</li>
+            <li>Your device's IPv6 address</li>
+            <li>What your device tried to use first, IPv6 or IPv4</li>
+            <li>DNS Security Filtering status</li>
+            <li>Network and VLAN details</li>
+            <li>Network Access Control details</li>
+          </ul>
+        </li>
+
+        <li class="list-group-item"><b>If I am off campus, what can this tool tell me?</b>
+          <p>Minimal information is provided to devices off the UNC campus, unless the VPN service is active.
+          </p>
+        </li>
+
+        <li class="list-group-item"><b>What is campus?</b>
+          <p>Campus refers to the computer network providing service to hundreds of buildings predominately in Chapel Hill, NC.
+            The campus network extends to a number of remote locations throughout North Carolina.
+            More information is available in <a href="https://tdx.unc.edu/TDClient/33/Portal/KB/ArticleDet?ID=331">Campus Subnets</a>.
+          </p>
+        </li>
+
+        <li class="list-group-item"><b>What is DNS Security Filtering?</b>
+          <p>UNC Information Technology Services provides a layer of malware and phishing protection 
+            through the domain name system (DNS) for the campus community.  Special client configurations 
+            or additional software packages are not required.  Clients using 
+            <a href="https://tdx.unc.edu/TDClient/33/Portal/KB/ArticleDet?ID=131">campus DNS servers</a>
+            benefit from the service.  More information is available in 
+            <a href="https://tdx.unc.edu/TDClient/33/Portal/KB/ArticleDet?ID=333">DNS Security Filtering Service</a>.</p>
+        </li>
+
+        <li class="list-group-item"><b>Is an API available?</b>
+          <p>This tool intends for users to interact with it through a web browser but it collects data 
+            through an API that can also be queried.
+          </p>
+          <ul>
+            <li><a href="{{ site_url }}/hostinfo">{{ site_url }}/hostinfo</a> for dual stack detection</li>
+            <li><a href="{{ ipv4_url }}/hostinfo">{{ ipv4_url }}/hostinfo</a> for IPv4 only testing</li>
+            <li><a href="{{ ipv6_url }}/hostinfo">{{ ipv6_url }}/hostinfo</a> for IPv6 only testing</li>
+          </ul>
+        </li>
+
+      </ul>
+
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block head_ext %}
+    <link rel="canonical" href="{{ site_url }}/faq">
+{% endblock %}

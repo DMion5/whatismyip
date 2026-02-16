@@ -213,6 +213,9 @@ async function add_marker (lat, lon, label) {
         position: { lat: lat, lng: lon },
     });
     mapElement.append(marker);
+
+	deviceLocation = new google.maps.LatLng(lat, lon);
+	map.setCenter(deviceLocation);
 }
 
 function pin_to_map(lat, lon, label) {

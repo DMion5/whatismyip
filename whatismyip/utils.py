@@ -345,7 +345,9 @@ def get_nac_info(ip_address, mac=None):
             app.logger.debug(f"Looking up end system info for mac {mac}")
             end_system_data = session.getEndSystemByMac(mac)
             if session.error:
-                app.logger.error("ERROR: getEndSystemByMac failed '%s'" % session.message)
+                app.logger.error(
+                    "ERROR: getEndSystemByMac failed '%s'" % session.message
+                )
             app.logger.debug(f"NAC end system by mac: {end_system_data}")
             # if 'policy' in ip_data and ip_data['policy']:
             #     ip_data['policy_parsed'] = parse_extreme_vsa(ip_data['policy'])
@@ -370,7 +372,11 @@ def get_nac_info(ip_address, mac=None):
             data["endSystemInfo"] = mac_data
 
         # If we have end system and it includes a switch IP, get additional info about the switch from NIT
-        if end_system_data and "switchIP" in end_system_data and end_system_data["switchIP"]:
+        if (
+            end_system_data
+            and "switchIP" in end_system_data
+            and end_system_data["switchIP"]
+        ):
             app.logger.debug(
                 f"NAC data includes switch IP {end_system_data['switchIP']}, collecting switch info"
             )

@@ -6,6 +6,7 @@ import time
 import ipaddress
 import requests
 import urllib3
+import json
 
 # from ipwhois import IPWhois
 
@@ -261,60 +262,56 @@ def get_address_objects(ip_address):
 
 def get_ip_location(ip_address):
     """
-    Get location data for the IP
-    Currently using https://iplocation.net
-    Other options: https://ipapi.co/
+    Get geo-location data for the IP
     """
-    start_time = time.time()
-    app.logger.debug(f"get_ip_location {ip_address}")
-
     # make sure we have a valid ip address
     try:
         ipaddr = ipaddress.ip_address(ip_address)
     except ValueError:
-        app.logger.warn(f"{ip_address} is not a valid ip address")
+        app.logger.error(f"{ip_address} is not a valid ip address for location lookup")
         return {}
 
-    if not ipaddr.is_private:
-        # Do not attempt this with private IP addresses
-        # api_url = f"https://api.iplocation.net/?ip={ip_address}" # Country lookup is free with no rate limits, but does not provide city level data
+    if ipaddr.is_global:
+        # Hit the remote API to get location information about this IP address.
+        # We have a few different APIs to work with.
+
+        # Available for FREE but provides Country information only.
+        # api_url = f"https://api.iplocation.net/?ip={ip_address}"
+
+        # Free for non-commercial use, no API key required.
+        # Limits to 45 requests per minute.  SSL is not available on free tier.
+        # Also provides DNS test https://ip-api.com/docs/dns
         api_url = f"http://ip-api.com/json/{ip_address}"
+
+        # Free for 30,000 IP lookups per month, no API key required.  SSL is available.
         # api_url = f"https://ipapi.co/{ip_address}/json/"
+
         session = requests.Session()
         try:
-            # response = session.get(f"{api_url}{ip_address}", timeout=3)
             response = session.get(api_url, timeout=3)
-        except requests.ReadTimeout:
-            # Something went wrong, return no data
-            app.logger.warn("unable to query location api")
+        except requests.ReadTimeout as e:
+            app.logger.error(f"Location API failed {e}")
             return {}
-
-        if response.status_code != 200:
-            app.logger.warn(f"iplocation query failed {response}")
-            execution_time = time.time() - start_time
-            app.logger.debug(f"get_ip_location complete in {execution_time} seconds")
+        if response.status_code == 200:
+            ip_location = response.json()
+            app.logger.debug(f"ip_location details: {ip_location}")
+            return ip_location
+        else:
+            app.logger.warning(f"ip_location query failed {response}")
             return {}
-
-        iplocation = response.json()
-        app.logger.debug(f"iplocation details: {iplocation}")
-        execution_time = time.time() - start_time
-        app.logger.debug(f"get_ip_location complete in {execution_time} seconds")
-        return iplocation
-
-    execution_time = time.time() - start_time
-    app.logger.debug(f"get_ip_location complete in {execution_time} seconds")
-    return {}
+    else:
+        # Do not attempt this lookup on non-global IP addresses
+        app.logger.debug(f"{ip_address} is not a global IP address")
+        return {}
 
 
-def get_nac_info(ip_address):
+def get_nac_info(ip_address, mac=None):
     """
-    Docstring for get_endSystemInfo
-
-    :param ip_address: Description
-    :param mac: Description
+    Collect information about this device from NAC (Extreme Networks XMC).
+    Collect EndSystem data about the current connection and the EndSystemInfo about the device's configuration.
     """
     start_time = time.time()
-    app.logger.debug(f"get_endSystemInfo {ip_address}")
+    app.logger.debug(f"get_nac_info ip {ip_address} and mac {mac}")
     data = {
         "endSystem": None,
         "endSystemInfo": None,
@@ -333,32 +330,125 @@ def get_nac_info(ip_address):
             exit(1)
         app.logger.debug("XMC session created")
 
+        # Try looking up the end system by IP address first, then fall back to MAC if that fails
         app.logger.debug(f"Looking up end system info for ip {ip_address}")
-        ip_data = session.getEndSystemByIp(ip_address)
+        end_system_data = session.getEndSystemByIp(ip_address)
         if session.error:
-            app.logger.error("ERROR: get devices failed '%s'" % session.message)
-        app.logger.debug(f"nac ip: {ip_data}")
+            app.logger.error("ERROR: getEndSystemByIP failed '%s'" % session.message)
+        app.logger.debug(f"NAC end system by ip: {end_system_data}")
         # if 'policy' in ip_data and ip_data['policy']:
-        #     policy_parts = ip_data['policy'].split(",")
-        #     for p in policy_parts:
-        #         app.logger.debug(f"Breaking up policy part: {p}")
-        #         p = p.strip()
-        #         p_key, p_value = p.split('=', 1)
-        #         new_key = f"policy_{p_key}"
-        #         ip_data[new_key] = p_value
-        data["endSystem"] = ip_data
+        #     ip_data['policy_parsed'] = parse_extreme_vsa(ip_data['policy'])
+        data["endSystem"] = end_system_data
 
-        # if 'macAddress' in ip_data and ip_data['macAddress']:
-        if ip_data and ip_data["macAddress"]:
-            app.logger.debug(
-                f"Looking up end system info for mac {ip_data['macAddress']}"
-            )
-            mac_data = session.getMacAddress(ip_data["macAddress"])
+        # Fall back to MAC address if we didn't get any end system data from the IP lookup and we have a MAC address to try
+        if end_system_data is None and mac:
+            app.logger.debug(f"Looking up end system info for mac {mac}")
+            end_system_data = session.getEndSystemByMac(mac)
             if session.error:
-                app.logger.error("ERROR: get devices failed '%s'" % session.message)
+                app.logger.error(
+                    "ERROR: getEndSystemByMac failed '%s'" % session.message
+                )
+            app.logger.debug(f"NAC end system by mac: {end_system_data}")
+            # if 'policy' in ip_data and ip_data['policy']:
+            #     ip_data['policy_parsed'] = parse_extreme_vsa(ip_data['policy'])
+            data["endSystem"] = end_system_data
+
+        # Lookup additional end system info using the MAC address from either the IP or MAC lookup results
+        if end_system_data and end_system_data["macAddress"]:
+            app.logger.debug(
+                f"Looking up end system info from NAC mac {end_system_data['macAddress']}"
+            )
+            mac_data = session.getMacAddress(end_system_data["macAddress"])
+            if session.error:
+                app.logger.error("ERROR: getMacAddress failed '%s'" % session.message)
             app.logger.debug(f"nac_mac: {mac_data}")
             data["endSystemInfo"] = mac_data
+        elif mac:
+            app.logger.debug(f"Looking up end system info from IPAM mac {mac}")
+            mac_data = session.getMacAddress(mac)
+            if session.error:
+                app.logger.error("ERROR: getMacAddress failed '%s'" % session.message)
+            app.logger.debug(f"nac_mac: {mac_data}")
+            data["endSystemInfo"] = mac_data
+
+        # If we have end system and it includes a switch IP, get additional info about the switch from NIT
+        if (
+            end_system_data
+            and "switchIP" in end_system_data
+            and end_system_data["switchIP"]
+        ):
+            app.logger.debug(
+                f"NAC data includes switch IP {end_system_data['switchIP']}, collecting switch info"
+            )
+            data["nit_building"] = get_nit_building(end_system_data["switchIP"])
+            app.logger.debug(f"NIT building data: {data['nit_building']}")
 
     execution_time = time.time() - start_time
     app.logger.debug(f"get_endSystemInfo complete in {execution_time} seconds")
     return data
+
+
+def get_nit_building(switch_ip):
+    """
+    Get building information from NIT about this device IP (switch, ap, or ups).
+    """
+    start_time = time.time()
+    app.logger.debug(f"get_nit_switch_info {switch_ip}")
+    data = {}
+
+    url = f"http://{app.config['NIT_SERVER']}:8081/buildings.cgi"
+    params = {
+        "authentication": app.config["NIT_AUTH"],
+        "ip": switch_ip,
+    }
+    try:
+        response = requests.get(url, params=params, timeout=5)
+    except requests.exceptions.RequestException as e:  # This is the correct syntax
+        app.logger.warning(f"NIT query failed: {url} {type(e).__name__}")
+        execution_time = time.time() - start_time
+        app.logger.debug(f"get_nit_switch_info complete in {execution_time} seconds")
+        return {}
+    if response.status_code != 200:
+        app.logger.warning(f"NIT query failed {response}")
+        execution_time = time.time() - start_time
+        app.logger.debug(f"get_nit_switch_info complete in {execution_time} seconds")
+        return {}
+    data = response.json()
+
+    execution_time = time.time() - start_time
+    app.logger.debug(f"get_nit_switch_info complete in {execution_time} seconds")
+    return data["building"] if "building" in data else {}
+
+
+def parse_extreme_vsa(vsa_string):
+    parsed_data = {"Extreme-Dynamic-Config": []}
+
+    # Split the main string by comma, but only if not within nested structures
+    # Using a simple split, then cleaning whitespace
+    parts = [part.strip() for part in vsa_string.split(",")]
+
+    for part in parts:
+        if "=" not in part:
+            continue
+
+        key, value = part.split("=", 1)
+        key = key.strip()
+        value = value.strip()
+
+        if key == "Extreme-Dynamic-Client-Assignments":
+            # Parse nested comma-separated values
+            nested_dict = {}
+            for item in value.split(","):
+                if "=" in item:
+                    n_key, n_value = item.split("=", 1)
+                    nested_dict[n_key.strip()] = n_value.strip()
+            parsed_data[key] = nested_dict
+
+        elif key == "Extreme-Dynamic-Config":
+            # Handle multiple configuration entries
+            parsed_data["Extreme-Dynamic-Config"].append(value)
+
+        else:
+            parsed_data[key] = value
+
+    return json.dumps(parsed_data)

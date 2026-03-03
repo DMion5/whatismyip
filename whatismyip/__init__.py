@@ -14,16 +14,14 @@ from flask import (
     abort,
 )
 from flask_cors import CORS
+from flask_compress import Compress
 
-# from flask_fontawesome import FontAwesome
 from dotenv import load_dotenv
 from user_agents import parse
 from dns import resolver, reversename
 import dns.exception
 
 from whatismyip.utils import *
-
-# from whatismyip import views
 
 # load dotenv in the base root
 APP_ROOT = os.path.join(os.path.dirname(__file__), "..")  # refers to application_top
@@ -33,24 +31,17 @@ load_dotenv(dotenv_path)
 app = Flask(__name__)
 app.config.from_object("config.Config")
 app.config.from_prefixed_env()
-
-# if __name__ != '__main__':
-#     gunicorn_logger = logging.getLogger('gunicorn.error')
-#     app.logger.handlers = gunicorn_logger.handlers
-#     app.logger.setLevel(gunicorn_logger.level)
-
-# logger = create_logger(app)
-# logger.setLevel(logging.INFO)
+Compress(app)
 
 # Dual stack clients need to access both the v6 and v4 versions of this site.
-# Allow the https v6 site to call the https v4 version of the api.
-# CORS(app, resources={r"/hostinfo": {"origins": ["https://whatismyip.unc.edu"]}})
-CORS(app, resources={r"/hostinfo": {"origins": [app.config["SERVER_URL"]]}})
-app.logger.debug(
-    f"URL: dual stack {app.config['SERVER_URL']}, ipv4-only {app.config['IPV4_SERVER_URL']}, ipv6-only {app.config['IPV6_SERVER_URL']}"
-)
-
-# fa = FontAwesome(app)
+api_config = {
+    "origins": [
+        app.config["SERVER_URL"],
+        app.config["IPV4_SERVER_URL"],
+        app.config["IPV6_SERVER_URL"],
+    ]
+}
+CORS(app, resources={"/hostinfo": api_config, "/nacinfo": api_config})
 
 
 @app.context_processor
@@ -320,7 +311,7 @@ def hostinfo():
     # collect NAC data to display
     data["nac"] = {}
     if data["is_campus"] and ip.version == 4:
-        nac_data = get_nac_info(data["client_address"])
+        nac_data = get_nac_info(data["client_address"], mac=addr_details["mac"])
         if nac_data:
             data["nac"] = nac_data
 
@@ -377,6 +368,12 @@ def nacinfo():
 def about():
     """Display a basic webpage with about information."""
     return render_template("about.html")
+
+
+@app.route("/faq")
+def faq():
+    """Display a basic webpage with about information."""
+    return render_template("faq.html")
 
 
 @app.route("/favicon.ico")

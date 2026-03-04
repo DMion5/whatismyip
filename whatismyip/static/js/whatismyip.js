@@ -225,6 +225,7 @@ async function add_marker (lat, lon, label) {
 }
 
 function codeAddress(address) {
+    geocoder = new google.maps.Geocoder();
 	// const address = document.getElementById("address").value;
 	console.log(`Mapping address ${address}`);
 	geocoder.geocode({ address: address }, (results, status) => {

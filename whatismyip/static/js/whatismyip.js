@@ -139,7 +139,11 @@ function test_primary_url(default_version) {
 				$('#net1-isp-row').show();
 				$('#net1-isp').text(result['iplocation']["isp"]);
 			}
-			if (result['iplocation']['lat'] && result['iplocation']['lon']) {
+
+			// Do the Map work
+			if (result['nac']['nit_building'] && result['nac']['nit_building']['address']) {
+				codeAddress(result['nac']['nit_building']['address']);
+			} else if (result['iplocation']['lat'] && result['iplocation']['lon']) {
 				// console.log('adding marker to map');
 				if ( is_campus) {
 					add_marker(result['iplocation']['lat'],result['iplocation']['lon'],'Your IP location');
@@ -185,6 +189,8 @@ function test_primary_url(default_version) {
 
 async function initMap() {
     //  Request the needed libraries.
+	// Initialize the Geocoder object within initMap
+    geocoder = new google.maps.Geocoder();
     const [{ Map }, { AdvancedMarkerElement }] = await Promise.all([
         google.maps.importLibrary('maps'),
         google.maps.importLibrary('marker'),
@@ -198,11 +204,11 @@ async function initMap() {
         mapTypeControl: false,
 		disableDefaultUI: true,
     });
-    // Add a marker positioned at the map center (Uluru).
-    // const marker = new AdvancedMarkerElement({
-    //     map: innerMap,
-    //     position: mapElement.center,
-    //     title: 'Uluru/Ayers Rock',
+    // Add a marker positioned at the map center
+	// var defaultLocation = {lat: 35.9049, lng: -79.0469};
+    // map = new google.maps.Map(document.getElementById('map'), {
+    //     zoom: 4,
+    //     center: defaultLocation
     // });
 }
 
@@ -218,6 +224,24 @@ async function add_marker (lat, lon, label) {
     const innerMap = mapElement.innerMap;
 	innerMap.setCenter({lat: lat, lng: lon});
 	innerMap.setZoom(11);
+}
+
+function codeAddress(address) {
+	// Add marker to Google Map by Address
+    geocoder.geocode({'address': address}, function(results, status) {
+        if (status == 'OK') {
+            // Center the map at the new location
+            map.setCenter(results[0].geometry.location); 
+            
+            // Place a marker at the retrieved coordinates
+            var marker = new google.maps.Marker({
+                map: map,
+                position: results[0].geometry.location 
+            });
+        } else {
+            alert('Geocode was not successful for the following reason: ' + status);
+        }
+    });
 }
 
 function createRandomString(length) {

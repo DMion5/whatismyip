@@ -141,12 +141,12 @@ function test_primary_url(default_version) {
 			}
 
 			// Do the Map work
-			if (result['nac']['nit_building'] && result['nac']['nit_building']['address']) {
-				codeAddress(result['nac']['nit_building']['address']);
-			}
-			if (is_campus && result['iplocation']['lat'] && result['iplocation']['lon']) {
-				add_marker(result['iplocation']['lat'],result['iplocation']['lon'],'Your IP location');
-			}
+			// if (result['nac']['nit_building'] && result['nac']['nit_building']['address']) {
+			// 	codeAddress(result['nac']['nit_building']['address']);
+			// }
+			// if (is_campus && result['iplocation']['lat'] && result['iplocation']['lon']) {
+			// 	add_marker(result['iplocation']['lat'],result['iplocation']['lon'],'Your IP location');
+			// }
 
 			// dump nac data
 			if (result['nac']['endSystem']) {
@@ -185,70 +185,75 @@ function test_primary_url(default_version) {
 
 }
 
+let map;
+let geocoder;
+
 async function initMap() {
-    //  Request the needed libraries.
-	// Initialize the Geocoder object within initMap
-    const [{ Map }, { AdvancedMarkerElement }] = await Promise.all([
-        google.maps.importLibrary('maps'),
-        google.maps.importLibrary('marker'),
-    ]);
+	// Request needed libraries asynchronously
+	const { Map } = await google.maps.importLibrary("maps");
+	const { Geocoder } = await google.maps.importLibrary("geocoding");
+	const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
+
+	// Initialize the map
+	var defaultLocation = {lat: 35.9049, lng: -79.0469};
+	map = new Map(document.getElementById("map"), {
+		center: defaultLocation, 
+		zoom: 8,
+		mapId: 'LOCATION_MAP_ID', 
+	});
+	geocoder = new Geocoder();
+
     // geocoder = new google.maps.Geocoder();
     // Get the gmp-map element.
-    const mapElement = document.querySelector('gmp-map');
+    // const mapElement = document.querySelector('gmp-map');
     // Get the inner map.
-    const innerMap = mapElement.innerMap;
+    // const innerMap = mapElement.innerMap;
     // Set map options.
-    innerMap.setOptions({
-        mapTypeControl: false,
-		disableDefaultUI: true,
-    });
-    // Add a marker positioned at the map center
-	// var defaultLocation = {lat: 35.9049, lng: -79.0469};
-    // map = new google.maps.Map(document.getElementById('map'), {
-    //     zoom: 4,
-    //     center: defaultLocation
+    // innerMap.setOptions({
+    //     mapTypeControl: false,
+	// 	disableDefaultUI: true,
     // });
 }
 
-async function add_marker (lat, lon, label) {
-	const mapElement = document.querySelector('gmp-map');
-    const { Map } = (await google.maps.importLibrary('maps'));
-    const { AdvancedMarkerElement } = (await google.maps.importLibrary('marker'));
-    const marker = new AdvancedMarkerElement({
-        position: { lat: lat, lng: lon },
-    });
-    mapElement.append(marker);
+// async function add_marker (lat, lon, label) {
+// 	const mapElement = document.querySelector('gmp-map');
+//     const { Map } = (await google.maps.importLibrary('maps'));
+//     const { AdvancedMarkerElement } = (await google.maps.importLibrary('marker'));
+//     const marker = new AdvancedMarkerElement({
+//         position: { lat: lat, lng: lon },
+//     });
+//     mapElement.append(marker);
 
-    const innerMap = mapElement.innerMap;
-	innerMap.setCenter({lat: lat, lng: lon});
-	innerMap.setZoom(11);
-}
+//     const innerMap = mapElement.innerMap;
+// 	innerMap.setCenter({lat: lat, lng: lon});
+// 	innerMap.setZoom(11);
+// }
 
-function codeAddress(address) {
-    geocoder = new google.maps.Geocoder();
-	// const address = document.getElementById("address").value;
-	console.log(`Mapping address ${address}`);
-	geocoder.geocode({ address: address }, (results, status) => {
-		if (status === "OK") {
-			// Center the map and add a marker at the results location
-			map.setCenter(results[0].geometry.location);
-			// Use the recommended AdvancedMarkerElement
-			addAdvancedMarker(results[0].geometry.location); 
-		} else {
-			alert("Geocode was not successful for the following reason: " + status);
-		}
-	});
-}
+// function codeAddress(address) {
+//     geocoder = new google.maps.Geocoder();
+// 	// const address = document.getElementById("address").value;
+// 	console.log(`Mapping address ${address}`);
+// 	geocoder.geocode({ address: address }, (results, status) => {
+// 		if (status === "OK") {
+// 			// Center the map and add a marker at the results location
+// 			map.setCenter(results[0].geometry.location);
+// 			// Use the recommended AdvancedMarkerElement
+// 			addAdvancedMarker(results[0].geometry.location); 
+// 		} else {
+// 			alert("Geocode was not successful for the following reason: " + status);
+// 		}
+// 	});
+// }
 
-	// Function to add an Advanced Marker
-async function addAdvancedMarker(position) {
-	const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
-	new AdvancedMarkerElement({
-		map: map,
-		position: position,
-		title: document.getElementById("address").value,
-	});
-}
+// 	// Function to add an Advanced Marker
+// async function addAdvancedMarker(position) {
+// 	const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
+// 	new AdvancedMarkerElement({
+// 		map: map,
+// 		position: position,
+// 		title: document.getElementById("address").value,
+// 	});
+// }
 
 function createRandomString(length) {
   const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -451,11 +456,12 @@ $(document).ready(function () {
 	test_secondary_url(default_version);
 
 	if (isLocalhost || is_campus) {
+		console.log(`Doing extended testing for campus`);
 		// Do additional tests for campus
 		get_dns_info();
 
 		// Show the map and get it ready
-		$('#map_card').show()
+		// $('#map_card').show()
 		initMap();
 	}
 });

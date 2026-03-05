@@ -2,6 +2,7 @@
 Utility functions
 """
 
+import re
 import time
 import ipaddress
 import requests
@@ -317,71 +318,89 @@ def get_nac_info(ip_address, mac=None):
         "endSystemInfo": None,
     }
 
-    if is_campus_ip(ip_address):
-        app.logger.debug(f"Connecting to XiQ to get end system info")
-        session = XMC_NBI(
-            app.config["XMC_SERVER"],
-            app.config["XMC_CLIENT_ID"],
-            app.config["XMC_SECRET"],
-            test=False,
-        )
-        if session.error:
-            app.logger.error("ERROR: '%s'" % session.message)
-            exit(1)
-        app.logger.debug("XMC session created")
+    if not is_campus_ip(ip_address):
+        app.logger.debug(f"{ip_address} is not a campus IP address, skipping NAC lookup")
+        execution_time = time.time() - start_time
+        app.logger.debug(f"get_nac_info complete in {execution_time} seconds")
+        return data
 
-        # Try looking up the end system by IP address first, then fall back to MAC if that fails
-        app.logger.debug(f"Looking up end system info for ip {ip_address}")
-        end_system_data = session.getEndSystemByIp(ip_address)
+    app.logger.debug(f"Connecting to XiQ to get end system info")
+    session = XMC_NBI(
+        app.config["XMC_SERVER"],
+        app.config["XMC_CLIENT_ID"],
+        app.config["XMC_SECRET"],
+        test=False,
+    )
+    if session.error:
+        app.logger.error("ERROR: '%s'" % session.message)
+        exit(1)
+    app.logger.debug("XMC session created")
+
+    # Try looking up the end system by IP address first, then fall back to MAC if that fails
+    app.logger.debug(f"Looking up end system info for ip {ip_address}")
+    end_system_data = session.getEndSystemByIp(ip_address)
+    if session.error:
+        app.logger.error("ERROR: getEndSystemByIP failed '%s'" % session.message)
+    app.logger.debug(f"NAC end system by ip: {end_system_data}")
+    # if 'policy' in ip_data and ip_data['policy']:
+    #     ip_data['policy_parsed'] = parse_extreme_vsa(ip_data['policy'])
+    data["endSystem"] = end_system_data
+
+    # Fall back to MAC address if we didn't get any end system data from the IP lookup and we have a MAC address to try
+    if end_system_data is None and mac:
+        app.logger.debug(f"Looking up end system info for mac {mac}")
+        end_system_data = session.getEndSystemByMac(mac)
         if session.error:
-            app.logger.error("ERROR: getEndSystemByIP failed '%s'" % session.message)
-        app.logger.debug(f"NAC end system by ip: {end_system_data}")
+            app.logger.error(
+                "ERROR: getEndSystemByMac failed '%s'" % session.message
+            )
+        app.logger.debug(f"NAC end system by mac: {end_system_data}")
         # if 'policy' in ip_data and ip_data['policy']:
         #     ip_data['policy_parsed'] = parse_extreme_vsa(ip_data['policy'])
         data["endSystem"] = end_system_data
 
-        # Fall back to MAC address if we didn't get any end system data from the IP lookup and we have a MAC address to try
-        if end_system_data is None and mac:
-            app.logger.debug(f"Looking up end system info for mac {mac}")
-            end_system_data = session.getEndSystemByMac(mac)
-            if session.error:
-                app.logger.error(
-                    "ERROR: getEndSystemByMac failed '%s'" % session.message
-                )
-            app.logger.debug(f"NAC end system by mac: {end_system_data}")
-            # if 'policy' in ip_data and ip_data['policy']:
-            #     ip_data['policy_parsed'] = parse_extreme_vsa(ip_data['policy'])
-            data["endSystem"] = end_system_data
+    # Lookup additional end system info using the MAC address from either the IP or MAC lookup results
+    if end_system_data and end_system_data["macAddress"]:
+        app.logger.debug(
+            f"Looking up end system info from NAC mac {end_system_data['macAddress']}"
+        )
+        mac_data = session.getMacAddress(end_system_data["macAddress"])
+        if session.error:
+            app.logger.error("ERROR: getMacAddress failed '%s'" % session.message)
+        app.logger.debug(f"nac_mac: {mac_data}")
+        data["endSystemInfo"] = mac_data
+    elif mac:
+        app.logger.debug(f"Looking up end system info from IPAM mac {mac}")
+        mac_data = session.getMacAddress(mac)
+        if session.error:
+            app.logger.error("ERROR: getMacAddress failed '%s'" % session.message)
+        app.logger.debug(f"nac_mac: {mac_data}")
+        data["endSystemInfo"] = mac_data
 
-        # Lookup additional end system info using the MAC address from either the IP or MAC lookup results
-        if end_system_data and end_system_data["macAddress"]:
-            app.logger.debug(
-                f"Looking up end system info from NAC mac {end_system_data['macAddress']}"
-            )
-            mac_data = session.getMacAddress(end_system_data["macAddress"])
-            if session.error:
-                app.logger.error("ERROR: getMacAddress failed '%s'" % session.message)
-            app.logger.debug(f"nac_mac: {mac_data}")
-            data["endSystemInfo"] = mac_data
-        elif mac:
-            app.logger.debug(f"Looking up end system info from IPAM mac {mac}")
-            mac_data = session.getMacAddress(mac)
-            if session.error:
-                app.logger.error("ERROR: getMacAddress failed '%s'" % session.message)
-            app.logger.debug(f"nac_mac: {mac_data}")
-            data["endSystemInfo"] = mac_data
+    # If we have end system and it includes a switch IP, get additional info about the switch from NIT
+    if (
+        end_system_data
+        and "switchIP" in end_system_data
+        and end_system_data["switchIP"]
+    ):
+        app.logger.debug(
+            f"NAC data includes switch IP {end_system_data['switchIP']}, collecting switch info"
+        )
+        data["nit_building"] = get_nit_building(end_system_data["switchIP"])
+        app.logger.debug(f"NIT building data: {data['nit_building']}")
 
-        # If we have end system and it includes a switch IP, get additional info about the switch from NIT
-        if (
-            end_system_data
-            and "switchIP" in end_system_data
-            and end_system_data["switchIP"]
-        ):
-            app.logger.debug(
-                f"NAC data includes switch IP {end_system_data['switchIP']}, collecting switch info"
-            )
-            data["nit_building"] = get_nit_building(end_system_data["switchIP"])
-            app.logger.debug(f"NIT building data: {data['nit_building']}")
+    # Do some cleanup on the data to make it easier to work with in the front end
+    if data["endSystem"] and "switchPortId" in data["endSystem"]:
+        wireless_regex = r"^(?P<ap_name>\S+)\s(?P<ap_mac>\S+):(?P<ssid>\S+)$"
+        match = re.match(wireless_regex, data["endSystem"]["switchPortId"])
+        if match:
+            data["endSystem"]["connection_type"] = "wireless"
+            data["endSystem"]["wireless_controller"] = data["endSystem"]["switchIP"] if "switchIP" in data["endSystem"] else None
+            data["endSystem"]["wireless_ap_name"] = match.group("ap_name")
+            data["endSystem"]["wireless_ap_mac"] = match.group("ap_mac")
+            data["endSystem"]["wireless_ssid"] = match.group("ssid")
+        else:
+            data["endSystem"]["connection_type"] = "wired"
 
     execution_time = time.time() - start_time
     app.logger.debug(f"get_endSystemInfo complete in {execution_time} seconds")

@@ -186,7 +186,6 @@ function test_primary_url(default_version) {
 
 let map;
 let geocoder;
-
 async function initMap() {
 	// Request needed libraries asynchronously
 	const { Map } = await google.maps.importLibrary("maps");
@@ -197,46 +196,24 @@ async function initMap() {
 	var defaultLocation = {lat: 35.9049, lng: -79.0469};
 	map = new Map(document.getElementById("map"), {
 		center: defaultLocation, 
-		zoom: 8,
+		zoom: 15,
 		mapId: 'LOCATION_MAP_ID', 
 	});
 	geocoder = new Geocoder();
-
-    // geocoder = new google.maps.Geocoder();
-    // Get the gmp-map element.
-    // const mapElement = document.querySelector('gmp-map');
-    // Get the inner map.
-    // const innerMap = mapElement.innerMap;
-    // Set map options.
-    // innerMap.setOptions({
-    //     mapTypeControl: false,
-	// 	disableDefaultUI: true,
-    // });
 }
 
-// async function add_marker (lat, lon, label) {
-// 	const mapElement = document.querySelector('gmp-map');
-//     const { Map } = (await google.maps.importLibrary('maps'));
-//     const { AdvancedMarkerElement } = (await google.maps.importLibrary('marker'));
-//     const marker = new AdvancedMarkerElement({
-//         position: { lat: lat, lng: lon },
-//     });
-//     mapElement.append(marker);
-
-//     const innerMap = mapElement.innerMap;
-// 	innerMap.setCenter({lat: lat, lng: lon});
-// 	innerMap.setZoom(11);
-// }
+async function add_marker (lat, lon, label) {
+	// Translate lat/lon to position to add map marker
+	var position = {lat: lat, lon: lon};
+	addAdvancedMarker(position, label);
+}
 
 function codeAddress(address) {
-    // geocoder = new google.maps.Geocoder();
-	// const address = document.getElementById("address").value;
+	// Translate address to a map marker
 	console.log(`Mapping address ${address}`);
 	geocoder.geocode({ address: address }, (results, status) => {
 		if (status === "OK") {
-			// Center the map and add a marker at the results location
 			map.setCenter(results[0].geometry.location);
-			// Use the recommended AdvancedMarkerElement
 			addAdvancedMarker(results[0].geometry.location, address); 
 		} else {
 			console.log("Geocode was not successful for the following reason: " + status);
@@ -244,8 +221,8 @@ function codeAddress(address) {
 	});
 }
 
-// Function to add an Advanced Marker
 async function addAdvancedMarker(position, title) {
+	// Add a marker to the map
 	const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
 	new AdvancedMarkerElement({
 		map: map,

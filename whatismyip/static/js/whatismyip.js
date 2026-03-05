@@ -139,15 +139,18 @@ function test_primary_url(default_version) {
 				$('#net1-isp-row').show();
 				$('#net1-isp').text(result['iplocation']["isp"]);
 			}
-			if (result['iplocation']['lat'] && result['iplocation']['lon']) {
-				// console.log('adding marker to map');
-				if ( is_campus) {
-					add_marker(result['iplocation']['lat'],result['iplocation']['lon'],'Your IP location');
-				}
+
+			// Do the Map work
+			if (result['nac']['nit_building'] && result['nac']['nit_building']['address']) {
+				codeAddress(result['nac']['nit_building']['address'], result['nac']['nit_building']['full_name']);
 			}
+			// } else if (is_campus && result['iplocation']['lat'] && result['iplocation']['lon']) {
+			// 	add_marker(result['iplocation']['lat'],result['iplocation']['lon'],'Your IP location');
+			// }
 
 			// dump nac data
 			if (result['nac']['endSystem']) {
+				$('#toggle-button').show();
 				$('#nac-row').show();
 				for (const [key, value] of Object.entries(result['nac']['endSystem'])) {
 					if ( value ) {
@@ -183,41 +186,53 @@ function test_primary_url(default_version) {
 
 }
 
+let map;
+let geocoder;
 async function initMap() {
-    //  Request the needed libraries.
-    const [{ Map }, { AdvancedMarkerElement }] = await Promise.all([
-        google.maps.importLibrary('maps'),
-        google.maps.importLibrary('marker'),
-    ]);
-    // Get the gmp-map element.
-    const mapElement = document.querySelector('gmp-map');
-    // Get the inner map.
-    const innerMap = mapElement.innerMap;
-    // Set map options.
-    innerMap.setOptions({
-        mapTypeControl: false,
+	// Request needed libraries asynchronously
+	const { Map } = await google.maps.importLibrary("maps");
+	const { Geocoder } = await google.maps.importLibrary("geocoding");
+	const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
+
+	// Initialize the map
+	var defaultLocation = {lat: 35.9049, lng: -79.0469};
+	map = new Map(document.getElementById("map"), {
+		center: defaultLocation, 
+		zoom: 15,
+		mapId: 'LOCATION_MAP_ID',
 		disableDefaultUI: true,
-    });
-    // Add a marker positioned at the map center (Uluru).
-    // const marker = new AdvancedMarkerElement({
-    //     map: innerMap,
-    //     position: mapElement.center,
-    //     title: 'Uluru/Ayers Rock',
-    // });
+	});
+	geocoder = new Geocoder();
 }
 
 async function add_marker (lat, lon, label) {
-	const mapElement = document.querySelector('gmp-map');
-    const { Map } = (await google.maps.importLibrary('maps'));
-    const { AdvancedMarkerElement } = (await google.maps.importLibrary('marker'));
-    const marker = new AdvancedMarkerElement({
-        position: { lat: lat, lng: lon },
-    });
-    mapElement.append(marker);
+	// Translate lat/lon to position to add map marker
+	var position = {lat: lat, lon: lon};
+	addAdvancedMarker(position, label);
+}
 
-    const innerMap = mapElement.innerMap;
-	innerMap.setCenter({lat: lat, lng: lon});
-	innerMap.setZoom(11);
+function codeAddress(address, title) {
+	// Translate address to a map marker
+	console.log(`Mapping address ${address}`);
+	geocoder.geocode({ address: address }, (results, status) => {
+		if (status === "OK") {
+			map.setCenter(results[0].geometry.location);
+			addAdvancedMarker(results[0].geometry.location, title); 
+		} else {
+			console.log("Geocode was not successful for the following reason: " + status);
+		}
+	});
+}
+
+async function addAdvancedMarker(position, title) {
+	// Add a marker to the map
+	console.log(`Adding map marker at ${position} titled ${title}`)
+	const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
+	new AdvancedMarkerElement({
+		map: map,
+		position: position,
+		title: title,
+	});
 }
 
 function createRandomString(length) {
@@ -401,6 +416,10 @@ $(document).ready(function () {
 	const default_address = JSON.parse(document.getElementById('default_address').textContent);
 	//console.log("Connection from " + default_address );
 
+	const isLocalhost = window.location.hostname === "localhost" || 
+						window.location.hostname === "127.0.0.1" ||
+						window.location.hostname === "::1"; // IPv6 loopback address
+
 	// Setup Google Map
 	//initMap();
 
@@ -414,10 +433,10 @@ $(document).ready(function () {
 	}
 
 	test_primary_url(default_version);
-
 	test_secondary_url(default_version);
 
-	if (is_campus) {
+	if (isLocalhost || is_campus) {
+		console.log(`Doing extended testing for campus`);
 		// Do additional tests for campus
 		get_dns_info();
 
@@ -425,5 +444,4 @@ $(document).ready(function () {
 		$('#map_card').show()
 		initMap();
 	}
-	//get_dns_info();
 });

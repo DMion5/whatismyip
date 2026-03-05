@@ -225,6 +225,7 @@ function codeAddress(address, title) {
 
 async function addAdvancedMarker(position, title) {
 	// Add a marker to the map
+	console.log(`Adding map marker at ${position} titled ${title}`)
 	const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
 	new AdvancedMarkerElement({
 		map: map,

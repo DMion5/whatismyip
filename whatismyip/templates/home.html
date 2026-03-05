@@ -105,6 +105,11 @@
         </div>
     </div>
 
+<!-- The Button as the trigger -->
+<button class="btn btn-primary my-3" type="button" data-mdb-toggle="collapse" data-mdb-target="#additionalDetails" aria-expanded="false" aria-controls="additionalDetails">
+  Toggle Additional Details
+</button>
+
   </div> <!-- end of column 1 -->
 
   <div id="address1-details" class="col-xl">
@@ -259,8 +264,9 @@
 
 </div> <!-- end of row -->
 
-<div id="nac-row" class="row p-1 mt-2" style="display:none;">
+<div class="collapse" id="additionalDetails">
 
+<div id="nac-row" class="row p-1 mt-2" style="display:none;">
   <div class="col-xl">
     <div class="card shadow my-3">
       <div class="card-body">
@@ -288,6 +294,8 @@
       </div>
     </div>
   </div>
+
+</div>
 
 </div>
 

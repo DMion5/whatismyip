@@ -379,7 +379,7 @@ def get_nac_info(ip_address, mac=None):
 
     # Do some cleanup on the data to add NIT inventory information
     if data["endSystem"] and "switchPortId" in data["endSystem"]:
-        wireless_regex = r"^(?P<ap_name>\S+)\s(?P<ap_mac>\S+):(?P<ssid>\S+)$"
+        wireless_regex = r"^(?P<ap_name>\S+)\s\((?P<ap_mac>\S+)\):(?P<ssid>\S+)$"
         ap_name_regex = r"^(?P<tier>[^-]+)-(?P<bldg_id>\d+)-"
         match = re.match(wireless_regex, data["endSystem"]["switchPortId"])
         if match:

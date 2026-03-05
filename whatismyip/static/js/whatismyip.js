@@ -141,12 +141,11 @@ function test_primary_url(default_version) {
 			}
 
 			// Do the Map work
-			// if (result['nac']['nit_building'] && result['nac']['nit_building']['address']) {
-			// 	codeAddress(result['nac']['nit_building']['address']);
-			// }
-			// if (is_campus && result['iplocation']['lat'] && result['iplocation']['lon']) {
-			// 	add_marker(result['iplocation']['lat'],result['iplocation']['lon'],'Your IP location');
-			// }
+			if (result['nac']['nit_building'] && result['nac']['nit_building']['address']) {
+				codeAddress(result['nac']['nit_building']['address']);
+			} else if (is_campus && result['iplocation']['lat'] && result['iplocation']['lon']) {
+				add_marker(result['iplocation']['lat'],result['iplocation']['lon'],'Your IP location');
+			}
 
 			// dump nac data
 			if (result['nac']['endSystem']) {
@@ -229,31 +228,31 @@ async function initMap() {
 // 	innerMap.setZoom(11);
 // }
 
-// function codeAddress(address) {
-//     geocoder = new google.maps.Geocoder();
-// 	// const address = document.getElementById("address").value;
-// 	console.log(`Mapping address ${address}`);
-// 	geocoder.geocode({ address: address }, (results, status) => {
-// 		if (status === "OK") {
-// 			// Center the map and add a marker at the results location
-// 			map.setCenter(results[0].geometry.location);
-// 			// Use the recommended AdvancedMarkerElement
-// 			addAdvancedMarker(results[0].geometry.location); 
-// 		} else {
-// 			alert("Geocode was not successful for the following reason: " + status);
-// 		}
-// 	});
-// }
+function codeAddress(address) {
+    // geocoder = new google.maps.Geocoder();
+	// const address = document.getElementById("address").value;
+	console.log(`Mapping address ${address}`);
+	geocoder.geocode({ address: address }, (results, status) => {
+		if (status === "OK") {
+			// Center the map and add a marker at the results location
+			map.setCenter(results[0].geometry.location);
+			// Use the recommended AdvancedMarkerElement
+			addAdvancedMarker(results[0].geometry.location, address); 
+		} else {
+			console.log("Geocode was not successful for the following reason: " + status);
+		}
+	});
+}
 
-// 	// Function to add an Advanced Marker
-// async function addAdvancedMarker(position) {
-// 	const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
-// 	new AdvancedMarkerElement({
-// 		map: map,
-// 		position: position,
-// 		title: document.getElementById("address").value,
-// 	});
-// }
+// Function to add an Advanced Marker
+async function addAdvancedMarker(position, title) {
+	const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
+	new AdvancedMarkerElement({
+		map: map,
+		position: position,
+		title: title,
+	});
+}
 
 function createRandomString(length) {
   const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";

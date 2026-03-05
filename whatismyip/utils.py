@@ -319,7 +319,9 @@ def get_nac_info(ip_address, mac=None):
     }
 
     if not is_campus_ip(ip_address):
-        app.logger.debug(f"{ip_address} is not a campus IP address, skipping NAC lookup")
+        app.logger.debug(
+            f"{ip_address} is not a campus IP address, skipping NAC lookup"
+        )
         execution_time = time.time() - start_time
         app.logger.debug(f"get_nac_info complete in {execution_time} seconds")
         return data
@@ -351,9 +353,7 @@ def get_nac_info(ip_address, mac=None):
         app.logger.debug(f"Looking up end system info for mac {mac}")
         end_system_data = session.getEndSystemByMac(mac)
         if session.error:
-            app.logger.error(
-                "ERROR: getEndSystemByMac failed '%s'" % session.message
-            )
+            app.logger.error("ERROR: getEndSystemByMac failed '%s'" % session.message)
         app.logger.debug(f"NAC end system by mac: {end_system_data}")
         # if 'policy' in ip_data and ip_data['policy']:
         #     ip_data['policy_parsed'] = parse_extreme_vsa(ip_data['policy'])
@@ -385,7 +385,11 @@ def get_nac_info(ip_address, mac=None):
         if match:
             # we have a wireless connection
             data["endSystem"]["connection_type"] = "wireless"
-            data["endSystem"]["wireless_controller"] = data["endSystem"]["switchIP"] if "switchIP" in data["endSystem"] else None
+            data["endSystem"]["wireless_controller"] = (
+                data["endSystem"]["switchIP"]
+                if "switchIP" in data["endSystem"]
+                else None
+            )
             data["endSystem"]["wireless_ap_name"] = match.group("ap_name")
             data["endSystem"]["wireless_ap_mac"] = match.group("ap_mac")
             data["endSystem"]["wireless_ssid"] = match.group("ssid")
@@ -400,7 +404,6 @@ def get_nac_info(ip_address, mac=None):
             data["endSystem"]["connection_type"] = "wired"
             data["nit_building"] = get_nit_building(end_system_data["switchIP"])
             app.logger.debug(f"NIT building info: {data['nit_building']}")
-
 
     execution_time = time.time() - start_time
     app.logger.debug(f"get_endSystemInfo complete in {execution_time} seconds")
@@ -437,6 +440,7 @@ def get_nit_building(switch_ip):
     execution_time = time.time() - start_time
     app.logger.debug(f"get_nit_switch_info complete in {execution_time} seconds")
     return data["building"] if "building" in data else {}
+
 
 def get_nit_building_by_id(building_id):
     """

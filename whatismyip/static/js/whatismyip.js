@@ -436,11 +436,8 @@ $(document).ready(function () {
 	test_secondary_url(default_version);
 
 	if (isLocalhost || is_campus) {
-		console.log(`Doing extended testing for campus`);
-		// Do additional tests for campus
+		// console.log(`Doing extended testing for campus`);
 		get_dns_info();
-
-		// Show the map and get it ready
 		$('#map_card').show()
 		initMap();
 	}

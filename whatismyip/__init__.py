@@ -667,19 +667,19 @@ def nacinfo():
 
 
 @app.route("/health")
-@app.route("/about")
+@app.route("/about", strict_slashes=False)
 def about():
     """Display a basic webpage with about information."""
     return render_template("about.html")
 
 
-@app.route("/faq")
+@app.route("/faq", strict_slashes=False)
 def faq():
     """Display a basic webpage with about information."""
     return render_template("faq.html")
 
 
-@app.route("/metrics")
+@app.route("/metrics", strict_slashes=False)
 @metrics_auth_required
 def metrics():
     """Display aggregate usage metrics for authenticated administrators."""

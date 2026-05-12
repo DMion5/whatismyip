@@ -5,9 +5,10 @@ Basic App
 import os
 import logging
 import sqlite3
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, time, timedelta, timezone
 from functools import wraps
 from hmac import compare_digest
+from zoneinfo import ZoneInfo
 from flask import (
     Flask,
     render_template,
@@ -36,6 +37,8 @@ app = Flask(__name__)
 app.config.from_object("config.Config")
 app.config.from_prefixed_env()
 Compress(app)
+
+METRICS_TIMEZONE = ZoneInfo("America/New_York")
 
 # Dual stack clients need to access both the v6 and v4 versions of this site.
 api_config = {
@@ -163,8 +166,12 @@ def get_metrics_dashboard(days=None):
     if days is None:
         days = app.config["METRICS_TIME_WINDOW_DAYS"]
 
-    cutoff = (datetime.now(timezone.utc) - timedelta(days=days - 1)).isoformat()
-    today = datetime.now(timezone.utc).date()
+    now_local = datetime.now(METRICS_TIMEZONE)
+    today = now_local.date()
+    first_day = today - timedelta(days=days - 1)
+    cutoff = datetime.combine(first_day, time.min, tzinfo=METRICS_TIMEZONE).astimezone(
+        timezone.utc
+    ).isoformat()
 
     with sqlite3.connect(METRICS_DB_PATH) as conn:
         conn.row_factory = sqlite3.Row
@@ -191,18 +198,25 @@ def get_metrics_dashboard(days=None):
             ("hostinfo",),
         ).fetchone()["count"]
 
-        daily_counts = _count_by_query(
-            conn,
+        daily_lookup = {}
+        daily_events = conn.execute(
             """
-            SELECT SUBSTR(created_at, 1, 10) AS day, COUNT(*) AS count
+            SELECT created_at
             FROM metrics_events
             WHERE event_type = ? AND created_at >= ?
-            GROUP BY SUBSTR(created_at, 1, 10)
-            ORDER BY day
+            ORDER BY created_at
             """,
             ("hostinfo", cutoff),
-        )
-        daily_lookup = {row["day"]: row["count"] for row in daily_counts}
+        ).fetchall()
+        for row in daily_events:
+            day = (
+                datetime.fromisoformat(row["created_at"])
+                .astimezone(METRICS_TIMEZONE)
+                .date()
+                .isoformat()
+            )
+            daily_lookup[day] = daily_lookup.get(day, 0) + 1
+
         daily_series = []
         for offset in range(days):
             day = (today - timedelta(days=days - 1 - offset)).isoformat()

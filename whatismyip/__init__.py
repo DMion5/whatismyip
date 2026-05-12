@@ -171,9 +171,11 @@ def get_metrics_dashboard(days=None):
     now_local = datetime.now(METRICS_TIMEZONE)
     today = now_local.date()
     first_day = today - timedelta(days=days - 1)
-    cutoff = datetime.combine(first_day, time.min, tzinfo=METRICS_TIMEZONE).astimezone(
-        timezone.utc
-    ).isoformat()
+    cutoff = (
+        datetime.combine(first_day, time.min, tzinfo=METRICS_TIMEZONE)
+        .astimezone(timezone.utc)
+        .isoformat()
+    )
 
     with sqlite3.connect(METRICS_DB_PATH) as conn:
         conn.row_factory = sqlite3.Row

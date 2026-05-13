@@ -137,6 +137,10 @@ main[role="main"] {
   border-color: var(--site-border);
 }
 
+html[data-theme="dark"] .text-muted {
+  color: var(--site-muted-text) !important;
+}
+
 .table {
   color: var(--site-text);
 }

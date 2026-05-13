@@ -318,6 +318,7 @@ def get_metrics_dashboard(days=None):
         "purpose_breakdown": purpose_breakdown,
     }
 
+
 # Routes
 @app.route("/")
 def home():

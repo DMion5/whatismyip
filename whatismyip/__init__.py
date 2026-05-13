@@ -6,8 +6,6 @@ import os
 import logging
 import sqlite3
 from datetime import datetime, time as dt_time, timedelta, timezone
-from functools import wraps
-from hmac import compare_digest
 from zoneinfo import ZoneInfo
 from flask import (
     Flask,
@@ -319,31 +317,6 @@ def get_metrics_dashboard(days=None):
         "campus_breakdown": campus_breakdown,
         "purpose_breakdown": purpose_breakdown,
     }
-
-
-def metrics_auth_required(view_func):
-    """Protect the metrics dashboard with HTTP basic auth."""
-
-    @wraps(view_func)
-    def wrapper(*args, **kwargs):
-        username = app.config.get("METRICS_USERNAME", "")
-        password = app.config.get("METRICS_PASSWORD", "")
-        if not username or not password:
-            abort(404)
-
-        auth = request.authorization
-        if (
-            auth
-            and compare_digest(auth.username or "", username)
-            and compare_digest(auth.password or "", password)
-        ):
-            return view_func(*args, **kwargs)
-
-        response = make_response("Authentication required", 401)
-        response.headers["WWW-Authenticate"] = 'Basic realm="WhatIsMyIP Metrics"'
-        return response
-
-    return wrapper
 
 
 # Routes
@@ -727,9 +700,8 @@ def faq_redirect():
 
 
 @app.route("/metrics")
-@metrics_auth_required
 def metrics():
-    """Display aggregate usage metrics for authenticated administrators."""
+    """Display aggregate usage metrics."""
     return render_template(
         "metrics.html",
         metrics=get_metrics_dashboard(),

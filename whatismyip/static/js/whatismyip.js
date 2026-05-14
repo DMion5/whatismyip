@@ -337,14 +337,14 @@ function append_dns_table_row(label, value, rowId = null, useHtmlValue = false) 
 }
 
 async function test_dns_security_filtering() {
-	// Test if DNS filtering is active by attempting to fetch an internal-only domain
-	// If filtering is ACTIVE (campus DNS): DNS resolves to internal site, fetch succeeds
-	// If filtering is INACTIVE (public DNS): DNS fails (NXDOMAIN), fetch fails with TypeError
+	// Test if DNS security filtering is active using Akamai's phishing test URL.
+	// When filtering is INACTIVE: the test site loads successfully (returns a warning page).
+	// When filtering is ACTIVE: the site is blocked by the filter and the fetch fails.
 	const controller = new AbortController();
 	const timeoutId = setTimeout(() => controller.abort(), 5000);
 
 	try {
-		await fetch('https://a10-lan.net.unc.edu/', {
+		await fetch('https://www.akamaietpphishingtest.com/', {
 			method: 'HEAD',
 			signal: controller.signal,
 			mode: 'no-cors',
@@ -352,13 +352,13 @@ async function test_dns_security_filtering() {
 			credentials: 'omit'
 		});
 
-		return true; // DNS resolved and connection succeeded - filtering is ACTIVE
+		return false; // Site loaded successfully - filtering is INACTIVE
 	} catch (error) {
 		if (error.name === 'AbortError') {
 			return null; // Timeout - inconclusive
 		}
 		if (error.name === 'TypeError') {
-			return false; // DNS resolution failed (NXDOMAIN) - filtering is INACTIVE
+			return true; // Connection blocked - filtering is ACTIVE
 		}
 		return null; // Other error - inconclusive
 	} finally {

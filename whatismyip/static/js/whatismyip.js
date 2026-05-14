@@ -337,10 +337,10 @@ function append_dns_table_row(label, value, rowId = null, useHtmlValue = false) 
 }
 
 function test_dns_security_filtering() {
-	// Test if DNS security filtering is active by attempting to load from a blocked domain
+	// Test if DNS security filtering is active by attempting to load from an internal-only domain
 	// Uses image tag which is allowed to load HTTP from HTTPS pages
-	// If filtering is ACTIVE: DNS resolves, img load event fires
-	// If filtering is INACTIVE: DNS fails (NXDOMAIN), img error event fires
+	// If filtering is ACTIVE (campus DNS): DNS resolves, img load event fires
+	// If filtering is INACTIVE (public DNS): DNS fails (NXDOMAIN), img error event fires
 	return new Promise((resolve) => {
 		const img = new Image();
 		let timeoutId = null;
@@ -376,7 +376,7 @@ function test_dns_security_filtering() {
 		}, 5000);
 
 		// Trigger the request
-		img.src = 'http://badguys.unc.edu/';
+		img.src = 'http://rpzblock.net.unc.edu/';
 	});
 }
 

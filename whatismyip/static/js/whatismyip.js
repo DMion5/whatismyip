@@ -324,7 +324,7 @@ function append_dns_table_row(label, value, rowId = null, useHtmlValue = false) 
 
 	const cell = $('<td colspan="2"></td>');
 	cell.append(`<div class="fw-bold">${label}</div>`);
-	const valueContainer = $('<div class="dns-row-value text-break"></div>');
+	const valueContainer = $('<div class="dns-row-value text-break" style="white-space: pre-line;"></div>');
 	if (useHtmlValue) {
 		valueContainer.html(value);
 	} else {
@@ -390,15 +390,17 @@ function get_dns_info() {
 			if (result['dns']) {
 				let geo = result['dns']['geo']
 				let ip = result['dns']['ip']
-				
-				// Add DNS Provider Name
-				if (geo) {
-					append_dns_table_row('Internet DNS Provider', geo);
-				}
 
-				// Add DNS Provider IP
-				if (ip) {
-					append_dns_table_row('Internet DNS Provider IP', ip);
+				// Add DNS provider details as one section to reduce vertical space.
+				if (geo || ip) {
+					let providerDetails = geo || '';
+					if (geo && ip) {
+						providerDetails = `${geo}\n${ip}`;
+					} else if (ip) {
+						providerDetails = ip;
+					}
+
+					append_dns_table_row('Internet DNS Provider', providerDetails);
 				}
 			}
 		},

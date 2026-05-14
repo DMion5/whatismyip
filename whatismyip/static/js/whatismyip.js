@@ -225,7 +225,7 @@ function test_primary_url(default_version) {
 		},
 		error: function (xhr, status, error) {
 			// $('#connect-ipv4').text("Not supported");
-			$('#connect-ipv4').html('<i class="fa-solid fa-circle-xmark text-danger"></i> Not supported');
+			$('#connect-ipv4').html('<i class="fa-solid fa-triangle-exclamation text-warning"></i> Not supported');
 			//console.log(error);
 		}
 	});
@@ -416,7 +416,7 @@ function get_dns_info() {
 			if (isFiltered === true) {
 				filteringHtml = `<i class="fa-solid fa-circle-check text-success"></i> Active`;
 			} else if (isFiltered === false) {
-				filteringHtml = `<i class="fa-solid fa-circle-xmark text-danger"></i> Inactive`;
+				filteringHtml = `<i class="fa-solid fa-triangle-exclamation text-warning"></i> Inactive`;
 			} else {
 				filteringHtml = `<i class="fa-solid fa-circle-question text-warning"></i> Unable to verify`;
 			}
@@ -541,7 +541,7 @@ function test_secondary_url(default_version) {
 		},
 		error: function (xhr, status, error) {
 			// $('#connect-ipv6').text("Not supported");
-			$('#connect-ipv6').html('<i class="fa-solid fa-circle-xmark text-danger"></i> Not supported');
+			$('#connect-ipv6').html('<i class="fa-solid fa-triangle-exclamation text-warning"></i> Not supported');
 			//console.log(error);
 		}
 	});

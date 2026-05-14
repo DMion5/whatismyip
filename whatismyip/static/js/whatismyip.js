@@ -329,26 +329,26 @@ function get_dns_info() {
 		success: function (result, status, xhr) {
 			if (result['dns']) {
 				let geo = result['dns']['geo']
+				let ip = result['dns']['ip']
+				
+				// Add DNS Provider IP
+				if (ip) {
+					$('#dns-table tbody').append(`<tr><th>DNS Provider IP</th><td style="word-break: break-word;">${ip}</td></tr>`);
+				}
+				
+				// Add DNS Provider Name
+				if (geo) {
+					$('#dns-table tbody').append(`<tr><th>DNS Provider</th><td style="word-break: break-word;">${geo}</td></tr>`);
+				}
+				
+				// Add Security Filtering status
 				if ( geo.includes('Akamai') ) {
 					$('#dns-table tbody').append(`<tr><th>Security Filtering <a href="https://tdx.unc.edu/TDClient/33/Portal/KB/ArticleDet?ID=333" alt="Security Filtering Service"><i class="fa-solid fa-circle-info" alt="More Information"></i></a></th><td><i class="fa-solid fa-circle-check text-success"></i> Active</td></tr>`);
 				} else {
 					$('#dns-table tbody').append(`<tr><th>Security Filtering <a href="https://tdx.unc.edu/TDClient/33/Portal/KB/ArticleDet?ID=333" alt="Security Filtering Service"><i class="fa-solid fa-circle-info" alt="More Information"></i></a></th><td><i class="fa-solid fa-circle-xmark text-danger"></i> Inactive</td></tr>`);
 				}
 				$('#dns-test').show();
-				// for (const [key, value] of Object.entries(result['dns'])) {
-				// 	if ( value ) {
-				// 		$('#dns-table tbody').append(`<tr><th>${key}</th><td>${value}</td></tr>`);
-				// 	}
-				// }
 			}
-			// if (result['edns']) {
-			// 	$('#dns-test').show();
-			// 	for (const [key, value] of Object.entries(result['edns'])) {
-			// 		if ( value ) {
-			// 			$('#dns-table tbody').append(`<tr><th>${key}</th><td>${value}</td></tr>`);
-			// 		}
-			// 	}
-			// }
 		},
 		error: function (xhr, status, error) {
 			console.dir(`DNS test failed: ${error}`)

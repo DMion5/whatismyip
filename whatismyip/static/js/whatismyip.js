@@ -336,34 +336,48 @@ function append_dns_table_row(label, value, rowId = null, useHtmlValue = false) 
 	$('#dns-table tbody').append(row);
 }
 
-async function test_dns_security_filtering() {
-	// Test if DNS security filtering is active by attempting to fetch a blocked domain
-	// If filtering is ACTIVE: DNS resolves to block page IP, fetch succeeds
-	// If filtering is INACTIVE: DNS returns NXDOMAIN, fetch fails with TypeError
-	const controller = new AbortController();
-	const timeoutId = setTimeout(() => controller.abort(), 5000);
+function test_dns_security_filtering() {
+	// Test if DNS security filtering is active by attempting to load from a blocked domain
+	// Uses image tag which is allowed to load HTTP from HTTPS pages
+	// If filtering is ACTIVE: DNS resolves, img load event fires
+	// If filtering is INACTIVE: DNS fails (NXDOMAIN), img error event fires
+	return new Promise((resolve) => {
+		const img = new Image();
+		let timeoutId = null;
+		let resolved = false;
 
-	try {
-		await fetch('https://badguys.unc.edu/', {
-			method: 'HEAD',
-			signal: controller.signal,
-			mode: 'no-cors',
-			cache: 'no-store',
-			credentials: 'omit'
-		});
+		const cleanup = () => {
+			if (timeoutId) clearTimeout(timeoutId);
+			resolved = true;
+			img.onload = null;
+			img.onerror = null;
+		};
 
-		return true; // DNS resolved - filtering is ACTIVE
-	} catch (error) {
-		if (error.name === 'AbortError') {
-			return null; // Timeout - inconclusive
-		}
-		if (error.name === 'TypeError') {
-			return false; // DNS resolution failed (NXDOMAIN) - filtering is INACTIVE
-		}
-		return null; // Other error - inconclusive
-	} finally {
-		clearTimeout(timeoutId);
-	}
+		img.onload = () => {
+			if (!resolved) {
+				cleanup();
+				resolve(true); // DNS resolved - filtering is ACTIVE
+			}
+		};
+
+		img.onerror = () => {
+			if (!resolved) {
+				cleanup();
+				resolve(false); // DNS resolution failed (NXDOMAIN) - filtering is INACTIVE
+			}
+		};
+
+		// Timeout after 5 seconds if no response
+		timeoutId = setTimeout(() => {
+			if (!resolved) {
+				cleanup();
+				resolve(null); // Timeout - inconclusive
+			}
+		}, 5000);
+
+		// Trigger the request
+		img.src = 'http://badguys.unc.edu/';
+	});
 }
 
 function get_dns_info() {

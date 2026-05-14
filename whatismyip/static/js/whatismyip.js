@@ -344,7 +344,7 @@ async function test_dns_security_filtering() {
 	const timeoutId = setTimeout(() => controller.abort(), 5000);
 
 	try {
-		await fetch('https://test-internal.net.unc.edu/', {
+		await fetch('https://a10-lan.net.unc.edu/', {
 			method: 'HEAD',
 			signal: controller.signal,
 			mode: 'no-cors',

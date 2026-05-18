@@ -573,12 +573,12 @@ $(document).ready(function () {
 	test_primary_url(default_version);
 	test_secondary_url(default_version);
 
-	if (isLocalhost || is_campus) {
+	// if (isLocalhost || is_campus) {
 		// console.log(`Doing extended testing for campus`);
 		if ('requestIdleCallback' in window) {
 			window.requestIdleCallback(() => get_dns_info(), { timeout: 2000 });
 		} else {
 			setTimeout(get_dns_info, 0);
 		}
-	}
+	// }
 });

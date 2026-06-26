@@ -188,12 +188,15 @@ function test_primary_url(default_version) {
 			if (result['nac']['nit_building'] && result['nac']['nit_building']['address']) {
 				// Precise building location via geocoding (street-level)
 				loadCampusMap(result['nac']['nit_building']['address'], result['nac']['nit_building']['full_name']);
-			} else if (result['iplocation']['lat'] && result['iplocation']['lon']) {
+			} else {
 				// Approximate IP geolocation (city-level) for everyone else
 				var mapLat = parseFloat(result['iplocation']['lat']);
 				var mapLon = parseFloat(result['iplocation']['lon']);
-				var mapLabel = result['iplocation']['city'] || 'IP location';
-				loadLatLonMap(mapLat, mapLon, mapLabel);
+				// Skip if geolocation failed (null, NaN, or the 0,0 fallback ip-api.com returns on lookup failure)
+				if (!isNaN(mapLat) && !isNaN(mapLon) && !(mapLat === 0 && mapLon === 0)) {
+					var mapLabel = result['iplocation']['city'] || 'IP location';
+					loadLatLonMap(mapLat, mapLon, mapLabel);
+				}
 			}
 
 			// dump nac data

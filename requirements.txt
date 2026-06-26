@@ -3,6 +3,7 @@ tomli>=2.0.0; python_version < "3.11"
 gunicorn>=25.0.0
 python-dotenv>=1.2.0
 requests>=2.33.0
+dnspython>=2.0.0
 urllib3>=2.7.0
 Flask-Compress>=1.15
 flask-cors>=6.0.0

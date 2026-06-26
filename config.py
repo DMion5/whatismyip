@@ -21,7 +21,8 @@ class Config:  # pylint: disable=too-few-public-methods
 
     SERVER_URL = "http://127.0.0.1:5000"
     IPV4_SERVER_URL = "http://127.0.0.1:5000"
-    IPV6_SERVER_URL = "http://127.0.0.1:5000"
+    # Leave empty to disable dual-stack IPv6 detection (appropriate for local dev)
+    IPV6_SERVER_URL = ""
 
     # Infoblox data
     IB_SERVER = "http://127.0.0.1"

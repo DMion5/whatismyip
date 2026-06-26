@@ -453,15 +453,19 @@ function get_dns_info() {
 function test_secondary_url(default_version) {
 	// test secondary url
 
+	var test_url = $('#connect-test').data('ipv6_url');
+	if (!test_url) {
+		$('#connect-ipv6').html('<i class="fa-solid fa-minus text-secondary"></i> Not configured');
+		return;
+	}
+
 	// handle starting state
 	if ( default_version == 6 ) {
 		$('#connect-default').text("IPv6");
-		// $('#connect-ipv6').text("Testing...");
 		$('#connect-ipv6').html('<i class="fa-solid fa-question"></i> Testing');
 	}
 
 	// Make AJAX call to the API to get the ipv6 address
-	var test_url = $('#connect-test').data('ipv6_url')
 	$.ajax({
 		type: "GET",
 		url: test_url + "/hostinfo",

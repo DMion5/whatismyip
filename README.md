@@ -50,6 +50,18 @@ The front-end fetches `/hostinfo` twice — once over IPv4 and once over IPv6 �
 - Python 3.11+ (or 3.10 with `tomli` installed — handled automatically by `requirements.txt`)
 - pip / virtualenv
 
+### DNS configuration for dual-stack detection
+
+The dual-stack IPv4/IPv6 detection relies on separate hostnames with deliberately restricted DNS records. The browser's Happy Eyeballs algorithm will choose IPv6 when both record types are present, so the per-protocol hostnames must advertise only one record type each:
+
+| Hostname                       | DNS records required  | Purpose                                           |
+| ------------------------------ | --------------------- | ------------------------------------------------- |
+| `whatismyip.example.edu`       | A **and** AAAA        | Primary site URL — reachable over both protocols  |
+| `ipv4.whatismyip.example.edu`  | A only (no AAAA)      | Forces IPv4 — browsers cannot fall back to IPv6   |
+| `ipv6.whatismyip.example.edu`  | AAAA only (no A)      | Forces IPv6 — browsers cannot fall back to IPv4   |
+
+Set these three hostnames in `FLASK_SERVER_URL`, `FLASK_IPV4_SERVER_URL`, and `FLASK_IPV6_SERVER_URL` respectively. If your institution does not have IPv6 on campus, leave `FLASK_IPV6_SERVER_URL` empty and the dual-stack check is skipped automatically.
+
 **Optional external integrations** (the app runs without them; campus-specific sections are simply omitted):
 
 | Integration           | Purpose                                             | Required?  |
@@ -79,6 +91,16 @@ flask --app whatismyip run
 ```
 
 Open <http://127.0.0.1:5000>.
+
+### Debugging a specific IP address locally
+
+Set `CLIENT_ADDRESS` in your `.env` (no `FLASK_` prefix) to override the detected address for every request. This is useful for testing campus-specific lookups without being on the campus network:
+
+```bash
+CLIENT_ADDRESS=152.2.1.2   # treated as the visitor's IP for all routes
+```
+
+Remove or unset the variable to go back to real address detection.
 
 ---
 

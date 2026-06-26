@@ -265,9 +265,20 @@ def get_ip_location(ip_address):
             app.logger.error(f"Location API failed {e}")
             return {}
         if response.status_code == 200:
-            ip_location = response.json()
-            app.logger.debug(f"ip_location details: {ip_location}")
-            return ip_location
+            raw = response.json()
+            app.logger.debug(f"ip_location details: {raw}")
+            # Normalize to a consistent structure regardless of which API is active.
+            # ip-api.com uses "country"/"countryCode"; the fallback API uses "country_name"/"country_code2".
+            return {
+                "ip": raw.get("query") or raw.get("ip"),
+                "ip_version": raw.get("ip_version", 4),
+                "country_name": raw.get("country_name") or raw.get("country"),
+                "country_code2": raw.get("country_code2") or raw.get("countryCode"),
+                "city": raw.get("city"),
+                "isp": raw.get("isp"),
+                "lat": raw.get("lat"),
+                "lon": raw.get("lon"),
+            }
         else:
             app.logger.warning(f"ip_location query failed {response}")
             return {}

@@ -78,7 +78,7 @@
 
 <div class="row g-4 p-1">
 
-  <div class="col-xl-3"> <!-- start of column 1 -->
+  <div class="col-xl-3 d-flex flex-column"> <!-- start of column 1 -->
 
     <div class="card shadow my-3">
       <div class="card-body">
@@ -116,7 +116,7 @@
       </div>
     </div>
 
-    <button id="toggle-button" class="btn btn-primary btn-block my-3" type="button" data-mdb-toggle="collapse" data-mdb-target="#additionalDetails" aria-expanded="false" aria-controls="additionalDetails" style="display:none;">
+    <button id="toggle-button" class="btn btn-primary btn-block mt-auto mb-3" type="button" data-mdb-toggle="collapse" data-mdb-target="#additionalDetails" aria-expanded="false" aria-controls="additionalDetails" style="display:none;">
       Toggle Additional Details
     </button>
 
@@ -396,8 +396,20 @@
       <div class="card-body">
         <h3 class="card-title h5">Campus Building</h3>
         <div class="table-responsive">
-          <table id="bldg-table" class="table table-sm">
+          <table class="table table-sm">
             <tbody>
+              <tr id="bldg-name-row" style="display:none;">
+                <th style="width:35%;">Name</th>
+                <td id="bldg-name"></td>
+              </tr>
+              <tr id="bldg-address-row" style="display:none;">
+                <th>Address</th>
+                <td id="bldg-address"></td>
+              </tr>
+              <tr id="bldg-id-row" style="display:none;">
+                <th>Building ID</th>
+                <td id="bldg-id"></td>
+              </tr>
             </tbody>
           </table>
         </div>

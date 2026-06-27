@@ -240,11 +240,19 @@ function test_primary_url(default_version) {
 
 			// dump building data
 			if (result['nac']['nit_building'] && Object.keys(result['nac']['nit_building']).length > 0) {
+				var bldg = result['nac']['nit_building'];
 				$('#bldg-col').show();
-				for (const [key, value] of Object.entries(result['nac']['nit_building'])) {
-					if ( value ) {
-						$('#bldg-table tbody').append(`<tr><th>${key}</th><td>${value}</td></tr>`);
-					}
+				if (bldg['official_name'] || bldg['full_name']) {
+					$('#bldg-name-row').show();
+					$('#bldg-name').text(bldg['official_name'] || bldg['full_name']);
+				}
+				if (bldg['address']) {
+					$('#bldg-address-row').show();
+					$('#bldg-address').text(bldg['address']);
+				}
+				if (bldg['building_id']) {
+					$('#bldg-id-row').show();
+					$('#bldg-id').text(bldg['building_id']);
 				}
 			}
 

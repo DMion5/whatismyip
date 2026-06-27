@@ -61,18 +61,23 @@ function copyAddress(addressSelector) {
 }
 
 function set_intro_text(is_campus, network_purpose) {
-	// add some user text at the very top of the page
+	var icon, msg, cls;
 	if (is_campus) {
-		if ( network_purpose == 'VPN' ) {
-			$('#intro_text').html(`<p>Your IP address indicates that you are connected with the campus VPN service.</p>`);
-		} else if ( network_purpose == 'Wireless' ) {
-			$('#intro_text').html(`<p>Your IP address indicates that you are connected to the campus wireless network.</p>`);
+		if (network_purpose == 'VPN') {
+			icon = 'fa-shield text-success';
+			msg  = 'You are connected through the campus VPN.';
+		} else if (network_purpose == 'Wireless') {
+			icon = 'fa-wifi text-success';
+			msg  = 'You are connected to the campus wireless network.';
 		} else {
-			$('#intro_text').html(`<p>Your IP address indicates that you are connected to the local campus network.</p>`);
+			icon = 'fa-building text-success';
+			msg  = 'You are connected to the campus network.';
 		}
 	} else {
-		$('#intro_text').html(`<p>Your IP address indicates that you are off campus and connected over the Internet.</p>`);
+		icon = 'fa-earth-americas text-secondary';
+		msg  = 'You are connected from off campus over the Internet.';
 	}
+	$('#intro_text').html(`<div class="intro-status"><i class="fa-solid ${icon} me-2"></i>${msg}</div>`);
 }
 
 function test_primary_url(default_version) {

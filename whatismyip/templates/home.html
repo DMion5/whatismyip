@@ -28,6 +28,7 @@
              role="button" tabindex="0" aria-label="Copy IPv4 address to clipboard">
           <div class="card-body">
             <div id="address_box" class="d-flex align-items-center unc-ip">
+              <span class="text-white opacity-50 flex-shrink-0 small fw-semibold ip-bar-label">IPv4</span>
               <div class="flex-grow-1 text-center">
                 <h2 id="address1" class="display-7 text-center mb-0">{{ context.client_address }}</h2>
               </div>
@@ -45,6 +46,7 @@
              role="button" tabindex="0" aria-label="Copy IPv6 address to clipboard">
           <div class="card-body">
             <div id="additional_ip" class="d-flex align-items-center unc-ip">
+              <span class="text-white opacity-50 flex-shrink-0 small fw-semibold ip-bar-label">IPv6</span>
               <div class="flex-grow-1 text-center">
                 <h2 id="address2" class="display-7 text-center mb-0">loading...</h2>
               </div>
@@ -78,7 +80,7 @@
     <div class="card shadow my-3">
       <div class="card-body">
         <div id="connect-test" data-ipv4_url="{{ context.ipv4_url }}" data-ipv6_url="{{ context.ipv6_url }}">
-          <h3 class="card-title h5">Campus Connectivity</h3>
+          <h3 class="card-title h5"><i class="fa-solid fa-tower-broadcast text-primary me-2" aria-hidden="true"></i>Campus Connectivity</h3>
           <div class="table-responsive">
           <table class="table table-sm">
             <tbody>
@@ -112,7 +114,7 @@
     </div>
 
     <button id="toggle-button" class="btn btn-primary btn-block mt-auto mb-3" type="button" data-mdb-toggle="collapse" data-mdb-target="#additionalDetails" aria-expanded="false" aria-controls="additionalDetails" style="display:none;">
-      Toggle Additional Details
+      <i class="fa-solid fa-chevron-down me-2 toggle-chevron" aria-hidden="true"></i>Network Details
     </button>
 
   </div> <!-- end of column 1 -->
@@ -121,7 +123,7 @@
 
     <div class="card shadow my-3">
       <div class="card-body">
-        <h3 class="card-title h5">IPv4 Address Details</h3>
+        <h3 class="card-title h5"><i class="fa-solid fa-globe text-primary me-2" aria-hidden="true"></i>IPv4 Address Details</h3>
         <div class="table-responsive">
           <table class="table table-sm">
             <tbody>
@@ -212,7 +214,7 @@
 
     <div class="card shadow my-3">
       <div class="card-body">
-        <h3 class="card-title h5">IPv6 Address Details</h3>
+        <h3 class="card-title h5"><i class="fa-solid fa-globe text-primary me-2" aria-hidden="true"></i>IPv6 Address Details</h3>
         <div class="table-responsive">
           <table class="table table-sm">
             <tbody>
@@ -307,7 +309,7 @@
   <div id="nac-col" class="col-xl" style="display:none;">
     <div id="nac-card" class="card shadow my-3" style="display:none;">
       <div class="card-body">
-        <h3 class="card-title h5">Network Access Control</h3>
+        <h3 class="card-title h5"><i class="fa-solid fa-lock text-primary me-2" aria-hidden="true"></i>Network Access Control</h3>
         <div class="table-responsive">
           <table id="nac-table" class="table table-sm">
             <tbody>
@@ -323,7 +325,7 @@
 
     <div id="net-config-card" class="card shadow" style="display:none; flex:1 1 400px; max-width:560px;">
       <div class="card-body">
-        <h3 class="card-title h5">Network Configuration</h3>
+        <h3 class="card-title h5"><i class="fa-solid fa-sliders text-primary me-2" aria-hidden="true"></i>Network Configuration</h3>
 
         <div id="net-config-v4" style="display:none;">
           <p class="text-muted small fw-semibold mb-1 mt-2">IPv4</p>
@@ -390,7 +392,7 @@
 
     <div id="bldg-card" class="card shadow" style="display:none; flex:1 1 400px; max-width:560px;">
       <div class="card-body">
-        <h3 class="card-title h5">Campus Building</h3>
+        <h3 class="card-title h5"><i class="fa-solid fa-building text-primary me-2" aria-hidden="true"></i>Campus Building</h3>
         <div class="table-responsive">
           <table class="table table-sm">
             <tbody>
@@ -414,7 +416,7 @@
 
     <div id="device-card" class="card shadow" style="display:none; flex:1 1 400px; max-width:560px;">
       <div class="card-body">
-        <h3 class="card-title h5">Your Device</h3>
+        <h3 class="card-title h5"><i class="fa-solid fa-laptop text-primary me-2" aria-hidden="true"></i>Your Device</h3>
         <div class="table-responsive">
           <table class="table table-sm">
             <tbody>

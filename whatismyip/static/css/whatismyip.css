@@ -222,3 +222,7 @@ a:hover {
 html[data-theme="dark"] #copy-notification {
   border: 1px solid var(--unc-cornerstone);
 }
+
+#additionalDetails.collapsing {
+  transition: none;
+}

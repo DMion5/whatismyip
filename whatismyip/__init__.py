@@ -595,8 +595,20 @@ def hostinfo():
     data["is_campus"] = is_campus_ip(data["client_address"])
 
     # collect device information
-    # user_agent = parse(http_user_agent)
-    data["user_device"] = parse(data["user_agent"]).__str__()
+    ua = parse(data["user_agent"])
+    data["user_device"] = {
+        "browser": ua.browser.family,
+        "browser_version": ua.browser.version_string,
+        "os": ua.os.family,
+        "os_version": ua.os.version_string,
+        "device_family": ua.device.family if ua.device.family != "Other" else None,
+        "device_brand": ua.device.brand,
+        "device_model": ua.device.model,
+        "is_mobile": ua.is_mobile,
+        "is_tablet": ua.is_tablet,
+        "is_pc": ua.is_pc,
+        "is_bot": ua.is_bot,
+    }
 
     # collect dns data
     reverse_addr = reversename.from_address(data["client_address"])

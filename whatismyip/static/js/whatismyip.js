@@ -259,6 +259,9 @@ function test_primary_url(default_version) {
 				}
 			}
 
+			// User device card — populate once; both callbacks return identical data
+			populateDeviceCard(result['user_device']);
+
 			// Network configuration card — IPv4 section (populated by primary/IPv4 callback)
 			var hasV4Config = false;
 			if (result['network']['netmask']) {
@@ -394,6 +397,45 @@ async function addAdvancedMarker(position, title) {
 		position: position,
 		title: title,
 	});
+}
+
+function populateDeviceCard(ud) {
+	if (!ud || $('#device-card').is(':visible')) return;
+	var hasInfo = false;
+	if (ud['browser'] && ud['browser'] !== 'Other') {
+		var browser = ud['browser'];
+		if (ud['browser_version']) browser += ' ' + ud['browser_version'];
+		$('#device-browser-row').show();
+		$('#device-browser').text(browser);
+		hasInfo = true;
+	}
+	if (ud['os'] && ud['os'] !== 'Other') {
+		var os = ud['os'];
+		if (ud['os_version']) os += ' ' + ud['os_version'];
+		$('#device-os-row').show();
+		$('#device-os').text(os);
+		hasInfo = true;
+	}
+	var deviceType = ud['is_bot'] ? 'Bot / Crawler' : ud['is_mobile'] ? 'Mobile' : ud['is_tablet'] ? 'Tablet' : ud['is_pc'] ? 'PC / Desktop' : null;
+	if (deviceType) {
+		$('#device-type-row').show();
+		$('#device-type').text(deviceType);
+		hasInfo = true;
+	}
+	if (ud['device_family']) {
+		var model = (ud['device_brand'] && ud['device_brand'] !== ud['device_family'])
+			? ud['device_brand'] + ' ' + ud['device_family']
+			: ud['device_family'];
+		$('#device-model-row').show();
+		$('#device-model').text(model);
+		hasInfo = true;
+	}
+	if (hasInfo) {
+		$('#device-card').show();
+		$('#detail-col').show();
+		$('#additional-info').show();
+		$('#toggle-button').show();
+	}
 }
 
 function createRandomString(length) {
@@ -670,6 +712,9 @@ function test_secondary_url(default_version) {
 				$('#net2-flags-row').show();
 				$('#net2-flags').html(net2_flags.join('&ensp;'));
 			}
+
+			// User device card — populate once; both callbacks return identical data
+			populateDeviceCard(result['user_device']);
 
 			// Network configuration card — IPv6 section (populated by secondary/IPv6 callback)
 			var hasV6Config = false;

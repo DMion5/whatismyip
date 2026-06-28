@@ -123,6 +123,11 @@
 					   {% if request.path == '/' %}aria-current="page"{% endif %}>Home</a>
 				</li>
 				<li class="nav-item">
+					<a class="nav-link small py-1{% if request.path == '/speedtest' %} active fw-semibold{% endif %}"
+					   href="{{ site_url }}/speedtest"
+					   {% if request.path == '/speedtest' %}aria-current="page"{% endif %}>Speed Test</a>
+				</li>
+				<li class="nav-item">
 					<a class="nav-link small py-1{% if request.path == '/about' %} active fw-semibold{% endif %}"
 					   href="{{ site_url }}/about"
 					   {% if request.path == '/about' %}aria-current="page"{% endif %}>About</a>
@@ -160,6 +165,7 @@
 							<li><a href="{{ site_url }}/about" aria-label="About">About "What is my IP?"</a></li>
 							<li><a href="{{ site_url }}/faq" aria-label="FAQ">Frequently Asked Questions</a></li>
 							<li><a href="{{ site_url }}/metrics" aria-label="Site statistics">Site Statistics</a></li>
+							<li><a href="{{ site_url }}/speedtest" aria-label="Speed test">Speed Test</a></li>
 						</ul>
 					</div>
 					<div class="col-lg-4">

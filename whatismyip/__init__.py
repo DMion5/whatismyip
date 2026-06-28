@@ -508,7 +508,7 @@ def get_metrics_dashboard(days=None):
                 """
                 SELECT COALESCE(NULLIF(TRIM(network_purpose), ''), 'Unknown') AS label, COUNT(*) AS count
                 FROM metrics_events
-                WHERE event_type = ?
+                WHERE event_type = ? AND is_campus = 1
                 GROUP BY label
                 ORDER BY count DESC
                 LIMIT 10

@@ -197,17 +197,15 @@
       <div class="card-body">
         <h3 class="h5 card-title">Campus mix</h3>
         {% if metrics.campus_breakdown %}
-          {% for row in metrics.campus_breakdown %}
-          <div class="mb-3">
-            <div class="d-flex justify-content-between small mb-1">
-              <span>{{ row.label }}</span>
-              <span>{{ row.count }} ({{ row.percentage }}%)</span>
-            </div>
-            <div class="progress" style="height: 0.75rem;">
-              <div class="progress-bar bg-primary" style="width: {{ row.percentage }}%;"></div>
-            </div>
+          <div style="position:relative;height:180px;" class="d-flex justify-content-center">
+            <canvas id="chartCampusMix" aria-label="Campus mix pie chart" role="img"></canvas>
           </div>
-          {% endfor %}
+          <script type="application/json" id="dataCampusMix">
+            {
+              "labels": {{ metrics.campus_breakdown | map(attribute='label') | list | tojson }},
+              "values": {{ metrics.campus_breakdown | map(attribute='count') | list | tojson }}
+            }
+          </script>
         {% else %}
           <p class="mb-0 text-muted">No metrics recorded yet.</p>
         {% endif %}
@@ -218,21 +216,19 @@
   <div class="col-lg-6">
     <div class="card shadow h-100">
       <div class="card-body">
-        <h3 class="h5 card-title">Network purpose</h3>
+        <h3 class="h5 card-title">Network purpose <small class="text-muted fw-normal" style="font-size:0.75em;">campus only</small></h3>
         {% if metrics.purpose_breakdown %}
-          {% for row in metrics.purpose_breakdown %}
-          <div class="mb-3">
-            <div class="d-flex justify-content-between small mb-1">
-              <span>{{ row.label }}</span>
-              <span>{{ row.count }} ({{ row.percentage }}%)</span>
-            </div>
-            <div class="progress" style="height: 0.75rem;">
-              <div class="progress-bar bg-primary" style="width: {{ row.percentage }}%;"></div>
-            </div>
+          <div style="position:relative;height:180px;" class="d-flex justify-content-center">
+            <canvas id="chartNetworkPurpose" aria-label="Network purpose pie chart" role="img"></canvas>
           </div>
-          {% endfor %}
+          <script type="application/json" id="dataNetworkPurpose">
+            {
+              "labels": {{ metrics.purpose_breakdown | map(attribute='label') | list | tojson }},
+              "values": {{ metrics.purpose_breakdown | map(attribute='count') | list | tojson }}
+            }
+          </script>
         {% else %}
-          <p class="mb-0 text-muted">No metrics recorded yet.</p>
+          <p class="mb-0 text-muted">No campus data recorded yet.</p>
         {% endif %}
       </div>
     </div>
@@ -306,17 +302,17 @@
     });
   }
 
-  // Doughnut chart — IP version mix
-  var pieEl   = document.getElementById('chartIpVersionMix');
-  var pieData = document.getElementById('dataIpVersionMix');
-  if (pieEl && pieData) {
-    var pd = JSON.parse(pieData.textContent);
-    new Chart(pieEl, {
+  function makeDoughnut(canvasId, dataId) {
+    var el  = document.getElementById(canvasId);
+    var raw = document.getElementById(dataId);
+    if (!el || !raw) return;
+    var d = JSON.parse(raw.textContent);
+    new Chart(el, {
       type: 'doughnut',
       data: {
-        labels: pd.labels,
+        labels: d.labels,
         datasets: [{
-          data: pd.values,
+          data: d.values,
           backgroundColor: pieColors,
           borderWidth: 0,
           hoverOffset: 6,
@@ -343,6 +339,12 @@
       }
     });
   }
+
+  makeDoughnut('chartCampusMix',     'dataCampusMix');
+  makeDoughnut('chartNetworkPurpose','dataNetworkPurpose');
+
+  // Doughnut chart — IP version mix
+  makeDoughnut('chartIpVersionMix', 'dataIpVersionMix');
 })();
 </script>
 {% endblock %}

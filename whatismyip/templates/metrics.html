@@ -70,8 +70,8 @@
   <div class="col-md-3">
     <div class="card shadow h-100">
       <div class="card-body">
-        <div class="text-muted small">Window size</div>
-        <div class="display-6 mb-0">{{ metrics.window_days }}d</div>
+        <div class="text-muted small">Reporting period</div>
+        <div class="display-6 mb-0">Last {{ metrics.window_days }} days</div>
       </div>
     </div>
   </div>
@@ -104,7 +104,7 @@
   <div class="col-md-3">
     <div class="card shadow h-100">
       <div class="card-body">
-        <h3 class="h5 card-title">IP version mix</h3>
+        <h3 class="h5 card-title">Protocol version</h3>
         {% if metrics.ip_versions %}
           <div style="position:relative;height:160px;" class="d-flex justify-content-center">
             <canvas id="chartIpVersionMix"
@@ -195,7 +195,7 @@
   <div class="col-lg-6">
     <div class="card shadow h-100">
       <div class="card-body">
-        <h3 class="h5 card-title">Campus mix</h3>
+        <h3 class="h5 card-title">Connection origin</h3>
         {% if metrics.campus_breakdown %}
           <div style="position:relative;height:180px;" class="d-flex justify-content-center">
             <canvas id="chartCampusMix" aria-label="Campus mix pie chart" role="img"></canvas>
@@ -216,7 +216,7 @@
   <div class="col-lg-6">
     <div class="card shadow h-100">
       <div class="card-body">
-        <h3 class="h5 card-title">Network purpose <small class="text-muted fw-normal" style="font-size:0.75em;">campus only</small></h3>
+        <h3 class="h5 card-title">Network type <small class="text-muted fw-normal" style="font-size:0.75em;">campus only</small></h3>
         {% if metrics.purpose_breakdown %}
           <div style="position:relative;height:180px;" class="d-flex justify-content-center">
             <canvas id="chartNetworkPurpose" aria-label="Network purpose pie chart" role="img"></canvas>

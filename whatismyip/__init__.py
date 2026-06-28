@@ -157,6 +157,7 @@ def _load_site_config():
         site_section = site_cfg.get("site", {})
         app.config["SITE_NAME"] = site_section.get("name", "")
         app.config["SITE_CITY"] = site_section.get("city", "")
+        app.config["SITE_REGION"] = site_section.get("region", "")
         app.config["SITE_COUNTRY_CODE"] = site_section.get("country_code", "")
         app.config["SITE_COUNTRY_NAME"] = site_section.get("country_name", "")
         app.config["SITE_LAT"] = site_section.get("lat", 0.0)
@@ -172,6 +173,7 @@ def _load_site_config():
         app.config["CAMPUS_NETWORKS"] = _DEFAULT_CAMPUS_NETWORKS
         app.config["DNS_SECURITY_TEST_URL"] = ""
         app.config["MAP_PROVIDER"] = "leaflet"
+        app.config["SITE_REGION"] = ""
         app.config["SITE_NAME"] = ""
         app.config["SITE_CITY"] = ""
         app.config["SITE_COUNTRY_CODE"] = ""
@@ -470,6 +472,21 @@ def get_metrics_dashboard(days=None):
             )
         )
 
+        org_breakdown = _with_percentages(
+            _count_by_query(
+                conn,
+                """
+                SELECT COALESCE(NULLIF(TRIM(org), ''), 'Unknown') AS label, COUNT(*) AS count
+                FROM metrics_events
+                WHERE event_type = ?
+                GROUP BY label
+                ORDER BY count DESC
+                LIMIT 10
+                """,
+                ("hostinfo",),
+            )
+        )
+
         country_breakdown = _with_percentages(
             _count_by_query(
                 conn,
@@ -506,7 +523,7 @@ def get_metrics_dashboard(days=None):
                 """
                 SELECT COALESCE(NULLIF(TRIM(network_purpose), ''), 'Unknown') AS label, COUNT(*) AS count
                 FROM metrics_events
-                WHERE event_type = ?
+                WHERE event_type = ? AND is_campus = 1
                 GROUP BY label
                 ORDER BY count DESC
                 LIMIT 10
@@ -524,6 +541,7 @@ def get_metrics_dashboard(days=None):
         "daily_max": daily_max,
         "ip_versions": ip_versions,
         "isp_breakdown": isp_breakdown,
+        "org_breakdown": org_breakdown,
         "country_breakdown": country_breakdown,
         "campus_breakdown": campus_breakdown,
         "purpose_breakdown": purpose_breakdown,
@@ -658,18 +676,25 @@ def hostinfo():
         # data['ipwhois'] = ipwhois
     else:
         # non-global addresses get a default location from site config
+        site_name = app.config.get("SITE_NAME", "")
         iplocation = {
             "country_code2": app.config.get("SITE_COUNTRY_CODE", ""),
             "country_name": app.config.get("SITE_COUNTRY_NAME", ""),
             "ip": str(ip),
             "ip_number": None,
             "ip_version": ip.version,
-            "isp": app.config.get("SITE_NAME", ""),
+            "isp": site_name,
+            "org": site_name,
+            "asn": None,
+            "region": app.config.get("SITE_REGION") or None,
             "response_code": None,
             "response_message": None,
             "city": app.config.get("SITE_CITY", ""),
             "lat": app.config.get("SITE_LAT", 0.0),
             "lon": app.config.get("SITE_LON", 0.0),
+            "mobile": False,
+            "proxy": False,
+            "hosting": False,
         }
     data["iplocation"] = iplocation
 

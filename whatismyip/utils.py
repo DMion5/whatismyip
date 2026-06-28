@@ -6,7 +6,6 @@ import re
 import time
 import ipaddress
 import requests
-import urllib3
 import json
 
 # from ipwhois import IPWhois
@@ -111,8 +110,6 @@ def get_network(ip_address):
 
         app.logger.debug("Checking for address info")
         session = requests.Session()
-        # requests.packages.urllib3.disable_warnings()
-        urllib3.disable_warnings(category=urllib3.exceptions.InsecureRequestWarning)
         params = {
             "_return_fields": "comment,network,network_view,members,extattrs,vlans.id,options",
             "_inheritance": True,
@@ -122,14 +119,11 @@ def get_network(ip_address):
             object_type = "ipv6network"
         else:
             object_type = "network"
-        # print("Using {} with {}".format(url,params))
-        # response = session.get("{}network".format(url), params=params, auth=(ib_username, ib_password), verify=False)  # pylint: disable=line-too-long
         response = session.get(
             f"{url}{object_type}",
             params=params,
             auth=(ib_username, ib_password),
-            verify=False,
-        )  # pylint: disable=line-too-long
+        )
         app.logger.debug(f"{response}")
         if response.status_code != 200:
             app.logger.warning(f"query failed {response}")
@@ -178,8 +172,6 @@ def get_address_objects(ip_address):
         url = f"https://{ib_server}/wapi/v2.10.5/"
 
         session = requests.Session()
-        # requests.packages.urllib3.disable_warnings()
-        urllib3.disable_warnings(category=urllib3.exceptions.InsecureRequestWarning)
         params = {
             "network_view": "default",
             "_return_fields+": "discovered_data,extattrs,fingerprint,ms_ad_user_data",
@@ -189,13 +181,11 @@ def get_address_objects(ip_address):
             object_type = "ipv6address"
         else:
             object_type = "ipv4address"
-        # response = session.get("{}ipv4address".format(url), params=params, auth=(ib_username, ib_password), verify=False)  # pylint: disable=line-too-long
         response = session.get(
             f"{url}{object_type}",
             params=params,
             auth=(ib_username, ib_password),
-            verify=False,
-        )  # pylint: disable=line-too-long
+        )
         app.logger.debug(f"{response}")
         if response.status_code != 200:
             address_list = None

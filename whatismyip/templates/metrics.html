@@ -1,19 +1,19 @@
 {% extends "base.html" %}
 
-{% block title %}Usage Metrics — What Is My IP? | UNC Chapel Hill ITS{% endblock %}
-{% block meta_description %}Usage statistics for the UNC Chapel Hill IP address tool: daily lookup counts, campus vs. off-campus ratio, IPv4/IPv6 mix, and ISP and country breakdown.{% endblock %}
-{% block og_title %}Usage Metrics — What Is My IP? | UNC Chapel Hill ITS{% endblock %}
-{% block og_description %}Usage statistics for the UNC Chapel Hill IP address tool: daily lookup counts, campus vs. off-campus ratio, IPv4/IPv6 mix, and ISP and country breakdown.{% endblock %}
+{% block title %}Site Statistics — What Is My IP? | UNC Chapel Hill ITS{% endblock %}
+{% block meta_description %}Usage statistics for the UNC Chapel Hill IP address tool: daily visit counts, campus vs. off-campus ratio, IPv4/IPv6 mix, and ISP and country breakdown.{% endblock %}
+{% block og_title %}Site Statistics — What Is My IP? | UNC Chapel Hill ITS{% endblock %}
+{% block og_description %}Usage statistics for the UNC Chapel Hill IP address tool: daily visit counts, campus vs. off-campus ratio, IPv4/IPv6 mix, and ISP and country breakdown.{% endblock %}
 {% block og_url %}{{ site_url }}/metrics{% endblock %}
-{% block twitter_title %}Usage Metrics — What Is My IP? | UNC Chapel Hill ITS{% endblock %}
-{% block twitter_description %}Aggregated usage statistics for the UNC Chapel Hill IP address diagnostic tool: lookup counts, campus split, IPv4/IPv6 mix, and ISP breakdown.{% endblock %}
+{% block twitter_title %}Site Statistics — What Is My IP? | UNC Chapel Hill ITS{% endblock %}
+{% block twitter_description %}Aggregated usage statistics for the UNC Chapel Hill IP address diagnostic tool: visit counts, campus split, IPv4/IPv6 mix, and ISP breakdown.{% endblock %}
 
 {% block structured_data %}
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "WebPage",
-  "name": "Usage Metrics — What Is My IP?",
+  "name": "Site Statistics — What Is My IP?",
   "url": "{{ site_url }}/metrics",
   "description": "Aggregated usage statistics for the UNC Chapel Hill IP address diagnostic tool. Shows daily lookup counts, campus vs. off-campus split, IPv4/IPv6 mix, ISP breakdown, and country distribution.",
   "isPartOf": {
@@ -37,8 +37,7 @@
 {% block content %}
 <div class="row p-1 my-3">
   <div class="col">
-    <h2 class="h4 mb-2">Usage Metrics</h2>
-    <p class="mb-0">Aggregated diagnostic lookups for the last {{ metrics.window_days }} days. The database stores counts and classifications only, not raw client IP addresses.</p>
+    <p class="mb-0">Aggregated page visits for the last {{ metrics.window_days }} days. The database stores counts and classifications only, not raw client IP addresses.</p>
   </div>
 </div>
 
@@ -46,7 +45,7 @@
   <div class="col-md-3">
     <div class="card shadow h-100">
       <div class="card-body">
-        <div class="text-muted small">Total lookups</div>
+        <div class="text-muted small"><i class="fa-solid fa-users me-1" aria-hidden="true"></i>Total visits</div>
         <div class="display-6 mb-0">{{ metrics.total_hostinfo }}</div>
       </div>
     </div>
@@ -54,7 +53,7 @@
   <div class="col-md-3">
     <div class="card shadow h-100">
       <div class="card-body">
-        <div class="text-muted small">Campus lookups</div>
+        <div class="text-muted small"><i class="fa-solid fa-building me-1" aria-hidden="true"></i>On-campus visits</div>
         <div class="display-6 mb-0">{{ metrics.total_campus }}</div>
       </div>
     </div>
@@ -62,7 +61,7 @@
   <div class="col-md-3">
     <div class="card shadow h-100">
       <div class="card-body">
-        <div class="text-muted small">Off-campus lookups</div>
+        <div class="text-muted small"><i class="fa-solid fa-house me-1" aria-hidden="true"></i>Off-campus visits</div>
         <div class="display-6 mb-0">{{ metrics.total_remote }}</div>
       </div>
     </div>
@@ -70,8 +69,8 @@
   <div class="col-md-3">
     <div class="card shadow h-100">
       <div class="card-body">
-        <div class="text-muted small">Window size</div>
-        <div class="display-6 mb-0">{{ metrics.window_days }}d</div>
+        <div class="text-muted small"><i class="fa-solid fa-calendar-days me-1" aria-hidden="true"></i>Reporting period</div>
+        <div class="display-6 mb-0">Last {{ metrics.window_days }} days</div>
       </div>
     </div>
   </div>
@@ -81,56 +80,19 @@
   <div class="col-md-9">
     <div class="card shadow h-100">
       <div class="card-body">
-        <h3 class="h5 card-title">Lookups over time</h3>
+        <h3 class="h5 card-title">Visits over time</h3>
         {% if metrics.daily_series %}
-          {% set n = metrics.daily_series | length %}
-          {% set denom = (n - 1) if n > 1 else 1 %}
-          {% set cx0 = 55 %}
-          {% set cx1 = 990 %}
-          {% set cy0 = 15 %}
-          {% set cy1 = 205 %}
-          {% set cxspan = cx1 - cx0 %}
-          {% set cyspan = cy1 - cy0 %}
-          {% set ns = namespace(lpts='', apts=cx0|string ~ ',' ~ cy1|string) %}
-          {% for row in metrics.daily_series %}
-            {% set x = (cx0 + (loop.index0 * cxspan / denom)) | round | int %}
-            {% set y = (cy1 - (row.count * cyspan / metrics.daily_max)) | round | int %}
-            {% set pt = x|string ~ ',' ~ y|string %}
-            {% set ns.lpts = ns.lpts ~ ' ' ~ pt %}
-            {% set ns.apts = ns.apts ~ ' ' ~ pt %}
-          {% endfor %}
-          {% set ns.apts = ns.apts ~ ' ' ~ cx1|string ~ ',' ~ cy1|string %}
-          <svg class="w-100" viewBox="0 0 1000 240" style="height:200px;overflow:visible;"
-               role="img" aria-label="Daily lookups over the past {{ metrics.window_days }} days">
-            {% for pct in [0, 25, 50, 75, 100] %}
-              {% set gy = (cy1 - (pct * cyspan / 100)) | round | int %}
-              {% set gv = (metrics.daily_max * pct / 100) | round | int %}
-              <line x1="{{ cx0 }}" y1="{{ gy }}" x2="{{ cx1 }}" y2="{{ gy }}"
-                    stroke="currentColor" stroke-opacity="0.1" stroke-width="1"/>
-              <text x="{{ cx0 - 6 }}" y="{{ gy + 4 }}" text-anchor="end"
-                    font-size="11" fill="currentColor" opacity="0.5">{{ gv }}</text>
-            {% endfor %}
-            <polygon points="{{ ns.apts }}" fill="var(--site-link)" opacity="0.12"/>
-            <polyline points="{{ ns.lpts | trim }}" fill="none"
-                      stroke="var(--site-link)" stroke-width="2.5"
-                      stroke-linejoin="round" stroke-linecap="round"/>
-            {% for row in metrics.daily_series %}
-              {% set x = (cx0 + (loop.index0 * cxspan / denom)) | round | int %}
-              {% if loop.index0 % 5 == 0 or loop.last %}
-                <text x="{{ x }}" y="{{ cy1 + 22 }}" text-anchor="middle"
-                      font-size="10" fill="currentColor" opacity="0.55">
-                  {{ row.day[5:] | replace('-', '/') }}
-                </text>
-              {% endif %}
-            {% endfor %}
-            {% for row in metrics.daily_series %}
-              {% set x = (cx0 + (loop.index0 * cxspan / denom)) | round | int %}
-              {% set y = (cy1 - (row.count * cyspan / metrics.daily_max)) | round | int %}
-              <circle cx="{{ x }}" cy="{{ y }}" r="3.5" fill="var(--site-link)" opacity="0.8">
-                <title>{{ row.day }}: {{ row.count }}</title>
-              </circle>
-            {% endfor %}
-          </svg>
+          <div style="position:relative;height:200px;">
+            <canvas id="chartLookupsOverTime"
+                    aria-label="Daily lookups over the past {{ metrics.window_days }} days"
+                    role="img"></canvas>
+          </div>
+          <script type="application/json" id="dataLookupsOverTime">
+            {
+              "labels": {{ metrics.daily_series | map(attribute='day') | list | tojson }},
+              "values": {{ metrics.daily_series | map(attribute='count') | list | tojson }}
+            }
+          </script>
         {% else %}
           <p class="mb-0 text-muted">No metrics recorded yet.</p>
         {% endif %}
@@ -141,19 +103,19 @@
   <div class="col-md-3">
     <div class="card shadow h-100">
       <div class="card-body">
-        <h3 class="h5 card-title">IP version mix</h3>
+        <h3 class="h5 card-title">Protocol version</h3>
         {% if metrics.ip_versions %}
-          {% for row in metrics.ip_versions %}
-          <div class="mb-3">
-            <div class="d-flex justify-content-between small mb-1">
-              <span>{{ row.label }}</span>
-              <span>{{ row.count }} ({{ row.percentage }}%)</span>
-            </div>
-            <div class="progress" style="height: 0.75rem;">
-              <div class="progress-bar bg-primary" style="width: {{ row.percentage }}%;"></div>
-            </div>
+          <div style="position:relative;height:160px;" class="d-flex justify-content-center">
+            <canvas id="chartIpVersionMix"
+                    aria-label="IP version mix pie chart"
+                    role="img"></canvas>
           </div>
-          {% endfor %}
+          <script type="application/json" id="dataIpVersionMix">
+            {
+              "labels": {{ metrics.ip_versions | map(attribute='label') | list | tojson }},
+              "values": {{ metrics.ip_versions | map(attribute='count') | list | tojson }}
+            }
+          </script>
         {% else %}
           <p class="mb-0 text-muted">No metrics recorded yet.</p>
         {% endif %}
@@ -163,17 +125,17 @@
 </div>
 
 <div class="row g-3 p-1 my-1">
-  <div class="col-lg-6">
+  <div class="col-lg-4">
     <div class="card shadow h-100">
       <div class="card-body">
-        <h3 class="h5 card-title">ISP breakdown</h3>
+        <h3 class="h5 card-title">Internet provider</h3>
         {% if metrics.isp_breakdown %}
           <div class="table-responsive">
             <table class="table table-sm align-middle mb-0">
               <thead>
                 <tr>
-                  <th>ISP</th>
-                  <th class="text-end">Hits</th>
+                  <th>Provider</th>
+                  <th class="text-end">Visits</th>
                   <th class="text-end">Share</th>
                 </tr>
               </thead>
@@ -195,17 +157,49 @@
     </div>
   </div>
 
-  <div class="col-lg-6">
+  <div class="col-lg-4">
     <div class="card shadow h-100">
       <div class="card-body">
-        <h3 class="h5 card-title">Country breakdown</h3>
+        <h3 class="h5 card-title">Organization</h3>
+        {% if metrics.org_breakdown %}
+          <div class="table-responsive">
+            <table class="table table-sm align-middle mb-0">
+              <thead>
+                <tr>
+                  <th>Organization</th>
+                  <th class="text-end">Visits</th>
+                  <th class="text-end">Share</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for row in metrics.org_breakdown %}
+                <tr>
+                  <td>{{ row.label }}</td>
+                  <td class="text-end">{{ row.count }}</td>
+                  <td class="text-end">{{ row.percentage }}%</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <p class="mb-0 text-muted">No metrics recorded yet.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-4">
+    <div class="card shadow h-100">
+      <div class="card-body">
+        <h3 class="h5 card-title">Country</h3>
         {% if metrics.country_breakdown %}
           <div class="table-responsive">
             <table class="table table-sm align-middle mb-0">
               <thead>
                 <tr>
                   <th>Country</th>
-                  <th class="text-end">Hits</th>
+                  <th class="text-end">Visits</th>
                   <th class="text-end">Share</th>
                 </tr>
               </thead>
@@ -232,19 +226,17 @@
   <div class="col-lg-6">
     <div class="card shadow h-100">
       <div class="card-body">
-        <h3 class="h5 card-title">Campus mix</h3>
+        <h3 class="h5 card-title">Connection origin</h3>
         {% if metrics.campus_breakdown %}
-          {% for row in metrics.campus_breakdown %}
-          <div class="mb-3">
-            <div class="d-flex justify-content-between small mb-1">
-              <span>{{ row.label }}</span>
-              <span>{{ row.count }} ({{ row.percentage }}%)</span>
-            </div>
-            <div class="progress" style="height: 0.75rem;">
-              <div class="progress-bar bg-primary" style="width: {{ row.percentage }}%;"></div>
-            </div>
+          <div style="position:relative;height:180px;" class="d-flex justify-content-center">
+            <canvas id="chartCampusMix" aria-label="Campus mix pie chart" role="img"></canvas>
           </div>
-          {% endfor %}
+          <script type="application/json" id="dataCampusMix">
+            {
+              "labels": {{ metrics.campus_breakdown | map(attribute='label') | list | tojson }},
+              "values": {{ metrics.campus_breakdown | map(attribute='count') | list | tojson }}
+            }
+          </script>
         {% else %}
           <p class="mb-0 text-muted">No metrics recorded yet.</p>
         {% endif %}
@@ -255,24 +247,135 @@
   <div class="col-lg-6">
     <div class="card shadow h-100">
       <div class="card-body">
-        <h3 class="h5 card-title">Network purpose</h3>
+        <h3 class="h5 card-title">Network type <small class="text-muted fw-normal" style="font-size:0.75em;">campus only</small></h3>
         {% if metrics.purpose_breakdown %}
-          {% for row in metrics.purpose_breakdown %}
-          <div class="mb-3">
-            <div class="d-flex justify-content-between small mb-1">
-              <span>{{ row.label }}</span>
-              <span>{{ row.count }} ({{ row.percentage }}%)</span>
-            </div>
-            <div class="progress" style="height: 0.75rem;">
-              <div class="progress-bar bg-primary" style="width: {{ row.percentage }}%;"></div>
-            </div>
+          <div style="position:relative;height:180px;" class="d-flex justify-content-center">
+            <canvas id="chartNetworkPurpose" aria-label="Network purpose pie chart" role="img"></canvas>
           </div>
-          {% endfor %}
+          <script type="application/json" id="dataNetworkPurpose">
+            {
+              "labels": {{ metrics.purpose_breakdown | map(attribute='label') | list | tojson }},
+              "values": {{ metrics.purpose_breakdown | map(attribute='count') | list | tojson }}
+            }
+          </script>
         {% else %}
-          <p class="mb-0 text-muted">No metrics recorded yet.</p>
+          <p class="mb-0 text-muted">No campus data recorded yet.</p>
         {% endif %}
       </div>
     </div>
   </div>
 </div>
+{% endblock %}
+
+{% block javascript %}
+<script src="{{ url_for('static', filename='js/chart.umd.min.js') }}"></script>
+<script>
+(function () {
+  var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  var textColor  = isDark ? 'rgba(255,255,255,0.65)' : 'rgba(0,0,0,0.55)';
+  var gridColor  = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.07)';
+  var accentBlue = '#4B9CD3';
+  var accentFill = isDark ? 'rgba(75,156,211,0.18)' : 'rgba(75,156,211,0.12)';
+  var pieColors  = ['#4B9CD3', '#2C5080', '#B7D7ED', '#5B6670'];
+
+  Chart.defaults.font.family = '"Open Sans", Helvetica, Arial, sans-serif';
+  Chart.defaults.font.size   = 12;
+  Chart.defaults.color       = textColor;
+
+  // Line chart — lookups over time
+  var lineEl   = document.getElementById('chartLookupsOverTime');
+  var lineData = document.getElementById('dataLookupsOverTime');
+  if (lineEl && lineData) {
+    var ld = JSON.parse(lineData.textContent);
+    new Chart(lineEl, {
+      type: 'line',
+      data: {
+        labels: ld.labels,
+        datasets: [{
+          data: ld.values,
+          borderColor: accentBlue,
+          backgroundColor: accentFill,
+          borderWidth: 2,
+          pointRadius: 3,
+          pointHoverRadius: 5,
+          fill: true,
+          tension: 0.3,
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              title: function(items) { return items[0].label; },
+              label: function(item)  { return ' ' + item.raw + ' visits'; }
+            }
+          }
+        },
+        scales: {
+          x: {
+            grid: { color: gridColor },
+            ticks: {
+              color: textColor,
+              maxTicksLimit: 7,
+              maxRotation: 0,
+            }
+          },
+          y: {
+            grid: { color: gridColor },
+            ticks: { color: textColor },
+            beginAtZero: true,
+          }
+        }
+      }
+    });
+  }
+
+  function makeDoughnut(canvasId, dataId) {
+    var el  = document.getElementById(canvasId);
+    var raw = document.getElementById(dataId);
+    if (!el || !raw) return;
+    var d = JSON.parse(raw.textContent);
+    new Chart(el, {
+      type: 'doughnut',
+      data: {
+        labels: d.labels,
+        datasets: [{
+          data: d.values,
+          backgroundColor: pieColors,
+          borderWidth: 0,
+          hoverOffset: 6,
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: { color: textColor, padding: 12, boxWidth: 12 }
+          },
+          tooltip: {
+            callbacks: {
+              label: function(item) {
+                var total = item.dataset.data.reduce(function(a, b) { return a + b; }, 0);
+                var pct   = total ? Math.round(item.raw / total * 100) : 0;
+                return ' ' + item.label + ': ' + item.raw + ' (' + pct + '%)';
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+
+  makeDoughnut('chartCampusMix',     'dataCampusMix');
+  makeDoughnut('chartNetworkPurpose','dataNetworkPurpose');
+
+  // Doughnut chart — IP version mix
+  makeDoughnut('chartIpVersionMix', 'dataIpVersionMix');
+})();
+</script>
 {% endblock %}

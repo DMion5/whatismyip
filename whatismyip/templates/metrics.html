@@ -83,54 +83,17 @@
       <div class="card-body">
         <h3 class="h5 card-title">Lookups over time</h3>
         {% if metrics.daily_series %}
-          {% set n = metrics.daily_series | length %}
-          {% set denom = (n - 1) if n > 1 else 1 %}
-          {% set cx0 = 55 %}
-          {% set cx1 = 990 %}
-          {% set cy0 = 15 %}
-          {% set cy1 = 205 %}
-          {% set cxspan = cx1 - cx0 %}
-          {% set cyspan = cy1 - cy0 %}
-          {% set ns = namespace(lpts='', apts=cx0|string ~ ',' ~ cy1|string) %}
-          {% for row in metrics.daily_series %}
-            {% set x = (cx0 + (loop.index0 * cxspan / denom)) | round | int %}
-            {% set y = (cy1 - (row.count * cyspan / metrics.daily_max)) | round | int %}
-            {% set pt = x|string ~ ',' ~ y|string %}
-            {% set ns.lpts = ns.lpts ~ ' ' ~ pt %}
-            {% set ns.apts = ns.apts ~ ' ' ~ pt %}
-          {% endfor %}
-          {% set ns.apts = ns.apts ~ ' ' ~ cx1|string ~ ',' ~ cy1|string %}
-          <svg class="w-100" viewBox="0 0 1000 240" style="height:200px;overflow:visible;"
-               role="img" aria-label="Daily lookups over the past {{ metrics.window_days }} days">
-            {% for pct in [0, 25, 50, 75, 100] %}
-              {% set gy = (cy1 - (pct * cyspan / 100)) | round | int %}
-              {% set gv = (metrics.daily_max * pct / 100) | round | int %}
-              <line x1="{{ cx0 }}" y1="{{ gy }}" x2="{{ cx1 }}" y2="{{ gy }}"
-                    stroke="currentColor" stroke-opacity="0.1" stroke-width="1"/>
-              <text x="{{ cx0 - 6 }}" y="{{ gy + 4 }}" text-anchor="end"
-                    font-size="11" fill="currentColor" opacity="0.5">{{ gv }}</text>
-            {% endfor %}
-            <polygon points="{{ ns.apts }}" fill="var(--site-link)" opacity="0.12"/>
-            <polyline points="{{ ns.lpts | trim }}" fill="none"
-                      stroke="var(--site-link)" stroke-width="2.5"
-                      stroke-linejoin="round" stroke-linecap="round"/>
-            {% for row in metrics.daily_series %}
-              {% set x = (cx0 + (loop.index0 * cxspan / denom)) | round | int %}
-              {% if loop.index0 % 5 == 0 or loop.last %}
-                <text x="{{ x }}" y="{{ cy1 + 22 }}" text-anchor="middle"
-                      font-size="10" fill="currentColor" opacity="0.55">
-                  {{ row.day[5:] | replace('-', '/') }}
-                </text>
-              {% endif %}
-            {% endfor %}
-            {% for row in metrics.daily_series %}
-              {% set x = (cx0 + (loop.index0 * cxspan / denom)) | round | int %}
-              {% set y = (cy1 - (row.count * cyspan / metrics.daily_max)) | round | int %}
-              <circle cx="{{ x }}" cy="{{ y }}" r="3.5" fill="var(--site-link)" opacity="0.8">
-                <title>{{ row.day }}: {{ row.count }}</title>
-              </circle>
-            {% endfor %}
-          </svg>
+          <div style="position:relative;height:200px;">
+            <canvas id="chartLookupsOverTime"
+                    aria-label="Daily lookups over the past {{ metrics.window_days }} days"
+                    role="img"></canvas>
+          </div>
+          <script type="application/json" id="dataLookupsOverTime">
+            {
+              "labels": {{ metrics.daily_series | map(attribute='day') | list | tojson }},
+              "values": {{ metrics.daily_series | map(attribute='count') | list | tojson }}
+            }
+          </script>
         {% else %}
           <p class="mb-0 text-muted">No metrics recorded yet.</p>
         {% endif %}
@@ -143,17 +106,17 @@
       <div class="card-body">
         <h3 class="h5 card-title">IP version mix</h3>
         {% if metrics.ip_versions %}
-          {% for row in metrics.ip_versions %}
-          <div class="mb-3">
-            <div class="d-flex justify-content-between small mb-1">
-              <span>{{ row.label }}</span>
-              <span>{{ row.count }} ({{ row.percentage }}%)</span>
-            </div>
-            <div class="progress" style="height: 0.75rem;">
-              <div class="progress-bar bg-primary" style="width: {{ row.percentage }}%;"></div>
-            </div>
+          <div style="position:relative;height:160px;" class="d-flex justify-content-center">
+            <canvas id="chartIpVersionMix"
+                    aria-label="IP version mix pie chart"
+                    role="img"></canvas>
           </div>
-          {% endfor %}
+          <script type="application/json" id="dataIpVersionMix">
+            {
+              "labels": {{ metrics.ip_versions | map(attribute='label') | list | tojson }},
+              "values": {{ metrics.ip_versions | map(attribute='count') | list | tojson }}
+            }
+          </script>
         {% else %}
           <p class="mb-0 text-muted">No metrics recorded yet.</p>
         {% endif %}
@@ -275,4 +238,111 @@
     </div>
   </div>
 </div>
+{% endblock %}
+
+{% block javascript %}
+<script src="{{ url_for('static', filename='js/chart.umd.min.js') }}"></script>
+<script>
+(function () {
+  var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  var textColor  = isDark ? 'rgba(255,255,255,0.65)' : 'rgba(0,0,0,0.55)';
+  var gridColor  = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.07)';
+  var accentBlue = '#4B9CD3';
+  var accentFill = isDark ? 'rgba(75,156,211,0.18)' : 'rgba(75,156,211,0.12)';
+  var pieColors  = ['#4B9CD3', '#2C5080', '#B7D7ED', '#5B6670'];
+
+  Chart.defaults.font.family = '"Open Sans", Helvetica, Arial, sans-serif';
+  Chart.defaults.font.size   = 12;
+  Chart.defaults.color       = textColor;
+
+  // Line chart — lookups over time
+  var lineEl   = document.getElementById('chartLookupsOverTime');
+  var lineData = document.getElementById('dataLookupsOverTime');
+  if (lineEl && lineData) {
+    var ld = JSON.parse(lineData.textContent);
+    new Chart(lineEl, {
+      type: 'line',
+      data: {
+        labels: ld.labels,
+        datasets: [{
+          data: ld.values,
+          borderColor: accentBlue,
+          backgroundColor: accentFill,
+          borderWidth: 2,
+          pointRadius: 3,
+          pointHoverRadius: 5,
+          fill: true,
+          tension: 0.3,
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              title: function(items) { return items[0].label; },
+              label: function(item)  { return ' ' + item.raw + ' lookups'; }
+            }
+          }
+        },
+        scales: {
+          x: {
+            grid: { color: gridColor },
+            ticks: {
+              color: textColor,
+              maxTicksLimit: 7,
+              maxRotation: 0,
+            }
+          },
+          y: {
+            grid: { color: gridColor },
+            ticks: { color: textColor },
+            beginAtZero: true,
+          }
+        }
+      }
+    });
+  }
+
+  // Doughnut chart — IP version mix
+  var pieEl   = document.getElementById('chartIpVersionMix');
+  var pieData = document.getElementById('dataIpVersionMix');
+  if (pieEl && pieData) {
+    var pd = JSON.parse(pieData.textContent);
+    new Chart(pieEl, {
+      type: 'doughnut',
+      data: {
+        labels: pd.labels,
+        datasets: [{
+          data: pd.values,
+          backgroundColor: pieColors,
+          borderWidth: 0,
+          hoverOffset: 6,
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: { color: textColor, padding: 12, boxWidth: 12 }
+          },
+          tooltip: {
+            callbacks: {
+              label: function(item) {
+                var total = item.dataset.data.reduce(function(a, b) { return a + b; }, 0);
+                var pct   = total ? Math.round(item.raw / total * 100) : 0;
+                return ' ' + item.label + ': ' + item.raw + ' (' + pct + '%)';
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+})();
+</script>
 {% endblock %}

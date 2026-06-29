@@ -182,6 +182,7 @@ function downloadReport() {
 	}
 
 	var connectSection = section('Connectivity', [
+		rpt('Default Protocol', primaryLabel),
 		rpt('IPv4', reportConnectV4),
 		rpt('IPv6', reportConnectV6),
 	]);

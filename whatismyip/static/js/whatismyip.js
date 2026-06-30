@@ -393,6 +393,7 @@ function test_primary_url(default_version) {
 				$('#second_address_section').show();
 				$('#address2').text(result["client_address"]);
 				$('#additional_ip .ip-bar-label').text('IPv4');
+				$('#second_address_section .ip-copy-card').removeClass('ip-loading');
 			}
 
 			// Populate IPv4 address's details
@@ -882,6 +883,7 @@ function test_secondary_url(default_version) {
 				$('#second_address_section').show();
 				$('#address2').text(result["client_address"]);
 				$('#additional_ip .ip-bar-label').text('IPv6');
+				$('#second_address_section .ip-copy-card').removeClass('ip-loading');
 			}
 			// Populate IPv6 address's details
 			$('#address2-details').show();

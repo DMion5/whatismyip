@@ -6,14 +6,18 @@
     Please enable JavaScript in your browser to use this service.
   </div>
 </noscript>
-<div class="row p-1 my-3">
+<div class="row mt-3 mb-2">
   <div class="col">
-    <p>Whether you are on campus, off campus, using a VPN, or behind a proxy, this site
-      determines your IP address by testing how your device communicates with the campus network.
-      See your connection details and IP address below — results update automatically, no page refresh needed.
-      Additional campus network details are provided when your address is recognized as a UNC address.
-    </p>
-    <div id="intro_text" data-nosnippet><div class="intro-status text-muted"><i class="fa-solid fa-spinner fa-spin me-2"></i>Testing connection&hellip;</div></div>
+    <div class="d-flex align-items-center justify-content-between gap-2">
+      <div id="intro_text" data-nosnippet><div class="intro-status text-muted"><i class="fa-solid fa-spinner fa-spin me-2"></i>Testing connection&hellip;</div></div>
+      <a id="report-btn" class="nav-report-btn flex-shrink-0 disabled" href="#"
+         onclick="downloadReport(); return false;"
+         aria-label="Download support report"
+         aria-disabled="true"
+         title="Download a PDF support report of your connection details">
+        <i class="fa-solid fa-file-arrow-down me-1"></i>Report
+      </a>
+    </div>
   </div>
 </div>
 
@@ -22,17 +26,17 @@
 
     <div id="first_address_section" class="row p-1 my-3" data-nosnippet>
       <div class="col">
-        <div class="card bg-primary shadow ip-copy-card"
+        <div class="card shadow ip-copy-card"
              onclick="copyAddress('#address1')"
              onkeydown="if(event.key==='Enter'||event.key===' ')copyAddress('#address1')"
              role="button" tabindex="0" aria-label="Copy IPv4 address to clipboard">
           <div class="card-body">
             <div id="address_box" class="d-flex align-items-center unc-ip">
-              <span class="text-white opacity-50 flex-shrink-0 small fw-semibold ip-bar-label"></span>
+              <span class="flex-shrink-0 ip-bar-label"></span>
               <div class="flex-grow-1 text-center">
-                <h2 id="address1" class="text-center mb-0">{{ context.client_address }}</h2>
+                <h2 id="address1" class="ip-hero-text mb-0">{{ context.client_address }}</h2>
               </div>
-              <i class="fa fa-copy text-white opacity-50 ms-2 flex-shrink-0" aria-hidden="true"></i>
+              <i class="fa fa-copy text-white opacity-50 ms-3 flex-shrink-0" aria-hidden="true"></i>
             </div>
           </div>
         </div>
@@ -40,19 +44,18 @@
     </div>
     <div id="second_address_section" class="row p-1 my-3" style="display:none;" data-nosnippet>
       <div class="col">
-        <div class="card bg-primary shadow ip-copy-card"
+        <div class="card shadow ip-copy-card ip-loading"
              onclick="copyAddress('#address2')"
              onkeydown="if(event.key==='Enter'||event.key===' ')copyAddress('#address2')"
              role="button" tabindex="0" aria-label="Copy IPv6 address to clipboard">
           <div class="card-body">
             <div id="additional_ip" class="d-flex align-items-center unc-ip">
-              <span class="text-white opacity-50 flex-shrink-0 small fw-semibold ip-bar-label"></span>
+              <span class="flex-shrink-0 ip-bar-label"></span>
               <div class="flex-grow-1 text-center">
-                <h2 id="address2" class="text-center mb-0">loading...</h2>
+                <h2 id="address2" class="ip-hero-text mb-0">Detecting&hellip;</h2>
               </div>
-              <i class="fa fa-copy text-white opacity-50 ms-2 flex-shrink-0" aria-hidden="true"></i>
+              <i class="fa fa-copy text-white opacity-50 ms-3 flex-shrink-0" aria-hidden="true"></i>
             </div>
-
           </div>
         </div>
       </div>
@@ -73,7 +76,9 @@
 
 </div> <!-- end of address row -->
 
-<div class="row g-4 p-1">
+<hr class="section-divider">
+
+<div class="row g-3 mt-1">
 
   <div class="col-xl-3 d-flex flex-column"> <!-- start of column 1 -->
 
@@ -291,7 +296,7 @@
 
 </div> <!-- end of row -->
 
-<div id="nac-diagram-row" class="p-1 mt-2" style="display:none;" data-nosnippet>
+<div id="nac-diagram-row" class="mt-3" style="display:none;" data-nosnippet>
   <div class="d-flex flex-column flex-md-row align-items-stretch gap-3">
     <div id="nac-diagram-card" class="card shadow flex-grow-1" style="display:none;">
       <div class="card-body py-2">
@@ -452,10 +457,10 @@
 
 </div><!-- end additionalDetails collapse -->
 
-<div class="row p-1 my-3">
+<div class="row mt-4 mb-3">
   <div class="col">
     <div class="card shadow card-body" style="background-color: var(--site-subtle-bg);">
-      <h2 class="card-title h5">What does this tool show?</h2>
+      <h2 class="card-title h5"><i class="fa-solid fa-circle-question text-primary me-2" aria-hidden="true"></i>What does this tool show?</h2>
       <div class="row mt-2">
         <div class="col-md-6">
           <p class="mb-1">All visitors see:</p>

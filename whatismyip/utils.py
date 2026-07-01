@@ -350,11 +350,19 @@ def get_nac_info(ip_address, mac=None):
 
     # Do some cleanup on the data to add NIT inventory information
     if data["endSystem"] and "switchPortId" in data["endSystem"]:
+        # Named AP format (Extreme): "AP-NAME (MAC):SSID"
         wireless_regex = r"^(?P<ap_name>\S+)\s\((?P<ap_mac>\S+)\):(?P<ssid>\S+)$"
+        # MAC-only format (Meraki): "CC-6E-2A-D6-2E-40:SSID" — no AP name, no building ID
+        meraki_wireless_regex = (
+            r"^(?P<ap_mac>[0-9A-Fa-f]{2}(?:[:-][0-9A-Fa-f]{2}){5}):(?P<ssid>.+)$"
+        )
         ap_name_regex = r"^(?P<tier>[^-]+)-(?P<bldg_id>\d+)-"
         match = re.match(wireless_regex, data["endSystem"]["switchPortId"])
+        meraki_match = re.match(
+            meraki_wireless_regex, data["endSystem"]["switchPortId"]
+        )
         if match:
-            # we have a wireless connection
+            # Named AP wireless — can resolve building from AP name
             data["endSystem"]["connection_type"] = "wireless"
             data["endSystem"]["wireless_controller"] = (
                 data["endSystem"]["switchIP"]
@@ -370,8 +378,22 @@ def get_nac_info(ip_address, mac=None):
                 data["endSystem"]["wireless_ap_bldg_id"] = ap_match.group("bldg_id")
                 data["nit_building"] = get_nit_building_by_id(ap_match.group("bldg_id"))
                 app.logger.debug(f"NIT building info: {data['nit_building']}")
+        elif meraki_match:
+            # MAC-only wireless — building lookup not available without Meraki API
+            data["endSystem"]["connection_type"] = "wireless"
+            data["endSystem"]["wireless_controller"] = (
+                data["endSystem"]["switchIP"]
+                if "switchIP" in data["endSystem"]
+                else None
+            )
+            data["endSystem"]["wireless_ap_name"] = None
+            data["endSystem"]["wireless_ap_mac"] = meraki_match.group("ap_mac")
+            data["endSystem"]["wireless_ssid"] = meraki_match.group("ssid")
+            app.logger.debug(
+                f"Meraki wireless: mac={meraki_match.group('ap_mac')} ssid={meraki_match.group('ssid')}"
+            )
         elif data["endSystem"] and "switchIP" in data["endSystem"]:
-            # we have a wired connection
+            # wired connection
             data["endSystem"]["connection_type"] = "wired"
             data["nit_building"] = get_nit_building(end_system_data["switchIP"])
             app.logger.debug(f"NIT building info: {data['nit_building']}")

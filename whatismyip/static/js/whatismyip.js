@@ -603,6 +603,7 @@ function test_primary_url(default_version) {
 			// User device card — populate once; both callbacks return identical data
 			populateDeviceCard(result['user_device']);
 			checkClockSync(result['server_time']);
+			checkNATType(result['client_address']);
 
 			// Network configuration card — IPv4 section (populated by primary/IPv4 callback)
 			var hasV4Config = false;
@@ -660,6 +661,80 @@ function test_primary_url(default_version) {
 		}
 	});
 
+}
+
+function checkNATType(serverIp) {
+	if (!serverIp || !window.RTCPeerConnection) return;
+	var hostIPs = [];
+	var srflxIPs = [];
+	var finished = false;
+	var timer;
+
+	function finish() {
+		if (finished) return;
+		finished = true;
+		clearTimeout(timer);
+		try { pc.close(); } catch (ignore) {}
+		renderNATResult(serverIp, hostIPs, srflxIPs);
+	}
+
+	var pc = new RTCPeerConnection({
+		iceServers: [
+			{ urls: 'stun:stun.l.google.com:19302' },
+			{ urls: 'stun:stun.cloudflare.com:3478' }
+		]
+	});
+
+	pc.onicecandidate = function (e) {
+		if (!e.candidate) { finish(); return; }
+		var parts = e.candidate.candidate.split(' ');
+		if (parts.length < 8) return;
+		var ip = parts[4], type = parts[7];
+		// Skip link-local and loopback
+		if (/^fe80:/i.test(ip) || ip === '::1' || ip === '127.0.0.1') return;
+		if (type === 'host' && !hostIPs.includes(ip)) hostIPs.push(ip);
+		if (type === 'srflx' && !srflxIPs.includes(ip)) srflxIPs.push(ip);
+	};
+
+	pc.createDataChannel('nat-probe');
+	pc.createOffer()
+		.then(function (offer) { return pc.setLocalDescription(offer); })
+		.catch(finish);
+
+	timer = setTimeout(finish, 6000);
+}
+
+function renderNATResult(serverIp, hostIPs, srflxIPs) {
+	var icon, cls, label;
+
+	if (srflxIPs.length === 0) {
+		if (hostIPs.some(function (ip) { return ip === serverIp; })) {
+			icon = 'fa-circle-check text-success'; cls = '';
+			label = 'No NAT — direct internet connection';
+		} else {
+			icon = 'fa-circle-question text-muted'; cls = 'text-muted';
+			label = 'STUN unreachable — UDP may be blocked';
+		}
+	} else {
+		var external = srflxIPs[0];
+		if (hostIPs.includes(external)) {
+			icon = 'fa-circle-check text-success'; cls = '';
+			label = 'No NAT — direct internet connection';
+		} else if (external === serverIp) {
+			icon = 'fa-arrow-right-arrow-left text-info'; cls = '';
+			label = 'Behind NAT — ' + external;
+		} else {
+			icon = 'fa-triangle-exclamation text-warning'; cls = 'text-warning';
+			label = 'Split path — UDP exits via ' + external + ', HTTP via ' + serverIp;
+		}
+	}
+
+	$('#device-nat').html('<i class="fa-solid ' + icon + ' me-1" aria-hidden="true"></i><span class="' + cls + '">' + label + '</span>');
+	$('#device-nat-row').show();
+	$('#device-card').show();
+	$('#detail-col').show();
+	$('#additional-info').show();
+	$('#nac-diagram-row').show();
 }
 
 function checkClockSync(serverTime) {

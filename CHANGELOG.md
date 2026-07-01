@@ -30,6 +30,7 @@ All notable changes to this project will be documented here. This project follow
 - Site Statistics last card row had no bottom margin, causing content to touch the footer. Added `mb-4` to the final row.
 - Open Source card on the About page now uses the subtle tinted background (`--site-subtle-bg`) to match the visual treatment of the bottom card on the home page.
 - Static asset cache busting: all CSS and JS `url_for` references across every template now append `?v={{ app_version }}` so browser caches are invalidated automatically on each version bump, preventing stale styles or scripts after a deploy.
+- Mixed-network address detection: when a device's IPv4 and IPv6 addresses resolve to different networks (e.g., campus IPv4 with iCloud Private Relay routing IPv6 off-campus), a supplementary note is appended to the connection status message. Detects iCloud Private Relay by ISP name, VPN/proxy by the ip-api proxy flag, and falls back to a generic split-network message for other cases.
 
 ---
 

@@ -131,6 +131,27 @@ function copyAddress(addressSelector) {
 		});
 }
 
+function checkAddressMismatch() {
+	if (!reportDataPrimary || !reportDataSecondary) return;
+	if (reportDataPrimary['is_campus'] === reportDataSecondary['is_campus']) return;
+
+	var offCampus = reportDataPrimary['is_campus'] ? reportDataSecondary : reportDataPrimary;
+	var isp = (offCampus['iplocation'] && offCampus['iplocation']['isp']) || '';
+	var note;
+
+	if (/icloud|private relay/i.test(isp)) {
+		note = 'iCloud Private Relay is routing one of your addresses off-campus.';
+	} else if (offCampus['iplocation'] && offCampus['iplocation']['proxy']) {
+		note = 'A VPN or proxy service is routing one of your addresses off-campus.';
+	} else {
+		note = 'Your two addresses are on different networks — one campus, one off-campus.';
+	}
+
+	$('#intro_text .intro-status').append(
+		`<div class="mt-1 small text-muted"><i class="fa-solid fa-circle-info text-info me-1" aria-hidden="true"></i>${note}</div>`
+	);
+}
+
 function showPrimaryLoadError() {
 	$('#intro_text').html('<div class="intro-status text-warning"><i class="fa-solid fa-triangle-exclamation me-2" aria-hidden="true"></i>Connection details could not be retrieved. <a href="javascript:void(0)" onclick="location.reload()">Refresh to try again.</a></div>');
 	$('#report-btn').addClass('disabled').attr('aria-disabled', 'true');
@@ -622,6 +643,7 @@ function test_primary_url(default_version) {
 			}
 
 			reportDataPrimary = result;
+			checkAddressMismatch();
 			if (default_version == 4) reportConnectV4 = 'Supported';
 			else reportConnectV6 = 'Supported';
 			$('#report-btn').removeClass('disabled').removeAttr('aria-disabled');
@@ -1035,6 +1057,7 @@ function test_secondary_url(default_version) {
 			}
 
 			reportDataSecondary = result;
+			checkAddressMismatch();
 			if (default_version == 4) reportConnectV6 = 'Supported';
 			else reportConnectV4 = 'Supported';
 		},

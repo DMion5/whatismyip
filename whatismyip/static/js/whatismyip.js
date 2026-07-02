@@ -18,6 +18,7 @@ var reportDnsProviderIp = null;
 var reportDnsEdnsGeo = null;
 var reportDnsEdnsIp = null;
 var reportDnsFiltering = null;
+var reportInternetIp = null;
 
 function buildNacDiagram(nac, userDevice) {
 	var es = nac.endSystem || {};
@@ -283,6 +284,7 @@ function downloadReport() {
 		rpt('Default Protocol', primaryLabel),
 		rpt('IPv4', reportConnectV4),
 		rpt('IPv6', reportConnectV6),
+		rpt('Internet Address', reportInternetIp ? reportInternetIp + ' (differs from campus address)' : null),
 	]);
 
 	var dnsProvider = [reportDnsProviderGeo, reportDnsProviderIp].filter(Boolean).join(' — ');
@@ -700,33 +702,21 @@ function renderNATResult(serverIp, externalIp, networkPurpose) {
 	var pathsDiffer = !isV6 && externalIp && externalIp !== serverIp;
 	if (!pathsDiffer) return;
 
-	var icon, label;
+	reportInternetIp = externalIp;
+
 	if (networkPurpose === 'VPN') {
-		icon = 'fa-code-branch text-info';
-		label = 'Split tunnel — campus VPN, internet via ' + externalIp;
 		$('#intro_text .intro-status').append(
 			`<div class="mt-1 small text-muted"><i class="fa-solid fa-circle-info text-info me-1" aria-hidden="true"></i>Internet traffic bypasses the VPN tunnel and exits via ${externalIp}.</div>`
 		);
 	} else if (networkPurpose) {
-		icon = 'fa-arrow-right-arrow-left text-info';
-		label = 'Campus NAT — internet traffic exits as ' + externalIp;
 		$('#intro_text .intro-status').append(
 			`<div class="mt-1 small text-muted"><i class="fa-solid fa-circle-info text-info me-1" aria-hidden="true"></i>Your internet traffic exits the campus network as ${externalIp}.</div>`
 		);
 	} else {
-		icon = 'fa-code-branch text-info';
-		label = 'Split path — campus ' + serverIp + ', internet ' + externalIp;
 		$('#intro_text .intro-status').append(
 			`<div class="mt-1 small text-muted"><i class="fa-solid fa-circle-info text-info me-1" aria-hidden="true"></i>Your internet traffic appears to use a different address (${externalIp}) than your campus connection.</div>`
 		);
 	}
-
-	$('#device-nat').html('<i class="fa-solid ' + icon + ' me-1" aria-hidden="true"></i><span>' + label + '</span>');
-	$('#device-nat-row').show();
-	$('#device-card').show();
-	$('#detail-col').show();
-	$('#additional-info').show();
-	$('#nac-diagram-row').show();
 }
 
 function checkClockSync(serverTime) {

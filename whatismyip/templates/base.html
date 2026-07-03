@@ -34,6 +34,8 @@
 	<meta name="msvalidate.01" content="{{ bing_verification_token }}">
 	{% endif %}
 
+	{% block canonical %}<link rel="canonical" href="{{ site_url }}{{ request.path }}">{% endblock %}
+
 	<link rel="icon" href="/static/logo/favicon.ico" sizes="48x48">
 	<link rel="icon" type="image/svg+xml" href="/static/logo/favicon.svg">
 	<link rel="apple-touch-icon" sizes="180x180" href="/static/logo/apple-touch-icon.png">
@@ -178,11 +180,6 @@
 								   href="{{ site_url }}/about"
 								   {% if request.path == '/about' %}aria-current="page"{% endif %}>About</a>
 							</li>
-							<li class="nav-item">
-								<a class="nav-link small py-1{% if request.path == '/metrics' %} active fw-semibold{% endif %}"
-								   href="{{ site_url }}/metrics"
-								   {% if request.path == '/metrics' %}aria-current="page"{% endif %}>Site Statistics</a>
-							</li>
 						</ul>
 					</div>
 				</div>
@@ -206,8 +203,6 @@
 					<div class="col-lg-4">
 						<h2 class="h5">Explore</h2>
 						<ul class="list-unstyled">
-							<li><a href="{{ site_url }}/speedtest">Speed Test</a></li>
-							<li><a href="{{ site_url }}/connectivity">Connectivity</a></li>
 							<li><a href="{{ site_url }}/faq">Frequently Asked Questions</a></li>
 							<li><a href="{{ site_url }}/about">About "What is my IP?"</a></li>
 							<li><a href="{{ site_url }}/metrics">Site Statistics</a></li>

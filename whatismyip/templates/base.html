@@ -34,6 +34,8 @@
 	<meta name="msvalidate.01" content="{{ bing_verification_token }}">
 	{% endif %}
 
+	{% block canonical %}<link rel="canonical" href="{{ site_url }}{{ request.path }}">{% endblock %}
+
 	<link rel="icon" href="/static/logo/favicon.ico" sizes="48x48">
 	<link rel="icon" type="image/svg+xml" href="/static/logo/favicon.svg">
 	<link rel="apple-touch-icon" sizes="180x180" href="/static/logo/apple-touch-icon.png">

@@ -128,12 +128,12 @@
 						<button id="theme-toggle" class="theme-toggle-btn" type="button" aria-label="Toggle theme" title="Theme: System">
 							<i id="theme-toggle-icon" class="fa-solid fa-circle-half-stroke" aria-hidden="true"></i>
 						</button>
-						<h1 class="mb-0">
+						{% block site_heading_open %}<p class="mb-0 site-title">{% endblock %}
 						<a href="{{ site_url }}" style="text-decoration: none; color: inherit;">
 							What Is My IP?
 							<img class="site-header-logo" src="{{ url_for('static', filename='logo/logo.png') }}" alt="Laptop logo">
 						</a>
-						</h1>
+						{% block site_heading_close %}</p>{% endblock %}
 						<p class="site-header-tagline">Network diagnostics &middot; UNC Information Technology Services</p>
 					  </div>
 					</div>

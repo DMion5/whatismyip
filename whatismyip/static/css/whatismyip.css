@@ -93,6 +93,12 @@ main[role="main"] {
   position: relative;
 }
 
+.site-title {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
 .site-page-heading {
   font-size: 1.6rem;
   font-weight: 700;

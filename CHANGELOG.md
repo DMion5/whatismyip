@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented here. This project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) conventions.
 
+## [1.6.1] - 2026-07-03
+
+### Fixed
+
+- **Duplicate `<h1>` tags on all non-home pages** — the site title in the base template was an `<h1>`, causing every interior page to have two `<h1>` elements (the site title and the page heading). The base template now renders the site title as a `<p class="site-title">` styled to match; `home.html` overrides the block back to `<h1>` so the home page retains a single correct heading for SEO.
+- **Leaflet map tile images missing alt text** — Leaflet generated tile `<img>` elements with `alt=""` (empty), which Bing Webmaster Tools flagged as missing. Added `alt: 'OpenStreetMap tile'` to the `L.tileLayer` options so Leaflet sets a descriptive alt on every tile natively.
+
+### Changed
+
+- **README updated** — architecture and detection flow sections now reflect the blueprint structure introduced in 1.5.0; gunicorn command corrected from `"whatismyip:app"` to `wsgi:application`; running tests section expanded to include the coverage invocation.
+- **FAQ external services entry corrected** — the answer previously said "yes, in one case" but the browser contacts up to three external services (ip-api.com for DNS provider, ipify.org for internet IP, and the DNS security test domain). All three are now listed accurately.
+- **`.gitignore` updated** — added `.ruff_cache/` and `.claude/`.
+
+---
+
 ## [1.6.0] - 2026-07-02
 
 ### Added

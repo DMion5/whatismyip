@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented here. This project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) conventions.
 
+## [1.6.3] - 2026-07-03
+
+### Fixed
+
+- **Campus DNS Security label on metrics page** — the Site Statistics page still showed "DNS security filtering" as the card title; updated to match the rename in 1.6.2.
+
+### Changed
+
+- **Canonical URL consolidated** — `<link rel="canonical">` moved from individual page templates into `base.html`, using `site_url + request.path` automatically. Error pages (404, 500) suppress the tag via a block override. Any future page template gets the correct canonical for free.
+- **Navbar simplified** — Site Statistics removed from the top navigation; it remains accessible via the footer. This also prepares for a potential future password-protection of that page without leaving a broken nav link.
+- **Footer "Explore" trimmed** — reduced to three links (FAQ, About, Site Statistics), removing Speed Test and Connectivity which are already prominent in the navbar.
+
 ## [1.6.2] - 2026-07-03
 
 ### Fixed

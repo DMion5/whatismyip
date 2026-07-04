@@ -577,6 +577,24 @@ function test_primary_url(default_version) {
 				}
 			}
 
+			// Meraki wireless client details
+			if (result['nac']['meraki_client']) {
+				var mc = result['nac']['meraki_client'];
+				var merakiRows = [
+					['Manufacturer', mc.manufacturer],
+					['Device', mc.description],
+					['Wireless Status', mc.status],
+					['SSID', mc.ssid],
+					['VLAN', mc.vlan],
+					['Last Seen', mc.last_seen],
+				];
+				merakiRows.forEach(function([label, val]) {
+					if (val) {
+						$('#nac-table tbody').append(`<tr><th>${label}</th><td>${val}</td></tr>`);
+					}
+				});
+			}
+
 			// dump building data
 			if (result['nac']['nit_building'] && Object.keys(result['nac']['nit_building']).length > 0) {
 				var bldg = result['nac']['nit_building'];

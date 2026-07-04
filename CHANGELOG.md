@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented here. This project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) conventions.
 
+## [1.7.0] - 2026-07-03
+
+### Added
+
+- **Cisco Meraki wireless enrichment** — when a campus device is connected to a Meraki AP, the server now optionally queries the Meraki Dashboard API to enrich the connection data. AP lookup (`/organizations/{orgId}/devices`) retrieves the AP name, which populates the connection diagram and feeds the existing building lookup flow if the name follows the standard tier-building naming convention. Client lookup (`/organizations/{orgId}/clients/search`) retrieves manufacturer, device description, wireless status, SSID, VLAN, and last-seen time, displayed as additional rows in the NAC table. Both calls fail silently — Aruba clients and unconfigured deployments are completely unaffected. Enabled by setting `FLASK_MERAKI_API_KEY` and `FLASK_MERAKI_ORG_ID` environment variables.
+
 ## [1.6.3] - 2026-07-03
 
 ### Fixed

@@ -26,7 +26,7 @@ def _get(path: str, params: dict | None = None) -> Any:
             return response.json()
         app.logger.warning(f"Meraki API {path} returned {response.status_code}")
         return None
-    except requests.RequestException as e:
+    except Exception as e:
         app.logger.warning(f"Meraki API request failed: {e}")
         return None
 
@@ -68,7 +68,7 @@ def get_meraki_client(client_mac: str) -> dict[str, Any] | None:
     start = time.time()
     result = _get(
         f"/organizations/{org_id}/clients/search",
-        params={"mac": client_mac, "timespan": 3600},
+        params={"mac": client_mac, "timespan": 86400},
     )
     app.logger.debug(f"Meraki client lookup in {time.time() - start:.3f}s")
     if not result:
@@ -77,12 +77,40 @@ def get_meraki_client(client_mac: str) -> dict[str, Any] | None:
     if not records:
         app.logger.debug(f"Meraki: no client found for MAC {client_mac}")
         return None
-    client = records[0].get("client", {})
+    # manufacturer is top-level; client fields are flat in each record (no nested "client" key)
+    rec = records[0]
+    network_id = rec.get("network", {}).get("id") or None
+    client_id = result.get("clientId") or None
     return {
-        "manufacturer": client.get("manufacturer") or None,
-        "description": client.get("description") or None,
-        "status": client.get("status") or None,
-        "ssid": client.get("ssid") or None,
-        "vlan": client.get("vlan") or None,
-        "last_seen": client.get("lastSeen") or None,
+        "manufacturer": result.get("manufacturer") or None,
+        "description": rec.get("description") or None,
+        "os": rec.get("os") or None,
+        "user": rec.get("user") or None,
+        "status": rec.get("status") or None,
+        "ssid": rec.get("ssid") or None,
+        "vlan": rec.get("vlan") or None,
+        "wireless_capabilities": rec.get("wirelessCapabilities") or None,
+        "network_id": network_id,
+        "client_id": client_id,
     }
+
+
+def get_meraki_signal_quality(network_id: str, client_id: str) -> dict[str, Any] | None:
+    """
+    Fetch recent RSSI and SNR for a wireless client using a 1-hour aggregate bucket.
+    """
+    start = time.time()
+    result = _get(
+        f"/networks/{network_id}/wireless/signalQualityHistory",
+        params={"clientId": client_id, "timespan": 3600, "resolution": 3600},
+    )
+    app.logger.debug(f"Meraki signal quality lookup in {time.time() - start:.3f}s")
+    if not isinstance(result, list) or not result:
+        return None
+    latest = result[-1]
+    app.logger.debug(f"Meraki signal quality: {latest}")
+    rssi = latest.get("rssi")
+    snr = latest.get("snr")
+    if rssi is None and snr is None:
+        return None
+    return {"rssi": rssi, "snr": snr}

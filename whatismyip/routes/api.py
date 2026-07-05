@@ -107,11 +107,14 @@ _SIMULATE_HOSTINFO = {
         },
         "nac": {
             "endSystem": {
+                "lastSeenTime": 1751734800000,
                 "macAddress": "00:00:5e:00:53:01",
                 "ipAddress": "192.0.2.50",
                 "nacApplianceGroupName": "Wireless Meraki",
                 "nacProfileName": "Default NAC Profile",
                 "nacApplianceIP": "172.29.145.91",
+                "policy": "Filter-Id='Enterasys:version=1:policy=Wireless-Meraki'",
+                "reason": "Default-Wireless-Meraki",
                 "switchIP": "152.23.141.249",
                 "switchPortId": "CC-6E-2A-D6-2E-40:eduroam",
                 "switchPort": "1",
@@ -244,7 +247,9 @@ def hostinfo() -> Response:
     simulate = request.args.get("simulate")
     if simulate:
         ip_ver = int(simulate) if simulate in ("4", "6") else 4
-        return jsonify(_SIMULATE_HOSTINFO[ip_ver])
+        sim_data = dict(_SIMULATE_HOSTINFO[ip_ver])
+        sim_data["server_time"] = int(time.time() * 1000)
+        return jsonify(sim_data)
 
     forwarded_for = request.environ.get("HTTP_X_FORWARDED_FOR", None)
     remote_address = request.environ.get("REMOTE_ADDR", None)

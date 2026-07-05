@@ -555,6 +555,7 @@
           <ul class="mb-0">
             <li>Campus network and VLAN assignment</li>
             <li>Network Access Control (NAC) details</li>
+            <li>Wi-Fi connection details — SSID, access point, and signal quality</li>
             <li>Building location map (street-level, where available)</li>
           </ul>
         </div>
@@ -579,7 +580,7 @@
   "@type": "WebApplication",
   "name": "What Is My IP? — UNC Chapel Hill",
   "url": "{{ site_url }}",
-  "description": "Find your IP address and test your connection to the UNC Chapel Hill campus network. Works for on-campus, VPN, and wireless users. Shows IPv4, IPv6, DNS security filtering status, and detailed campus network information.",
+  "description": "Find your IP address and test your connection to the UNC Chapel Hill campus network. Works for on-campus, VPN, and wireless users. Shows IPv4, IPv6, DNS provider detection, DNS security filtering status, and detailed campus network information.",
   "applicationCategory": "NetworkingApplication",
   "operatingSystem": "Any",
   "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
@@ -592,6 +593,8 @@
     "IP address lookup",
     "IPv4 and IPv6 detection",
     "Campus VPN detection",
+    "DNS provider detection",
+    "DNS leak test",
     "DNS security filtering test",
     "Network and VLAN details",
     "ISP and geolocation"

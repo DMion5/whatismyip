@@ -35,7 +35,9 @@ def get_client_address(
     """
     In general the X-Forwarded-For header is a comma separated list of IP
     addresses but the header format is not formally standardized.  We will
-    only trust the last two addresses for security concerns.
+    only trust the last two addresses for security concerns — ignoring any
+    client-supplied entries earlier in the chain.  When only one address is
+    present (single-proxy deployment) that address is returned directly.
 
     Example value: "2610:28:3091:1000:2::a,172.22.158.131"
     """

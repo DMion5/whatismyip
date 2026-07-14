@@ -93,10 +93,16 @@
 
 	<header class="ub-global-header">
 		<div class="container ub-global-header-inner">
-			<a class="ub-university-link" href="https://www.buffalo.edu/" aria-label="University at Buffalo home">
-				<span class="ub-university-name">University at Buffalo</span>
-				<span class="ub-suny-name">The State University of New York</span>
-			</a>
+			<a
+	class="ub-university-link"
+	href="https://www.buffalo.edu/"
+	aria-label="University at Buffalo home">
+	<img
+		class="ub-university-logo"
+		src="{{ url_for('static', filename='logo/201-Interlocking-UB-RGB-Blue.png') }}"
+		alt=""
+	>
+</a>
 
 			<nav class="ub-global-links" aria-label="University services">
 				<a href="https://myub.buffalo.edu/">MyUB / HUB</a>

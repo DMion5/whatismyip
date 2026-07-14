@@ -425,3 +425,11 @@ html[data-theme="dark"] .text-danger {
 		font-size: 0.66rem;
 	}
 }
+
+.ub-university-logo {
+	display: block;
+	width: 240px;
+	max-width: 100%;
+	height: auto;
+	object-fit: contain;
+}

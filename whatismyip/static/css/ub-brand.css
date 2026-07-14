@@ -1,0 +1,427 @@
+@charset "UTF-8";
+
+/*
+ * University at Buffalo branding layer for What Is My IP?
+ *
+ * This file intentionally uses plain text rather than recreating or modifying
+ * an official UB logo. Add an approved institutional lockup only after review
+ * by University Communications.
+ */
+
+:root {
+	--ub-blue: #005bbb;
+	--ub-white: #ffffff;
+	--ub-harriman-blue: #002f56;
+	--ub-baird-point: #e4e4e4;
+	--ub-townsend-gray: #666666;
+	--ub-solar-strand: #ffc72c;
+	--ub-capen-brick: #990000;
+	--ub-lake-lasalle: #00a69c;
+
+	/*
+	 * The upstream stylesheet still consumes --unc-* custom properties.
+	 * Re-map them here so the rest of the application receives UB colors
+	 * without requiring a large fork of whatismyip.css.
+	 */
+	--unc-carolina-blue: var(--ub-blue);
+	--unc-navy: var(--ub-harriman-blue);
+	--unc-white: var(--ub-white);
+	--unc-bolin-creek: var(--ub-harriman-blue);
+	--unc-fordham-fountain: var(--ub-baird-point);
+	--unc-cloud: var(--ub-baird-point);
+	--unc-old-well-basin: var(--ub-townsend-gray);
+	--unc-flat-gray: var(--ub-townsend-gray);
+	--unc-cornerstone: var(--ub-baird-point);
+	--unc-franklin-fog: var(--ub-baird-point);
+
+	--site-bg: var(--ub-white);
+	--site-surface: var(--ub-white);
+	--site-subtle-bg: var(--ub-baird-point);
+	--site-text: var(--ub-harriman-blue);
+	--site-muted-text: var(--ub-townsend-gray);
+	--site-link: var(--ub-blue);
+	--site-link-hover: var(--ub-harriman-blue);
+	--site-border: var(--ub-baird-point);
+	--site-chrome: var(--ub-harriman-blue);
+	--site-chrome-text: var(--ub-white);
+	--site-chrome-link: var(--ub-white);
+}
+
+html[data-theme="dark"] {
+	--site-bg: var(--ub-harriman-blue);
+	--site-surface: var(--ub-harriman-blue);
+	--site-subtle-bg: var(--ub-blue);
+	--site-text: var(--ub-white);
+	--site-muted-text: var(--ub-baird-point);
+	--site-link: var(--ub-white);
+	--site-link-hover: var(--ub-solar-strand);
+	--site-border: var(--ub-townsend-gray);
+	--site-chrome: var(--ub-harriman-blue);
+	--site-chrome-text: var(--ub-white);
+	--site-chrome-link: var(--ub-white);
+}
+
+body {
+	font-family: Arial, Helvetica, sans-serif;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.site-title,
+.site-page-heading {
+	font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Accessible skip link */
+.ub-skip-link {
+	position: fixed;
+	top: 0.5rem;
+	left: 0.5rem;
+	z-index: 5000;
+	padding: 0.65rem 0.9rem;
+	background: var(--ub-white);
+	color: var(--ub-harriman-blue);
+	border: 2px solid var(--ub-blue);
+	font-weight: 700;
+	transform: translateY(-160%);
+	transition: transform 0.15s ease;
+}
+
+.ub-skip-link:focus {
+	transform: translateY(0);
+}
+
+/* Global UB service bar */
+.ub-global-header {
+	background: var(--ub-blue);
+	color: var(--ub-white);
+	border-bottom: 1px solid var(--ub-harriman-blue);
+}
+
+.ub-global-header-inner {
+	min-height: 62px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1.5rem;
+	padding-top: 0.55rem;
+	padding-bottom: 0.55rem;
+}
+
+.ub-university-link {
+	display: inline-flex;
+	flex-direction: column;
+	color: var(--ub-white);
+	text-decoration: none;
+	line-height: 1.1;
+}
+
+.ub-university-link:hover,
+.ub-university-link:focus {
+	color: var(--ub-white);
+	text-decoration: underline;
+	text-decoration-thickness: 2px;
+	text-underline-offset: 3px;
+}
+
+.ub-university-name {
+	font-size: 1.1rem;
+	font-weight: 700;
+	letter-spacing: 0.01em;
+}
+
+.ub-suny-name {
+	margin-top: 0.2rem;
+	font-size: 0.72rem;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+}
+
+.ub-global-links {
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	flex-wrap: wrap;
+	gap: 1rem;
+}
+
+.ub-global-links a {
+	color: var(--ub-white);
+	font-size: 0.86rem;
+	font-weight: 700;
+	text-decoration: none;
+}
+
+.ub-global-links a:hover,
+.ub-global-links a:focus {
+	color: var(--ub-white);
+	text-decoration: underline;
+	text-decoration-thickness: 2px;
+	text-underline-offset: 3px;
+}
+
+/* Application identity */
+.ub-page-title {
+	position: relative;
+	color: var(--ub-blue);
+}
+
+.ub-app-title {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.65rem;
+	color: var(--ub-blue);
+	text-decoration: none;
+}
+
+.ub-app-title:hover,
+.ub-app-title:focus {
+	color: var(--ub-harriman-blue);
+	text-decoration: none;
+}
+
+.ub-app-icon {
+	width: 2.4rem;
+	height: 2.4rem;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 50%;
+	background: var(--ub-blue);
+	color: var(--ub-white);
+	font-size: 1rem;
+}
+
+.site-title {
+	font-size: clamp(1.8rem, 4vw, 2.45rem);
+	font-weight: 700;
+	letter-spacing: -0.02em;
+}
+
+.site-header-tagline {
+	color: var(--ub-townsend-gray);
+	font-size: 0.84rem;
+	font-weight: 700;
+	letter-spacing: 0.03em;
+}
+
+html[data-theme="dark"] .site-header-tagline {
+	color: var(--ub-baird-point);
+}
+
+.site-page-heading,
+.metrics-stat-number {
+	color: var(--ub-blue);
+}
+
+.theme-toggle-btn {
+	border-color: var(--ub-baird-point);
+	color: var(--ub-blue);
+}
+
+.theme-toggle-btn:focus-visible {
+	border-color: var(--ub-blue);
+	box-shadow: 0 0 0 0.2rem rgba(0, 91, 187, 0.25);
+}
+
+/* Site navigation */
+.site-navbar {
+	background: var(--ub-harriman-blue);
+	border-top: 4px solid var(--ub-blue);
+}
+
+.site-navbar .nav-link {
+	color: var(--ub-white);
+	opacity: 1;
+}
+
+.site-navbar .nav-link:hover,
+.site-navbar .nav-link:focus {
+	color: var(--ub-white);
+	text-decoration: underline;
+	text-decoration-thickness: 2px;
+	text-underline-offset: 4px;
+}
+
+.site-navbar .nav-link.active {
+	color: var(--ub-white) !important;
+	border-bottom-color: var(--ub-solar-strand);
+}
+
+.site-navbar-toggler {
+	color: var(--ub-white);
+}
+
+.site-navbar-toggler:focus-visible {
+	outline-color: var(--ub-solar-strand);
+}
+
+/* Core controls */
+.bg-primary,
+.btn-primary,
+.nav-report-btn,
+.nac-icon {
+	background-color: var(--ub-blue) !important;
+	border-color: var(--ub-blue) !important;
+	color: var(--ub-white) !important;
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.nav-report-btn:hover:not(:disabled),
+.nav-report-btn:focus:not(:disabled) {
+	background-color: var(--ub-harriman-blue) !important;
+	border-color: var(--ub-harriman-blue) !important;
+	color: var(--ub-white) !important;
+}
+
+.text-primary {
+	color: var(--ub-blue) !important;
+}
+
+/* The main IP address card */
+.ip-copy-card {
+	background: var(--ub-blue) !important;
+	color: var(--ub-white) !important;
+	border: 1px solid var(--ub-blue) !important;
+	border-radius: 0;
+	box-shadow: 0 6px 18px rgba(0, 47, 86, 0.28) !important;
+}
+
+.ip-copy-card:hover {
+	filter: none;
+	background: var(--ub-harriman-blue) !important;
+	box-shadow: 0 8px 24px rgba(0, 47, 86, 0.34) !important;
+}
+
+.ip-copy-card:focus-visible {
+	outline: 3px solid var(--ub-solar-strand);
+	outline-offset: 3px;
+}
+
+.ip-bar-label {
+	background: var(--ub-harriman-blue);
+}
+
+/* Cards and tables */
+.card,
+.list-group-item,
+.accordion-item {
+	border-radius: 0;
+	border-color: var(--site-border);
+}
+
+.card.shadow {
+	box-shadow: 0 4px 14px rgba(0, 47, 86, 0.12) !important;
+}
+
+html[data-theme="dark"] .card.shadow {
+	box-shadow: 0 4px 14px rgba(0, 0, 0, 0.28) !important;
+}
+
+.intro-status {
+	border-left-color: var(--ub-blue);
+}
+
+.section-divider {
+	border-top-color: var(--ub-baird-point);
+}
+
+a {
+	text-decoration-thickness: 1px;
+	text-underline-offset: 2px;
+}
+
+a:focus-visible,
+button:focus-visible {
+	outline: 3px solid var(--ub-solar-strand);
+	outline-offset: 3px;
+}
+
+/* Footer */
+.ub-footer {
+	background: var(--ub-harriman-blue);
+	color: var(--ub-white);
+}
+
+.ub-footer h2 {
+	color: var(--ub-white);
+	font-size: 1rem;
+	font-weight: 700;
+}
+
+.ub-footer li {
+	margin-bottom: 0.35rem;
+}
+
+.ub-footer a {
+	color: var(--ub-white);
+	text-decoration: underline;
+	text-decoration-thickness: 1px;
+	text-underline-offset: 3px;
+}
+
+.ub-footer a:hover,
+.ub-footer a:focus {
+	color: var(--ub-solar-strand);
+}
+
+.ub-footer-meta,
+.ub-footer-credit {
+	color: var(--ub-baird-point);
+}
+
+.ub-footer-credit {
+	max-width: 62rem;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+/* Error and warning accents */
+.alert-danger,
+.text-danger {
+	color: var(--ub-capen-brick) !important;
+}
+
+html[data-theme="dark"] .text-danger {
+	color: var(--ub-white) !important;
+}
+
+/* Responsive behavior */
+@media (max-width: 767.98px) {
+	.ub-global-header-inner {
+		align-items: flex-start;
+		flex-direction: column;
+		gap: 0.65rem;
+	}
+
+	.ub-global-links {
+		justify-content: flex-start;
+		gap: 0.8rem;
+	}
+
+	.site-navbar .nav-link.active {
+		border-left-color: var(--ub-solar-strand);
+	}
+}
+
+@media (max-width: 480px) {
+	.ub-global-links {
+		display: grid;
+		grid-template-columns: repeat(3, auto);
+		width: 100%;
+	}
+
+	.ub-university-name {
+		font-size: 1rem;
+	}
+
+	.ub-suny-name {
+		font-size: 0.66rem;
+	}
+}

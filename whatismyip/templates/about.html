@@ -1,79 +1,155 @@
 {% extends "base.html" %}
 
-{% block title %}About — What Is My IP? | UNC Network Diagnostic Tool{% endblock %}
-{% block meta_description %}About the UNC Chapel Hill IP address tool from ITS. Shows the address campus applications see for your device — on campus, via VPN, or over the Internet.{% endblock %}
-{% block og_title %}About — What Is My IP? | UNC Network Diagnostic Tool{% endblock %}
-{% block og_description %}About the UNC Chapel Hill IP address tool from ITS. Shows the address campus applications see for your device — on campus, via VPN, or over the Internet.{% endblock %}
+{% block title %}About | UB Network Diagnostics{% endblock %}
+{% block meta_description %}Learn about UB Network Diagnostics, a University at Buffalo service that displays the IP address seen by campus applications and helps troubleshoot network connectivity.{% endblock %}
+{% block og_title %}About | UB Network Diagnostics{% endblock %}
+{% block og_description %}Learn how UB Network Diagnostics helps the University at Buffalo community identify IP, VPN, DNS and campus network information.{% endblock %}
 {% block og_url %}{{ site_url }}/about{% endblock %}
-{% block twitter_title %}About — What Is My IP? | UNC Network Diagnostic Tool{% endblock %}
-{% block twitter_description %}About the UNC Chapel Hill campus IP address diagnostic tool from ITS. Shows your IP address as seen by campus applications.{% endblock %}
+{% block twitter_title %}About | UB Network Diagnostics{% endblock %}
+{% block twitter_description %}Learn how UB Network Diagnostics helps troubleshoot University at Buffalo network connectivity.{% endblock %}
 
 {% block structured_data %}
 <script type="application/ld+json">
 {
-  "@context": "https://schema.org",
-  "@type": "WebPage",
-  "name": "About — What Is My IP?",
-  "url": "{{ site_url }}/about",
-  "description": "About the UNC Chapel Hill campus IP address diagnostic tool provided by Information Technology Services.",
-  "isPartOf": {
-    "@type": "WebSite",
-    "name": "What Is My IP? — UNC Chapel Hill",
-    "url": "{{ site_url }}"
-  },
-  "publisher": {
-    "@type": "Organization",
-    "name": "UNC Information Technology Services",
-    "url": "https://its.unc.edu"
-  }
+	"@context": "https://schema.org",
+	"@type": "WebPage",
+	"name": "About UB Network Diagnostics",
+	"url": "{{ site_url }}/about",
+	"description": "Information about the University at Buffalo network diagnostic service operated by UB Information Technology.",
+	"isPartOf": {
+		"@type": "WebSite",
+		"name": "UB Network Diagnostics",
+		"url": "{{ site_url }}"
+	},
+	"publisher": {
+		"@type": "Organization",
+		"name": "UB Information Technology",
+		"url": "https://www.buffalo.edu/ubit.html"
+	}
 }
 </script>
 {% endblock %}
 
 {% block content %}
 <div class="row mt-3 mb-1">
-  <div class="col">
-    <h1 class="site-page-heading">About This Tool</h1>
-    <p class="site-page-subheading">Hosted on the campus network and provided by <a href="https://its.unc.edu/">UNC Information Technology Services</a> as a network diagnostic tool. IP addresses shown are those visible to campus applications, including VPN addresses. For questions, see the <a href="https://tdx.unc.edu/TDClient/33/Portal/KB/ArticleDet?ID=263">Determine Client IP Address</a> help article.</p>
-  </div>
+	<div class="col">
+		<h1 class="site-page-heading">About UB Network Diagnostics</h1>
+		<p class="site-page-subheading">
+			A network troubleshooting service for the University at Buffalo community,
+			operated by
+			<a href="https://www.buffalo.edu/ubit.html">UB Information Technology</a>.
+		</p>
+	</div>
 </div>
 
 <div class="row mt-3">
-  <div class="col">
-    <div class="card shadow card-body">
-      <h2 class="card-title h5"><i class="fa-solid fa-globe text-primary me-2" aria-hidden="true"></i>Why use this tool?</h2>
-      <p>While many sites exist to show your IP address, this tool runs locally on the campus network and offers several advantages:</p>
-      <ul class="list-unstyled mb-0">
-        <li class="mb-2"><i class="fa-solid fa-check text-primary me-2" aria-hidden="true"></i>Devices on campus without general internet connectivity can still reach this site.</li>
-        <li class="mb-2"><i class="fa-solid fa-check text-primary me-2" aria-hidden="true"></i>VPN users see the campus address assigned by the VPN, not their home internet address.</li>
-        <li class="mb-2"><i class="fa-solid fa-check text-primary me-2" aria-hidden="true"></i>Campus addresses include additional detail — network, VLAN, building, and NAC information.</li>
-        <li><i class="fa-solid fa-check text-primary me-2" aria-hidden="true"></i>Further detail is available via the <a href="https://nit.net.unc.edu">Network Information Tool (NIT)</a> for authorized users.</li>
-      </ul>
-    </div>
-  </div>
+	<div class="col">
+		<div class="card shadow card-body">
+			<h2 class="card-title h5">
+				<i class="fa-solid fa-network-wired text-primary me-2" aria-hidden="true"></i>
+				What this service shows
+			</h2>
+
+			<p>
+				This site displays the Internet Protocol address visible to UB services.
+				Depending on your connection and the information available from campus
+				network systems, it may also show:
+			</p>
+
+			<ul class="mb-0">
+				<li class="mb-2">IPv4 and IPv6 connectivity.</li>
+				<li class="mb-2">Whether the address is recognized as on-campus, off-campus or connected through a campus VPN.</li>
+				<li class="mb-2">DNS resolver and DNS security information.</li>
+				<li class="mb-2">Campus network, VLAN, DHCP and IP address management details.</li>
+				<li>Additional device or connection information when supported by UB network management systems.</li>
+			</ul>
+		</div>
+	</div>
 </div>
 
-<div class="row mt-3 mb-3">
-  <div class="col">
-    <div class="card shadow card-body" style="background-color: var(--site-subtle-bg);">
-      <h2 class="card-title h5"><i class="fa-solid fa-code-branch text-primary me-2" aria-hidden="true"></i>Open Source</h2>
-        <p>The source code for this tool is available on
-          <a href="https://github.com/unc-network/whatismyip">GitHub</a>.
-          It is written in Python using the <a href="https://flask.palletsprojects.com/">Flask</a> framework
-          and is released under the MIT License.
-        </p>
-        <p>The tool was built for the UNC Chapel Hill campus environment but is designed to be
-          adapted by other higher education institutions.
-          Campus network ranges, DNS security filtering settings, and institution branding are
-          all configurable without changing code.
-          Integrations with network management systems such as Infoblox IPAM and
-          Extreme Networks NAC are optional — the core IP address and geolocation features
-          work for any deployment.
-        </p>
-        <p class="mb-0">If your institution runs a similar tool or adapts this one, we'd love to hear about it.</p>
-      </div>
-    </div>
-  </div>
+<div class="row mt-3">
+	<div class="col-lg-6 mb-3">
+		<div class="card shadow card-body h-100">
+			<h2 class="card-title h5">
+				<i class="fa-solid fa-life-ring text-primary me-2" aria-hidden="true"></i>
+				Get help
+			</h2>
+
+			<p>
+				When contacting support, use the <strong>Report</strong> button on the home
+				page to download a summary of the connection details shown by this service.
+			</p>
+
+			<ul class="list-unstyled mb-0">
+				<li class="mb-2">
+					<a href="https://support.buffalo.edu/">
+						<i class="fa-solid fa-ticket me-2" aria-hidden="true"></i>
+						Submit a support request
+					</a>
+				</li>
+				<li class="mb-2">
+					<a href="https://www.buffalo.edu/ubit/get-help.html">
+						<i class="fa-solid fa-circle-info me-2" aria-hidden="true"></i>
+						UBIT Help Center options and hours
+					</a>
+				</li>
+				<li class="mb-2">
+					<i class="fa-solid fa-phone me-2" aria-hidden="true"></i>
+					<a href="tel:+17166453542">716-645-3542</a>
+				</li>
+				<li>
+					<i class="fa-solid fa-envelope me-2" aria-hidden="true"></i>
+					<a href="mailto:ubithelp@buffalo.edu">ubithelp@buffalo.edu</a>
+				</li>
+			</ul>
+		</div>
+	</div>
+
+	<div class="col-lg-6 mb-3">
+		<div class="card shadow card-body h-100">
+			<h2 class="card-title h5">
+				<i class="fa-solid fa-shield-halved text-primary me-2" aria-hidden="true"></i>
+				Privacy and appropriate use
+			</h2>
+
+			<p>
+				The service processes network and browser information needed to produce
+				diagnostic results. Operational and usage data may be recorded for service
+				reliability, security and troubleshooting.
+			</p>
+
+			<p class="mb-0">
+				See the
+				<a href="https://www.buffalo.edu/administrative-services/policy-compliance-and-internal-controls/policy/ub-policy-lib/privacy.html">
+					University at Buffalo Website Privacy Policy
+				</a>
+				for information about data collected by official UB websites and associated
+				web applications.
+			</p>
+		</div>
+	</div>
+</div>
+
+<div class="row mb-3">
+	<div class="col">
+		<div class="card shadow card-body" style="background-color: var(--site-subtle-bg);">
+			<h2 class="card-title h5">
+				<i class="fa-solid fa-code-branch text-primary me-2" aria-hidden="true"></i>
+				Open-source foundation
+			</h2>
+
+			<p>
+				This deployment is adapted from the
+				<a href="https://github.com/unc-network/whatismyip">What Is My IP?</a>
+				project developed by UNC Information Technology Services and released under
+				the MIT License.
+			</p>
+
+			<p class="mb-0">
+				UB-specific branding, campus network ranges and integrations are maintained
+				by the University at Buffalo deployment team.
+			</p>
+		</div>
+	</div>
 </div>
 {% endblock %}
-

@@ -1,21 +1,24 @@
 {
-  "name": "What Is My IP?",
-  "short_name": "WhatIsMyIP",
+  "name": "UB Network Diagnostics",
+  "short_name": "UB NetDiag",
+  "description": "View your IP address and test University at Buffalo network connectivity.",
+  "start_url": "/",
+  "scope": "/",
   "icons": [
     {
       "src": "/static/logo/web-app-manifest-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "maskable"
+      "purpose": "any maskable"
     },
     {
       "src": "/static/logo/web-app-manifest-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "maskable"
+      "purpose": "any maskable"
     }
   ],
-  "theme_color": "#ffffff",
-  "background_color": "#4e97ce",
+  "theme_color": "#005bbb",
+  "background_color": "#ffffff",
   "display": "standalone"
 }

@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 
-{% block title %}Frequently Asked Questions — What Is My IP? | UNC Chapel Hill ITS{% endblock %}
-{% block meta_description %}Common questions about the UNC campus IP address diagnostic tool: campus VPN detection, DNS security filtering, IPv4 vs IPv6, off-campus access, and API usage.{% endblock %}
-{% block og_title %}Frequently Asked Questions — What Is My IP? | UNC Chapel Hill ITS{% endblock %}
-{% block og_description %}Common questions about the UNC campus IP address diagnostic tool: campus VPN detection, DNS security filtering, IPv4 vs IPv6, off-campus access, and API usage.{% endblock %}
+{% block title %}Frequently Asked Questions | UB Network Diagnostics{% endblock %}
+{% block meta_description %}Common questions about UB Network Diagnostics, including UB VPN, eduroam, IPv4 and IPv6, DNS diagnostics, privacy, reports and API access.{% endblock %}
+{% block og_title %}Frequently Asked Questions | UB Network Diagnostics{% endblock %}
+{% block og_description %}Common questions about University at Buffalo network diagnostics, UB VPN, eduroam, DNS, privacy and support reports.{% endblock %}
 {% block og_url %}{{ site_url }}/faq{% endblock %}
-{% block twitter_title %}Frequently Asked Questions — What Is My IP? | UNC Chapel Hill ITS{% endblock %}
-{% block twitter_description %}Common questions about the UNC campus IP address diagnostic tool: VPN detection, DNS security filtering, IPv4 vs IPv6, and more.{% endblock %}
+{% block twitter_title %}Frequently Asked Questions | UB Network Diagnostics{% endblock %}
+{% block twitter_description %}Common questions about UB network diagnostics, UB VPN, eduroam, IPv4, IPv6 and DNS.{% endblock %}
 
 {% block structured_data %}
 <script type="application/ld+json">
@@ -14,483 +14,147 @@
   "@context": "https://schema.org",
   "@type": "FAQPage",
   "mainEntity": [
-    {
-      "@type": "Question",
-      "name": "If I am on campus, what can this tool tell me?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Every visitor sees their IP address, internet provider, approximate geolocation, and DNS security filtering status. On-campus and VPN users additionally see campus network and VLAN assignment, DHCP and network configuration details, Network Access Control (NAC) details including switch port and connection policy, Wi-Fi connection details including SSID and signal quality, and a building location map for wired and wireless connections."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "If I am off campus, what can this tool tell me?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Off-campus visitors see their IP address, internet provider, approximate location, and DNS security filtering status. Campus network details are not available from off-campus addresses. If you are connected via the UNC VPN, the tool will recognize your VPN address and show campus network details as if you were on campus."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "Why am I seeing an off-campus result when I am physically on campus?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Several things can cause this: you may be on a guest or visitor Wi-Fi network, using a personal mobile hotspot, on a specialized network segment not recognized as a standard campus range, or have a VPN from another organization active. Try connecting to the main campus Wi-Fi (eduroam) or a wired network port and reloading the page."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "Why does this site show a different IP address than other lookup sites?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Most general IP lookup tools show the address your device presents to arbitrary internet servers. This tool tests connectivity specifically to the UNC campus network, so a VPN connection will show your campus VPN address here while a general lookup site would still show your home internet address. Additionally, this tool tests both IPv4 and IPv6 separately and shows whichever your device uses by default when reaching campus — which may be IPv6."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "What is campus?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Campus refers to the computer network providing service to hundreds of buildings, predominantly in Chapel Hill, NC. The campus network extends to a number of remote locations throughout North Carolina."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "What is Network Access Control (NAC)?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Network Access Control (NAC) is a system that manages which devices are allowed to connect to the campus network and under what conditions. When you connect, NAC checks whether your device meets security requirements such as being registered or having current software. The connection policy shown in this tool reflects the access level your device has been granted."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "What is Campus DNS Security?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "UNC Information Technology Services provides malware and phishing protection through the domain name system (DNS). Devices using campus DNS servers receive this protection automatically — no software or configuration changes required."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "What does the DNS provider check show?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "The DNS provider check identifies which DNS server your device is actually sending queries to — similar to a DNS leak test. On campus you should see UNC or Akamai as your provider; UNC's campus DNS servers forward all queries through Akamai to apply the DNS security filtering layer, so Akamai is the expected result for devices correctly using campus DNS. Seeing your home ISP instead means your device is not using campus DNS and is not receiving DNS security protection. The UNC VPN pushes campus DNS servers to your device, so VPN users should also see UNC or Akamai; seeing your home ISP instead indicates a DNS leak where queries are bypassing the VPN tunnel. Privacy DNS services such as Cloudflare or Google will also appear here if your device is configured to use them."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "Does this site contact any external services?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Yes. Your browser contacts up to three external services as part of the diagnostic checks. First, ip-api.com is contacted to identify your internet DNS provider and EDNS client subnet. Second, ipify.org is contacted to check what IPv4 address internet servers see for your connection, which is compared against the campus-detected address to identify split-tunnel VPN or campus NAT scenarios. Third, if campus DNS security is configured, your browser attempts to reach a known test domain to determine whether filtering is active. In all cases your IP address is visible to any internet service you contact, so these checks do not expose anything beyond what is inherent to browsing the web. No data from these checks is sent back to UNC servers beyond the aggregate filtering result."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "Is my IP address being stored or tracked?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "This tool does not log or store your IP address. Site statistics track only aggregate counts — such as how many visits came from IPv4 vs. IPv6, or what general region visitors came from — but individual IP addresses are never written to disk. No cookies are used for tracking."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "Why does my IP location look inaccurate?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "IP geolocation is a city-level estimate based on where an internet provider registered its address block, not your physical location. A residential ISP may register its IP ranges at a regional office, so your location might appear as a different city. For campus addresses, location is set to Chapel Hill regardless of where on the network you are connected."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "The location data for my IP address doesn't look right. Can it be updated?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Yes. The geolocation service used by this tool offers a data correction page for submitting requests."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "How do I download a support report?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "The Report button in the navigation bar generates a print-ready summary of everything shown on the home page — your IP address, connection type, campus network details, device information, and connectivity test results. The button activates once your connection details have loaded. Clicking it opens a formatted page in a new window; use your browser's Print function and choose Save as PDF. You can then email the file or attach it to an ITS Service Desk ticket."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "How does the speed test on this site work?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "The speed test uses Ookla Speedtest Custom to measure download speed, upload speed, and latency. By default it selects the closest server. To test your connection specifically to the UNC campus network, select UNC Chapel Hill from the server list in the widget or use the UNC Chapel Hill server directly on Speedtest.net."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "What is the difference between Internet provider and Organization in the site statistics?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Internet provider is the company that sells you internet access — the legal business name registered as the owner of your IP address range. Organization is the entity registered as the operator of your specific IP address block. For home users these are often the same or closely related (such as a brand name vs. the parent company). For universities and businesses that manage their own IP allocations, the organization is typically the institution itself."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "Can I query information about different IP addresses?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "No. For security reasons, this tool only displays information about the client device communicating with it."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "Is an API available?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "This application is intended for browser-based use, but it is powered by an API that can be accessed directly at /hostinfo for dual stack detection. API responses and data structures may change over time without notice."
-      }
-    }
+    {"@type":"Question","name":"What can this tool show?","acceptedAnswer":{"@type":"Answer","text":"Every visitor can see the IP address visible to the application and IPv4 or IPv6 connectivity. Depending on deployment integrations and whether the address is recognized as a UB network or UB VPN address, the tool may also show DNS, VLAN, DHCP, IP address management, wireless, device and UB location information."}},
+    {"@type":"Question","name":"Which Wi-Fi network should I use at UB?","acceptedAnswer":{"@type":"Answer","text":"eduroam is UB's official secure Wi-Fi network for students, faculty and staff. UB_Connect is used by visitors and to begin eduroam setup on campus. UB_Devices is intended for devices that cannot use enterprise authentication."}},
+    {"@type":"Question","name":"How should I interpret a UB VPN result?","acceptedAnswer":{"@type":"Answer","text":"UB recommends Cisco Secure Client for access to protected UB services from off campus. Some VPN configurations route only traffic for protected UB services, so a public non-UB IP on a general internet test does not by itself prove that UB VPN is disconnected."}},
+    {"@type":"Question","name":"Why might I see an off-campus result while physically at UB?","acceptedAnswer":{"@type":"Answer","text":"The device may be using guest Wi-Fi, a mobile hotspot, a specialized network segment or another organization's VPN. Connect to eduroam or a UB wired network, disable unrelated VPN software and run the test again."}},
+    {"@type":"Question","name":"What does the DNS provider check show?","acceptedAnswer":{"@type":"Answer","text":"The DNS provider check estimates which resolver answered the browser's test query. Results can vary because of encrypted DNS, VPN routing, browser settings, cellular relays, enterprise security products and the network's resolver architecture. Do not assume one provider name is always required at UB."}},
+    {"@type":"Question","name":"Is my IP address stored?","acceptedAnswer":{"@type":"Answer","text":"The application metrics feature is designed to store aggregate counts rather than raw client IP addresses. Web server, reverse proxy, security and operational logs are separate and may record network identifiers according to the deployment configuration and applicable policy."}},
+    {"@type":"Question","name":"How do I get help?","acceptedAnswer":{"@type":"Answer","text":"Check UBIT Alerts, download the report from the home page and submit it with a request at support.buffalo.edu. The UBIT Help Center can also be reached at 716-645-3542 or ubithelp@buffalo.edu."}},
+    {"@type":"Question","name":"Is an API available?","acceptedAnswer":{"@type":"Answer","text":"The application provides host information endpoints for the current client connection. Responses and data structures may change without notice, and the API cannot be used to query arbitrary third-party IP addresses."}}
   ]
 }
 </script>
 {% endblock %}
 
+{% macro faq_item(id, icon, color, question) -%}
+<div class="accordion-item faq-accent-{{ color }}">
+  <h2 class="accordion-header" id="{{ id }}-heading">
+    <button class="accordion-button collapsed" type="button" data-mdb-toggle="collapse" data-mdb-target="#{{ id }}" aria-expanded="false" aria-controls="{{ id }}">
+      <i class="fa-solid {{ icon }} text-{{ color }} me-2" aria-hidden="true"></i>{{ question }}
+    </button>
+  </h2>
+  <div id="{{ id }}" class="accordion-collapse collapse" aria-labelledby="{{ id }}-heading">
+    <div class="accordion-body">{{ caller() }}</div>
+  </div>
+</div>
+{%- endmacro %}
+
 {% block content %}
 <div class="row mt-3 mb-1">
   <div class="col">
     <h1 class="site-page-heading">Frequently Asked Questions</h1>
-    <p class="site-page-subheading">Browse common questions below. For additional help or to share feedback, contact the <a href="https://help.unc.edu">ITS Service Desk</a>.</p>
+    <p class="site-page-subheading">For additional help, check <a href="https://www.buffalo.edu/ubit/news/alerts.html">UBIT Alerts</a> and contact the <a href="https://www.buffalo.edu/ubit/get-help.html">UBIT Help Center</a>.</p>
   </div>
 </div>
 
-<div class="row">
-  <div class="col">
-      <div class="accordion my-3" id="faqAccordion">
+<div class="row"><div class="col"><div class="accordion my-3" id="faqAccordion">
+  <p class="faq-section-label text-primary">Results and UB connectivity</p>
 
-        <p class="faq-section-label text-primary">What you see</p>
+  {% call faq_item('faq-what-you-see', 'fa-circle-info', 'primary', 'What can this tool show?') %}
+    <p>Every visitor can see the IP address visible to this application and whether IPv4 and IPv6 requests succeed. The page may also show internet provider, approximate geolocation and DNS information.</p>
+    <p class="mb-0">When the address is recognized as a UB network or UB VPN address and the deployment has the necessary integrations, additional network, VLAN, DHCP, IP address management, wireless, device and UB location details may appear. Missing details can mean the integration has no record; it does not necessarily mean the connection is broken.</p>
+  {% endcall %}
 
-        <div class="accordion-item faq-accent-primary">
-          <h2 class="accordion-header" id="faq-on-campus-heading">
-            <button class="accordion-button collapsed" type="button" data-mdb-toggle="collapse" data-mdb-target="#faq-on-campus" aria-expanded="false" aria-controls="faq-on-campus">
-              <i class="fa-solid fa-building text-primary me-2" aria-hidden="true"></i>
-              If I am on campus, what can this tool tell me?
-            </button>
-          </h2>
-          <div id="faq-on-campus" class="accordion-collapse collapse" aria-labelledby="faq-on-campus-heading">
-            <div class="accordion-body">
-              <p>Every visitor sees your IP address, internet provider, approximate geolocation, and DNS security filtering status. On-campus and VPN users additionally see:</p>
-              <ul class="mb-3">
-                <li>Campus network and VLAN assignment</li>
-                <li>DHCP and network configuration details</li>
-                <li>Network Access Control (NAC) details, including switch port and connection policy</li>
-                <li>Wi-Fi connection details — SSID, access point name, and signal quality (for Meraki wireless)</li>
-                <li>Building location map for wired and wireless connections</li>
-              </ul>
-              <p class="mb-0">Knowing these details helps diagnose connectivity problems and confirm that a VPN connection is active before accessing IP-restricted resources.</p>
-            </div>
-          </div>
-        </div>
+  {% call faq_item('faq-wifi', 'fa-wifi', 'primary', 'Which Wi-Fi network should I use at UB?') %}
+    <p><strong>eduroam</strong> is UB's official secure Wi-Fi network for students, faculty and staff. <strong>UB_Connect</strong> is used by visitors and as the on-campus starting point for eduroam setup. <strong>UB_Devices</strong> is for devices such as some TVs, printers and gaming consoles that cannot use enterprise authentication.</p>
+    <p class="mb-0"><a href="https://www.buffalo.edu/ubit/service-guides/connecting/wifi.html">Set up eduroam and review UB Wi-Fi options</a>.</p>
+  {% endcall %}
 
-        <div class="accordion-item faq-accent-primary">
-          <h2 class="accordion-header" id="faq-off-campus-heading">
-            <button class="accordion-button collapsed" type="button" data-mdb-toggle="collapse" data-mdb-target="#faq-off-campus" aria-expanded="false" aria-controls="faq-off-campus">
-              <i class="fa-solid fa-house text-primary me-2" aria-hidden="true"></i>
-              If I am off campus, what can this tool tell me?
-            </button>
-          </h2>
-          <div id="faq-off-campus" class="accordion-collapse collapse" aria-labelledby="faq-off-campus-heading">
-            <div class="accordion-body">
-              <p>Off-campus visitors see their IP address, internet provider, approximate location, and DNS security filtering status. Campus network details — VLAN assignment, NAC information, and building location — are not available from off-campus addresses.</p>
-              <p class="mb-0">If you are connected via the UNC VPN, the tool will recognize your VPN address and show campus network details as if you were on campus.</p>
-            </div>
-          </div>
-        </div>
+  {% call faq_item('faq-off-campus-result', 'fa-house', 'primary', 'Why am I seeing an off-campus result while physically at UB?') %}
+    <ul>
+      <li>You may be connected to guest Wi-Fi rather than eduroam.</li>
+      <li>Your device may be using a personal hotspot or cellular connection.</li>
+      <li>A VPN from another organization may be routing the request elsewhere.</li>
+      <li>The device may be on a specialized UB network range that is not yet configured in this deployment.</li>
+    </ul>
+    <p class="mb-0">Connect to eduroam or a UB wired network, disable unrelated VPN software and run the test again.</p>
+  {% endcall %}
 
-        <div class="accordion-item faq-accent-primary">
-          <h2 class="accordion-header" id="faq-off-campus-result-heading">
-            <button class="accordion-button collapsed" type="button" data-mdb-toggle="collapse" data-mdb-target="#faq-off-campus-result" aria-expanded="false" aria-controls="faq-off-campus-result">
-              <i class="fa-solid fa-circle-question text-primary me-2" aria-hidden="true"></i>
-              Why am I seeing an off-campus result when I am physically on campus?
-            </button>
-          </h2>
-          <div id="faq-off-campus-result" class="accordion-collapse collapse" aria-labelledby="faq-off-campus-result-heading">
-            <div class="accordion-body">
-              <p>Several things can cause this:</p>
-              <ul class="mb-3">
-                <li>You are connected to a guest or visitor Wi-Fi network rather than the main campus network</li>
-                <li>Your device is using a personal mobile hotspot instead of campus Wi-Fi or a wired connection</li>
-                <li>Your device is on a specialized network segment not recognized as a standard campus address range</li>
-                <li>A VPN from another organization is active, routing your traffic through a different IP</li>
-              </ul>
-              <p class="mb-0">Try connecting to the main campus Wi-Fi (eduroam) or a wired network port and reloading the page.</p>
-            </div>
-          </div>
-        </div>
+  {% call faq_item('faq-vpn', 'fa-shield-halved', 'primary', 'How should I interpret a UB VPN result?') %}
+    <p>UB recommends Cisco Secure Client to access protected UB services from off campus. Some VPN configurations route only traffic intended for protected UB services. Because of that, a general public IP check may continue to show your home or mobile provider even while selected UB services use the VPN.</p>
+    <p class="mb-0">Use the result together with the service you are trying to reach. See <a href="https://www.buffalo.edu/ubit/service-guides/connecting/vpn.html">UB VPN guidance</a> for current setup instructions.</p>
+  {% endcall %}
 
-        <div class="accordion-item faq-accent-primary">
-          <h2 class="accordion-header" id="faq-different-ip-heading">
-            <button class="accordion-button collapsed" type="button" data-mdb-toggle="collapse" data-mdb-target="#faq-different-ip" aria-expanded="false" aria-controls="faq-different-ip">
-              <i class="fa-solid fa-arrow-right-arrow-left text-primary me-2" aria-hidden="true"></i>
-              Why does this site show a different IP address than other lookup sites?
-            </button>
-          </h2>
-          <div id="faq-different-ip" class="accordion-collapse collapse" aria-labelledby="faq-different-ip-heading">
-            <div class="accordion-body">
-              <p>Most general IP lookup tools show the address your device presents to arbitrary servers on the internet. This tool is different — it tests connectivity specifically to the UNC campus network. That distinction matters: a VPN connection routes your traffic through a campus address, so this tool shows your VPN IP while a general lookup site would still show your home internet address.</p>
-              <p class="mb-0">Additionally, most lookup sites force a connection over IPv4. This tool tests both IPv4 and IPv6 separately and shows whichever your device uses by default when reaching campus — which may be IPv6. Both addresses are correct; your device can use different protocols to reach different destinations simultaneously.</p>
-            </div>
-          </div>
-        </div>
+  {% call faq_item('faq-different-ip', 'fa-arrow-right-arrow-left', 'primary', 'Why does this site show a different IP address than another lookup site?') %}
+    <p class="mb-0">Different sites can be reached over different protocols and routes. One site may use IPv6 while another uses IPv4; a VPN, proxy, secure web gateway, cellular relay or split-routing policy can also present different public addresses. Both results can be valid for their respective destinations.</p>
+  {% endcall %}
 
-        <p class="faq-section-label text-success">Campus network</p>
+  <p class="faq-section-label text-success">Network and DNS</p>
 
-        <div class="accordion-item faq-accent-success">
-          <h2 class="accordion-header" id="faq-campus-heading">
-            <button class="accordion-button collapsed" type="button" data-mdb-toggle="collapse" data-mdb-target="#faq-campus" aria-expanded="false" aria-controls="faq-campus">
-              <i class="fa-solid fa-network-wired text-success me-2" aria-hidden="true"></i>
-              What is campus?
-            </button>
-          </h2>
-          <div id="faq-campus" class="accordion-collapse collapse" aria-labelledby="faq-campus-heading">
-            <div class="accordion-body">
-              <p class="mb-0">Campus refers to the computer network providing service to hundreds of buildings, predominantly in Chapel Hill, NC.
-                The campus network extends to a number of remote locations throughout North Carolina.
-                More information is available in the
-                <a href="https://tdx.unc.edu/TDClient/33/Portal/KB/ArticleDet?ID=331">Campus Subnets</a>
-                help article.
-              </p>
-            </div>
-          </div>
-        </div>
+  {% call faq_item('faq-campus', 'fa-building', 'success', 'What does “UB network” mean on this site?') %}
+    <p class="mb-0">It means an address range configured by the deployment team as belonging to University at Buffalo network infrastructure, including recognized campus and remote UB locations. UB has North, South and Downtown campuses, and also operates at other locations. See the <a href="https://www.buffalo.edu/home/visiting-ub/map.html">official UB campus maps</a>.</p>
+  {% endcall %}
 
-        <div class="accordion-item faq-accent-success">
-          <h2 class="accordion-header" id="faq-nac-heading">
-            <button class="accordion-button collapsed" type="button" data-mdb-toggle="collapse" data-mdb-target="#faq-nac" aria-expanded="false" aria-controls="faq-nac">
-              <i class="fa-solid fa-lock text-success me-2" aria-hidden="true"></i>
-              What is Network Access Control (NAC)?
-            </button>
-          </h2>
-          <div id="faq-nac" class="accordion-collapse collapse" aria-labelledby="faq-nac-heading">
-            <div class="accordion-body">
-              <p class="mb-0">Network Access Control is a system that manages which devices are allowed to connect to the campus network and under what conditions.
-                When you connect, NAC checks whether your device meets security requirements — such as being registered or having current software.
-                The connection policy shown in this tool reflects the access level your device has been granted.
-              </p>
-            </div>
-          </div>
-        </div>
+  {% call faq_item('faq-nac', 'fa-lock', 'success', 'What is Network Access Control?') %}
+    <p class="mb-0">Network Access Control is a general term for systems that identify devices and apply connection policy. If this deployment is integrated with UB network-management systems, it may show connection information available for the current address. The exact fields depend on the data source and permissions configured by the deployment team.</p>
+  {% endcall %}
 
-        <div class="accordion-item faq-accent-success">
-          <h2 class="accordion-header" id="faq-dns-heading">
-            <button class="accordion-button collapsed" type="button" data-mdb-toggle="collapse" data-mdb-target="#faq-dns" aria-expanded="false" aria-controls="faq-dns">
-              <i class="fa-solid fa-shield-halved text-success me-2" aria-hidden="true"></i>
-              What is Campus DNS Security?
-            </button>
-          </h2>
-          <div id="faq-dns" class="accordion-collapse collapse" aria-labelledby="faq-dns-heading">
-            <div class="accordion-body">
-              <p class="mb-0">UNC Information Technology Services provides malware and phishing protection through the domain name system (DNS).
-                Devices using <a href="https://tdx.unc.edu/TDClient/33/Portal/KB/ArticleDet?ID=131">campus DNS servers</a>
-                receive this protection automatically — no software or configuration changes required.
-                More information is available in the
-                <a href="https://tdx.unc.edu/TDClient/33/Portal/KB/ArticleDet?ID=333">DNS Security Filtering Service</a>
-                help article.
-              </p>
-            </div>
-          </div>
-        </div>
+  {% call faq_item('faq-dns-provider', 'fa-magnifying-glass', 'success', 'What does the DNS provider check show?') %}
+    <p>The test estimates which resolver answered a browser-generated DNS query. It is similar to a lightweight DNS leak check, but the result should be treated as diagnostic evidence rather than a definitive security verdict.</p>
+    <p>Encrypted DNS, browser settings, UB VPN routing, cellular privacy relays, enterprise security products and the network's resolver architecture can all affect the provider name. Do not assume that one specific company name is always required at UB.</p>
+    <p class="mb-0">The provider label may be derived from third-party IP and DNS data and can be incomplete or outdated.</p>
+  {% endcall %}
 
-        <div class="accordion-item faq-accent-success">
-          <h2 class="accordion-header" id="faq-dns-provider-heading">
-            <button class="accordion-button collapsed" type="button" data-mdb-toggle="collapse" data-mdb-target="#faq-dns-provider" aria-expanded="false" aria-controls="faq-dns-provider">
-              <i class="fa-solid fa-magnifying-glass text-success me-2" aria-hidden="true"></i>
-              What does the DNS provider check show?
-            </button>
-          </h2>
-          <div id="faq-dns-provider" class="accordion-collapse collapse" aria-labelledby="faq-dns-provider-heading">
-            <div class="accordion-body">
-              <p>Every time your device connects to a website, it asks a DNS server to translate the domain name into an IP address.
-                The DNS provider check reveals which server your device is actually sending those queries to — similar to what dedicated
-                <strong>DNS leak test</strong> websites do, but built directly into this tool.</p>
-              <p>This matters in a few situations:</p>
-              <ul class="mb-3">
-                <li><strong>On campus:</strong> you should see UNC or Akamai listed as your DNS provider. UNC's campus DNS servers forward all queries through Akamai to apply the DNS security filtering layer, so Akamai is the expected result for devices correctly using campus DNS. If you see your home internet provider instead, your device is not using campus DNS and will not receive DNS security protection.</li>
-                <li><strong>On VPN:</strong> the UNC VPN pushes campus DNS servers to your device, so you should also see UNC or Akamai here. If you see your home ISP instead, your VPN has a DNS leak — queries are bypassing the tunnel and going directly to your ISP, which can expose your browsing activity and bypass campus DNS security.</li>
-                <li><strong>Using a privacy DNS service:</strong> services like Cloudflare (1.1.1.1) or Google (8.8.8.8) will appear here if your device is configured to use them, which overrides your network's default DNS and may bypass campus DNS security filtering.</li>
-              </ul>
-              <p class="mb-0">The provider name comes from a reverse lookup of the IP address returned by your DNS resolver, cross-referenced with ISP data from ip-api.com.</p>
-            </div>
-          </div>
-        </div>
+  {% call faq_item('faq-dns-security', 'fa-filter-circle-dollar', 'success', 'What does the DNS security test mean?') %}
+    <p class="mb-0">This feature only has meaning when the deployment administrator has configured a test domain and documented the expected behavior. A passed or failed result can be affected by caching, browser security, encrypted DNS and network filtering. Do not describe it as an official UB security control unless UBIT has approved the configuration and wording.</p>
+  {% endcall %}
 
-        <p class="faq-section-label text-warning">Privacy &amp; location</p>
+  <p class="faq-section-label text-warning">Privacy and location</p>
 
-        <div class="accordion-item faq-accent-warning">
-          <h2 class="accordion-header" id="faq-privacy-heading">
-            <button class="accordion-button collapsed" type="button" data-mdb-toggle="collapse" data-mdb-target="#faq-privacy" aria-expanded="false" aria-controls="faq-privacy">
-              <i class="fa-solid fa-eye-slash text-warning me-2" aria-hidden="true"></i>
-              Is my IP address being stored or tracked?
-            </button>
-          </h2>
-          <div id="faq-privacy" class="accordion-collapse collapse" aria-labelledby="faq-privacy-heading">
-            <div class="accordion-body">
-              <p class="mb-0">This tool does not log or store your IP address. Site statistics track only aggregate counts — such as how many visits came from IPv4 vs. IPv6, or what general region visitors came from — but individual IP addresses are never written to disk. No cookies are used for tracking.</p>
-            </div>
-          </div>
-        </div>
+  {% call faq_item('faq-privacy', 'fa-eye-slash', 'warning', 'Is my IP address stored or tracked?') %}
+    <p>The application's metrics feature is designed to store aggregate counts and classifications rather than raw client IP addresses.</p>
+    <p class="mb-0">That does not cover every system in the hosting path. Web-server, reverse-proxy, load-balancer, security and operational logs may record network identifiers according to their configuration and applicable UB policy. The production owner should complete a privacy and logging review before launch.</p>
+  {% endcall %}
 
-        <div class="accordion-item faq-accent-warning">
-          <h2 class="accordion-header" id="faq-external-service-heading">
-            <button class="accordion-button collapsed" type="button" data-mdb-toggle="collapse" data-mdb-target="#faq-external-service" aria-expanded="false" aria-controls="faq-external-service">
-              <i class="fa-solid fa-arrow-up-right-from-square text-warning me-2" aria-hidden="true"></i>
-              Does this site contact any external services?
-            </button>
-          </h2>
-          <div id="faq-external-service" class="accordion-collapse collapse" aria-labelledby="faq-external-service-heading">
-            <div class="accordion-body">
-              <p>Yes. Your browser contacts up to three external services as part of the diagnostic checks:</p>
-              <ul class="mb-3">
-                <li><a href="https://ip-api.com/">ip-api.com</a> — identifies your internet DNS provider and EDNS client subnet as part of the DNS information test.</li>
-                <li><a href="https://www.ipify.org/">ipify.org</a> — checks what IPv4 address internet servers see for your connection. This is compared against the campus-detected address to identify split-tunnel VPN or campus NAT scenarios.</li>
-                <li>A configured test domain — if DNS security filtering is enabled, your browser attempts to reach a known test domain to determine whether filtering is active.</li>
-              </ul>
-              <p class="mb-0">In all cases your IP address is visible to any internet service you contact, so these checks do not expose anything beyond what is inherent to browsing the web. No data from these checks is sent back to UNC servers beyond the aggregate filtering result.</p>
-            </div>
-          </div>
-        </div>
+  {% call faq_item('faq-external-service', 'fa-arrow-up-right-from-square', 'warning', 'Does this site contact external services?') %}
+    <p>Depending on configuration, the browser may contact:</p>
+    <ul>
+      <li><a href="https://ip-api.com/">ip-api.com</a> for IP, provider or DNS-related data.</li>
+      <li><a href="https://www.ipify.org/">ipify.org</a> to compare the IPv4 address visible to a public internet service.</li>
+      <li>A configured DNS test domain.</li>
+      <li>Connectivity targets listed on the Connectivity page.</li>
+      <li>Fast.com only when the user opens the external speed-test link.</li>
+    </ul>
+    <p class="mb-0">Each external provider can see the public IP address used to contact it. The deployment owner should confirm the enabled services, privacy notice and third-party review requirements before production use.</p>
+  {% endcall %}
 
-        <div class="accordion-item faq-accent-warning">
-          <h2 class="accordion-header" id="faq-location-accuracy-heading">
-            <button class="accordion-button collapsed" type="button" data-mdb-toggle="collapse" data-mdb-target="#faq-location-accuracy" aria-expanded="false" aria-controls="faq-location-accuracy">
-              <i class="fa-solid fa-location-dot text-warning me-2" aria-hidden="true"></i>
-              Why does my IP location look inaccurate?
-            </button>
-          </h2>
-          <div id="faq-location-accuracy" class="accordion-collapse collapse" aria-labelledby="faq-location-accuracy-heading">
-            <div class="accordion-body">
-              <p class="mb-0">IP geolocation is a city-level estimate based on where an internet provider registered its address block — not your physical location or GPS position.
-                A residential ISP may register its IP ranges at a regional office or data center, so your location might appear as a different city or part of the state.
-                For campus addresses, location is set to Chapel Hill regardless of where on the network you are connected.
-              </p>
-            </div>
-          </div>
-        </div>
+  {% call faq_item('faq-location-accuracy', 'fa-location-dot', 'warning', 'Why does my IP location look inaccurate?') %}
+    <p class="mb-0">IP geolocation is an estimate based on address-registration and provider data, not GPS. It may identify Buffalo, Amherst, another nearby city or a provider facility rather than your physical location. Campus integrations can provide a more specific building only when the deployment has a reliable authorized data source.</p>
+  {% endcall %}
 
-        <div class="accordion-item faq-accent-warning">
-          <h2 class="accordion-header" id="faq-location-update-heading">
-            <button class="accordion-button collapsed" type="button" data-mdb-toggle="collapse" data-mdb-target="#faq-location-update" aria-expanded="false" aria-controls="faq-location-update">
-              <i class="fa-solid fa-pen-to-square text-warning me-2" aria-hidden="true"></i>
-              The location data for my IP address doesn't look right. Can it be updated?
-            </button>
-          </h2>
-          <div id="faq-location-update" class="accordion-collapse collapse" aria-labelledby="faq-location-update-heading">
-            <div class="accordion-body">
-              <p class="mb-0">Yes, the service <a href="https://ip-api.com/">IP-API.com</a> being used offers a <a href="https://ip-api.com/docs/correction">data correction</a> page for submitting requests.</p>
-            </div>
-          </div>
-        </div>
+  {% call faq_item('faq-location-update', 'fa-pen-to-square', 'warning', 'Can inaccurate public geolocation data be corrected?') %}
+    <p class="mb-0">The public geolocation provider used by the application may accept correction requests. For IP-API, see its <a href="https://ip-api.com/docs/correction">data correction page</a>. UB-managed address data should be corrected through the appropriate UB network or IP address management process instead.</p>
+  {% endcall %}
 
-        <p class="faq-section-label text-info">Technical</p>
+  <p class="faq-section-label text-info">Reports, speed and API</p>
 
-        <div class="accordion-item faq-accent-info">
-          <h2 class="accordion-header" id="faq-report-heading">
-            <button class="accordion-button collapsed" type="button" data-mdb-toggle="collapse" data-mdb-target="#faq-report" aria-expanded="false" aria-controls="faq-report">
-              <i class="fa-solid fa-file-arrow-down text-info me-2" aria-hidden="true"></i>
-              How do I download a support report?
-            </button>
-          </h2>
-          <div id="faq-report" class="accordion-collapse collapse" aria-labelledby="faq-report-heading">
-            <div class="accordion-body">
-              <p>The <b>Report</b> button in the navigation bar generates a print-ready summary of everything shown on the home page — your IP address, connection type, campus network details, device information, and IPv4/IPv6 connectivity test results. The button activates automatically once your connection details have finished loading.</p>
-              <p>Clicking <b>Report</b> opens a formatted page in a new browser window. From there, use your browser's Print function (<kbd>Ctrl+P</kbd> on Windows / <kbd>Cmd+P</kbd> on Mac) and choose <b>Save as PDF</b> as the destination. The resulting file can be emailed to the <a href="https://help.unc.edu">ITS Service Desk</a> or attached to a help ticket.</p>
-              <p class="mb-0">If a popup blocker prevents the window from opening, allow popups for this site and try again.</p>
-            </div>
-          </div>
-        </div>
+  {% call faq_item('faq-report', 'fa-file-arrow-down', 'info', 'How do I download a support report?') %}
+    <p>The <strong>Report</strong> button creates a print-ready summary after the home-page diagnostics finish loading. Use your browser's Print command and select <strong>Save as PDF</strong>.</p>
+    <p class="mb-0">Attach the result to a request at <a href="https://support.buffalo.edu/">support.buffalo.edu</a>. Review the report first and do not include passwords, authentication tokens or restricted data.</p>
+  {% endcall %}
 
-        <div class="accordion-item faq-accent-info">
-          <h2 class="accordion-header" id="faq-speedtest-heading">
-            <button class="accordion-button collapsed" type="button" data-mdb-toggle="collapse" data-mdb-target="#faq-speedtest" aria-expanded="false" aria-controls="faq-speedtest">
-              <i class="fa-solid fa-gauge-high text-info me-2" aria-hidden="true"></i>
-              How does the speed test on this site work?
-            </button>
-          </h2>
-          <div id="faq-speedtest" class="accordion-collapse collapse" aria-labelledby="faq-speedtest-heading">
-            <div class="accordion-body">
-              <p>The speed test embedded on this site uses <a href="https://www.ookla.com/">Ookla Speedtest Custom</a>, the same technology behind Speedtest.net.
-                It measures your download speed, upload speed, and latency by transferring data between your device and a test server.
-              </p>
-              <p>By default, Ookla selects the closest available server. To measure your connection specifically to the UNC campus network,
-                manually select <b>UNC Chapel Hill</b> from the server list within the widget, or use the
-                <a href="https://www.speedtest.net/server/14774">UNC Chapel Hill server</a> directly on Speedtest.net.
-              </p>
-              <p class="mb-0">Speed test results reflect your connection to that specific server at that moment — network congestion,
-                Wi-Fi signal strength, and VPN overhead can all affect the numbers.</p>
-            </div>
-          </div>
-        </div>
+  {% call faq_item('faq-speedtest', 'fa-gauge-high', 'info', 'How does the speed-test page work?') %}
+    <p>The page opens <a href="https://fast.com/">Fast.com</a>, a third-party service referenced in UBIT connectivity guidance. The test measures performance to the provider's infrastructure, not specifically to a UB campus server.</p>
+    <p class="mb-0">Results vary with Wi-Fi signal, other traffic, VPN routing, device performance and network congestion. Compare multiple tests and note whether you were on eduroam, wired Ethernet, a home network or cellular data.</p>
+  {% endcall %}
 
-        <div class="accordion-item faq-accent-info">
-          <h2 class="accordion-header" id="faq-isp-org-heading">
-            <button class="accordion-button collapsed" type="button" data-mdb-toggle="collapse" data-mdb-target="#faq-isp-org" aria-expanded="false" aria-controls="faq-isp-org">
-              <i class="fa-solid fa-sitemap text-info me-2" aria-hidden="true"></i>
-              What is the difference between Internet provider and Organization in the site statistics?
-            </button>
-          </h2>
-          <div id="faq-isp-org" class="accordion-collapse collapse" aria-labelledby="faq-isp-org-heading">
-            <div class="accordion-body">
-              <p>Both come from geolocation data associated with your IP address, but they describe different things:</p>
-              <ul class="mb-3">
-                <li><b>Internet provider</b> is the company that sells you internet access — the legal business name registered as the owner of your IP address range. Examples: "Charter Communications", "Comcast Cable Communications LLC", "AT&T Enterprises LLC".</li>
-                <li><b>Organization</b> is the entity registered as the operator of your specific IP address block with the regional internet registry. For home users this is often a brand or subsidiary name (e.g., "Spectrum" is Charter's consumer brand). For universities, businesses, and enterprises that manage their own IP allocations, it is typically the institution itself — for example, a UNC campus device would show "University of North Carolina at Chapel Hill" as the organization.</li>
-              </ul>
-              <p class="mb-0">The two fields are often the same or closely related for residential connections, but can differ significantly for business and campus users.</p>
-            </div>
-          </div>
-        </div>
+  {% call faq_item('faq-isp-org', 'fa-sitemap', 'info', 'What is the difference between Internet provider and Organization?') %}
+    <p><strong>Internet provider</strong> generally names the company providing or announcing the connection. <strong>Organization</strong> generally identifies the entity associated with the specific IP block.</p>
+    <p class="mb-0">For a campus address, the organization may appear as the University at Buffalo, SUNY, a network partner or another registry label. These fields come from public IP data and are not authoritative UB asset records.</p>
+  {% endcall %}
 
-        <div class="accordion-item faq-accent-info">
-          <h2 class="accordion-header" id="faq-query-heading">
-            <button class="accordion-button collapsed" type="button" data-mdb-toggle="collapse" data-mdb-target="#faq-query" aria-expanded="false" aria-controls="faq-query">
-              <i class="fa-solid fa-ban text-info me-2" aria-hidden="true"></i>
-              Can I query information about different IP addresses?
-            </button>
-          </h2>
-          <div id="faq-query" class="accordion-collapse collapse" aria-labelledby="faq-query-heading">
-            <div class="accordion-body">
-              <p class="mb-0">No. For security reasons, this tool only displays information about the client device communicating with it.</p>
-            </div>
-          </div>
-        </div>
+  {% call faq_item('faq-query', 'fa-ban', 'info', 'Can I query information about a different IP address?') %}
+    <p class="mb-0">No. The application is designed to report information about the client connection making the request, not arbitrary third-party addresses.</p>
+  {% endcall %}
 
-        <div class="accordion-item faq-accent-info">
-          <h2 class="accordion-header" id="faq-api-heading">
-            <button class="accordion-button collapsed" type="button" data-mdb-toggle="collapse" data-mdb-target="#faq-api" aria-expanded="false" aria-controls="faq-api">
-              <i class="fa-solid fa-code text-info me-2" aria-hidden="true"></i>
-              Is an API available?
-            </button>
-          </h2>
-          <div id="faq-api" class="accordion-collapse collapse" aria-labelledby="faq-api-heading">
-            <div class="accordion-body">
-              <p>This application is intended for browser-based use, but it is powered by an API that can be accessed directly.
-                API responses and data structures may change over time without notice.
-              </p>
-              <ul class="mb-0">
-                <li><a href="{{ site_url }}/hostinfo">Dual stack hostinfo</a> for dual stack detection</li>
-                <li><a href="{{ ipv4_url }}/hostinfo">IPv4 hostinfo</a> for IPv4 only testing</li>
-                {% if ipv6_url %}<li><a href="{{ ipv6_url }}/hostinfo">IPv6 hostinfo</a> for IPv6 only testing</li>{% endif %}
-              </ul>
-            </div>
-          </div>
-        </div>
-
-      </div>
-
-  </div>
-</div>
-{% endblock %}
-
-
-{% block javascript %}
-<script src="{{ url_for('static', filename='js/mdb.min.js') }}?v={{ app_version }}"></script>
+  {% call faq_item('faq-api', 'fa-code', 'info', 'Is an API available?') %}
+    <p>The browser interface uses host-information endpoints. Responses and data structures may change without notice.</p>
+    <ul class="mb-0">
+      <li><a href="{{ site_url }}/hostinfo">Dual-stack host information</a></li>
+      <li><a href="{{ ipv4_url }}/hostinfo">IPv4-only host information</a></li>
+      {% if ipv6_url %}<li><a href="{{ ipv6_url }}/hostinfo">IPv6-only host information</a></li>{% endif %}
+    </ul>
+  {% endcall %}
+</div></div></div>
 {% endblock %}

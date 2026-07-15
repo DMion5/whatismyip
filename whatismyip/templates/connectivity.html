@@ -1,19 +1,18 @@
 {% extends "base.html" %}
 
-{% block title %}Connectivity Tests — What Is My IP? | UNC Chapel Hill ITS{% endblock %}
-{% block meta_description %}Test whether your device can reach key campus and internet resources from your current network connection.{% endblock %}
-{% block og_title %}Connectivity Tests — What Is My IP? | UNC Chapel Hill ITS{% endblock %}
-{% block og_description %}Test whether your device can reach key campus and internet resources from your current network connection.{% endblock %}
+{% block title %}Connectivity Tests | UB Network Diagnostics{% endblock %}
+{% block meta_description %}Test whether your device can reach selected University at Buffalo and internet resources from your current network connection.{% endblock %}
+{% block og_title %}Connectivity Tests | UB Network Diagnostics{% endblock %}
+{% block og_description %}Test whether your device can reach selected University at Buffalo and internet resources from your current connection.{% endblock %}
 {% block og_url %}{{ site_url }}/connectivity{% endblock %}
-{% block twitter_title %}Connectivity Tests — What Is My IP? | UNC Chapel Hill ITS{% endblock %}
-{% block twitter_description %}Test whether your device can reach key campus and internet resources from your current network connection.{% endblock %}
-
+{% block twitter_title %}Connectivity Tests | UB Network Diagnostics{% endblock %}
+{% block twitter_description %}Test whether your device can reach selected UB and internet resources from your current connection.{% endblock %}
 
 {% block content %}
 <div class="row mt-3 mb-1">
   <div class="col">
     <h1 class="site-page-heading">Connectivity Tests</h1>
-    <p class="site-page-subheading">Tests whether your device can reach key campus and internet resources from your current connection. Tests run automatically and reflect your network at this moment.</p>
+    <p class="site-page-subheading">Tests whether your browser can reach configured UB and internet endpoints from your current connection. Tests run automatically and reflect the network path available at this moment.</p>
   </div>
 </div>
 
@@ -46,9 +45,7 @@
               <i class="fa-regular fa-clock me-1" aria-hidden="true"></i>Ready
             </div>
           </div>
-          {% if target.description %}
-          <p class="text-muted small mb-1">{{ target.description }}</p>
-          {% endif %}
+          {% if target.description %}<p class="text-muted small mb-1">{{ target.description }}</p>{% endif %}
           <div class="text-muted" style="font-size:0.72rem; overflow-wrap:anywhere;">{{ target.url }}</div>
         </div>
       </div>
@@ -57,7 +54,7 @@
   {% else %}
     <div class="col">
       <div class="card shadow card-body text-muted">
-        <p class="mb-0">No connectivity targets configured. Add <code>[[connectivity.targets]]</code> entries to <code>data/config.toml</code> to enable this page.</p>
+        <p class="mb-0">No connectivity targets are configured. Add <code>[[connectivity.targets]]</code> entries to <code>data/config.toml</code> to enable this page.</p>
       </div>
     </div>
   {% endif %}
@@ -65,10 +62,11 @@
 
 <div class="row mb-4">
   <div class="col">
-    <p class="text-muted small mb-0">
+    <p class="text-muted small mb-2">
       <i class="fa-solid fa-circle-info me-1" aria-hidden="true"></i>
-      Tests use browser fetch requests. A <strong>reachable</strong> result confirms the host responded; an <strong>unreachable</strong> result indicates a network or DNS failure. Results do not verify the content of the response.
+      Tests use browser <code>fetch</code> requests in <code>no-cors</code> mode. A <strong>reachable</strong> result means the browser completed a network request; it does not verify page content, authentication or overall service health.
     </p>
+    <p class="text-muted small mb-0">Browser extensions, captive portals, filtering products and local security settings can affect results. Check <a href="https://www.buffalo.edu/ubit/news/alerts.html">UBIT Alerts</a> before reporting a suspected outage.</p>
   </div>
 </div>
 {% endblock %}
@@ -86,7 +84,6 @@
 
   async function runTest(target, idx) {
     setStatus(idx, '<i class="fa-solid fa-spinner fa-spin me-1" aria-hidden="true"></i>Testing…');
-
     var controller = new AbortController();
     var timer = setTimeout(function () { controller.abort(); }, 8000);
     var t0 = performance.now();
@@ -95,31 +92,18 @@
       await fetch(target.url, { mode: 'no-cors', cache: 'no-store', signal: controller.signal });
       clearTimeout(timer);
       var ms = Math.round(performance.now() - t0);
-      setStatus(idx,
-        '<i class="fa-solid fa-circle-check text-success me-1" aria-hidden="true"></i>' +
-        '<span class="text-success">Reachable</span>' +
-        '<span class="text-muted"> — ' + ms + ' ms</span>'
-      );
+      setStatus(idx, '<i class="fa-solid fa-circle-check text-success me-1" aria-hidden="true"></i><span class="text-success">Reachable</span><span class="text-muted"> — ' + ms + ' ms</span>');
     } catch (e) {
       clearTimeout(timer);
       if (e.name === 'AbortError') {
-        setStatus(idx,
-          '<i class="fa-solid fa-triangle-exclamation text-warning me-1" aria-hidden="true"></i>' +
-          '<span class="text-warning">Timed out</span>'
-        );
+        setStatus(idx, '<i class="fa-solid fa-triangle-exclamation text-warning me-1" aria-hidden="true"></i><span class="text-warning">Timed out</span>');
       } else {
-        setStatus(idx,
-          '<i class="fa-solid fa-circle-xmark text-danger me-1" aria-hidden="true"></i>' +
-          '<span class="text-danger">Unreachable</span>'
-        );
+        setStatus(idx, '<i class="fa-solid fa-circle-xmark text-danger me-1" aria-hidden="true"></i><span class="text-danger">Unreachable</span>');
       }
     }
   }
 
-  window.runAllTests = function () {
-    targets.forEach(function (t, i) { runTest(t, i); });
-  };
-
+  window.runAllTests = function () { targets.forEach(function (t, i) { runTest(t, i); }); };
   document.addEventListener('DOMContentLoaded', window.runAllTests);
 }());
 </script>

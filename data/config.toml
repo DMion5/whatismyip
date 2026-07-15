@@ -7,15 +7,15 @@
 # Your institution's display name.
 # Used as the ISP/organization label when a visitor's IP is a private (RFC 1918)
 # or campus address that cannot be looked up through the public geolocation API.
-name = "Your Institution Name"
+name = "State University of New York at Buffalo"
 
 # Primary campus location — used as the geolocation fallback for private/campus IPs.
 city = "Buffalo"
 region = "New York"
 country_code = "US"
 country_name = "United States"
-lat = 0.0
-lon = 0.0
+lat = 43.0010
+lon = -78.7900
 
 # Bing Webmaster Tools verification token.
 # The 32-character hex token from your Bing Webmaster verification file.
@@ -71,6 +71,12 @@ type = "self"
 name = "UB Homepage"
 url = "https://www.buffalo.edu/"
 description = "UB main website"
+type = "internet"
+
+[[connectivity.targets]]
+name = "Microsoft 365"
+url = "https://office365.microsoft.com"
+description = "Microsoft 365"
 type = "internet"
 
 [[connectivity.targets]]

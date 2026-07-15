@@ -586,39 +586,64 @@
 {
   "@context": "https://schema.org",
   "@type": "WebApplication",
-  "name": "What Is My IP? — UNC Chapel Hill",
+  "name": "What Is My IP? — UB Information Technology",
+  "alternateName": "UBIT What Is My IP?",
   "url": "{{ site_url }}",
-  "description": "Find your IP address and test your connection to the UNC Chapel Hill campus network. Works for on-campus, VPN, and wireless users. Shows IPv4, IPv6, DNS provider detection, DNS security filtering status, and detailed campus network information.",
+  "description": "Find your IP address and test your connection to the University at Buffalo campus network. Designed for on-campus, UB VPN and Wi-Fi users, the tool provides IPv4 and IPv6 detection, DNS provider information, DNS security filtering status, and detailed UB network diagnostics.",
   "applicationCategory": "NetworkingApplication",
   "operatingSystem": "Any",
-  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "isAccessibleForFree": true,
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
   "provider": {
     "@type": "Organization",
-    "name": "UNC Information Technology Services",
-    "url": "https://its.unc.edu"
+    "name": "UB Information Technology",
+    "alternateName": "UBIT",
+    "url": "https://www.buffalo.edu/ubit.html",
+    "parentOrganization": {
+      "@type": "CollegeOrUniversity",
+      "name": "University at Buffalo",
+      "alternateName": "UB",
+      "url": "https://www.buffalo.edu/"
+    }
   },
   "featureList": [
     "IP address lookup",
     "IPv4 and IPv6 detection",
-    "Campus VPN detection",
+    "UB VPN detection",
+    "UB campus network detection",
+    "Wi-Fi connection details",
     "DNS provider detection",
-    "DNS leak test",
-    "DNS security filtering test",
+    "DNS leak testing",
+    "DNS security filtering testing",
     "Network and VLAN details",
-    "ISP and geolocation"
+    "ISP and IP geolocation",
+    "Device and browser information"
   ]
 }
 </script>
+
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "WebSite",
-  "name": "What Is My IP? — UNC Chapel Hill",
+  "name": "What Is My IP? — UB Information Technology",
+  "alternateName": "UBIT What Is My IP?",
   "url": "{{ site_url }}",
   "publisher": {
     "@type": "Organization",
-    "name": "UNC Information Technology Services",
-    "url": "https://its.unc.edu"
+    "name": "UB Information Technology",
+    "alternateName": "UBIT",
+    "url": "https://www.buffalo.edu/ubit.html",
+    "parentOrganization": {
+      "@type": "CollegeOrUniversity",
+      "name": "University at Buffalo",
+      "alternateName": "UB",
+      "url": "https://www.buffalo.edu/"
+    }
   }
 }
 </script>

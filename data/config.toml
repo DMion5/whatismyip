@@ -94,8 +94,8 @@ type = "internet"
 
 [[connectivity.targets]]
 name = "IT Help Desk"
-url = "https://www.buffalo.edu/ubit/services/all/ubit-help-center.html"
-description = "UBIT support and service portal"
+url = "https://ubuffalo.teamdynamix.com/TDClient/42/ITPortal/Home/"
+description = "UBIT support and service portal on teamdynamix"
 type = "campus"
 
 

@@ -37,7 +37,7 @@
                 <li>Campus network and VLAN assignment</li>
                 <li>DHCP and network configuration details</li>
                 <li>Network Access Control (NAC) details, including switch port and connection policy</li>
-                <li>Wi-Fi connection details — SSID, access point name, and signal quality (when available)</li>
+                <li>Wi-Fi connection details - SSID, access point name, and signal quality (when available)</li>
                 <li>Building location map for wired and wireless connections</li>
               </ul>
               <p class="mb-0">Knowing these details helps diagnose connectivity problems and troubleshoot access to UB network resources.</p>
@@ -54,7 +54,7 @@
           </h2>
           <div id="faq-off-campus" class="accordion-collapse collapse" aria-labelledby="faq-off-campus-heading">
             <div class="accordion-body">
-              <p>Off-campus visitors see their IP address, internet provider, approximate location, and DNS security filtering status. Campus network details — VLAN assignment, NAC information, and building location — are not available from off-campus addresses.</p>
+              <p>Off-campus visitors see their IP address, internet provider, approximate location, and DNS security filtering status. Campus network details - VLAN assignment, NAC information, and building location - are not available from off-campus addresses.</p>
               <p class="mb-0">If your UB VPN connection uses an address recognized by this deployment, the tool may show additional campus network details.</p>
             </div>
           </div>
@@ -91,7 +91,7 @@
           <div id="faq-different-ip" class="accordion-collapse collapse" aria-labelledby="faq-different-ip-heading">
             <div class="accordion-body">
               <p>Most general IP lookup tools show the address your device presents to their internet service. This tool also tests IPv4 and IPv6 connectivity to the configured UB service endpoints. A VPN, proxy, cellular relay, or different network route can cause two sites to see different addresses.</p>
-              <p class="mb-0">Additionally, most lookup sites force a connection over IPv4. This tool tests both IPv4 and IPv6 separately and shows whichever your device uses by default when reaching campus — which may be IPv6. Both addresses are correct; your device can use different protocols to reach different destinations simultaneously.</p>
+              <p class="mb-0">Additionally, most lookup sites force a connection over IPv4. This tool tests both IPv4 and IPv6 separately and shows whichever your device uses by default when reaching campus - which may be IPv6. Both addresses are correct; your device can use different protocols to reach different destinations simultaneously.</p>
             </div>
           </div>
         </div>
@@ -124,7 +124,7 @@
           <div id="faq-nac" class="accordion-collapse collapse" aria-labelledby="faq-nac-heading">
             <div class="accordion-body">
               <p class="mb-0">Network Access Control is a system that manages which devices are allowed to connect to the campus network and under what conditions.
-                When you connect, NAC checks whether your device meets security requirements — such as being registered or having current software.
+                When you connect, NAC checks whether your device meets security requirements - such as being registered or having current software.
                 The connection policy shown in this tool reflects the access level your device has been granted.
               </p>
             </div>
@@ -175,9 +175,9 @@
             <div class="accordion-body">
               <p>Yes. Your browser contacts up to three external services as part of the diagnostic checks:</p>
               <ul class="mb-3">
-                <li><a href="https://ip-api.com/">ip-api.com</a> — identifies your internet DNS provider and EDNS client subnet as part of the DNS information test.</li>
-                <li><a href="https://www.ipify.org/">ipify.org</a> — checks what IPv4 address internet servers see for your connection. This is compared against the campus-detected address to identify split-tunnel VPN or campus NAT scenarios.</li>
-                <li>A configured test domain — if DNS security filtering is enabled, your browser attempts to reach a known test domain to determine whether filtering is active.</li>
+                <li><a href="https://ip-api.com/">ip-api.com</a> - identifies your internet DNS provider and EDNS client subnet as part of the DNS information test.</li>
+                <li><a href="https://www.ipify.org/">ipify.org</a> - checks what IPv4 address internet servers see for your connection. This is compared against the campus-detected address to identify split-tunnel VPN or campus NAT scenarios.</li>
+                <li>A configured test domain - if DNS security filtering is enabled, your browser attempts to reach a known test domain to determine whether filtering is active.</li>
               </ul>
               <p class="mb-0">In all cases your IP address is visible to any internet service you contact, so these checks do not expose anything beyond what is inherent to browsing the web. The application receives only the diagnostic results needed to display the page, subject to the production configuration.</p>
             </div>
@@ -193,7 +193,7 @@
           </h2>
           <div id="faq-location-accuracy" class="accordion-collapse collapse" aria-labelledby="faq-location-accuracy-heading">
             <div class="accordion-body">
-              <p class="mb-0">IP geolocation is a city-level estimate based on where an internet provider registered its address block — not your physical location or GPS position.
+              <p class="mb-0">IP geolocation is a city-level estimate based on where an internet provider registered its address block - not your physical location or GPS position.
                 A residential ISP may register its IP ranges at a regional office or data center, so your location might appear as a different city or part of the state.
                 For recognized UB addresses, deployment-specific data may identify a UB campus or building when that information is available.
               </p>
@@ -226,7 +226,7 @@
           </h2>
           <div id="faq-report" class="accordion-collapse collapse" aria-labelledby="faq-report-heading">
             <div class="accordion-body">
-              <p>The <b>Report</b> button in the navigation bar generates a print-ready summary of everything shown on the home page — your IP address, connection type, campus network details, device information, and IPv4/IPv6 connectivity test results. The button activates automatically once your connection details have finished loading.</p>
+              <p>The <b>Report</b> button in the navigation bar generates a print-ready summary of everything shown on the home page - your IP address, connection type, campus network details, device information, and IPv4/IPv6 connectivity test results. The button activates automatically once your connection details have finished loading.</p>
               <p>Clicking <b>Report</b> opens a formatted page in a new browser window. From there, use your browser's Print function (<kbd>Ctrl+P</kbd> on Windows / <kbd>Cmd+P</kbd> on Mac) and choose <b>Save as PDF</b> as the destination. The resulting file can be attached to a request at <a href="https://support.buffalo.edu/">support.buffalo.edu</a>.</p>
               <p class="mb-0">If a popup blocker prevents the window from opening, allow popups for this site and try again.</p>
             </div>
@@ -259,8 +259,8 @@
             <div class="accordion-body">
               <p>Both come from geolocation data associated with your IP address, but they describe different things:</p>
               <ul class="mb-3">
-                <li><b>Internet provider</b> is the company that sells you internet access — the legal business name registered as the owner of your IP address range. Examples: "Charter Communications", "Comcast Cable Communications LLC", "AT&T Enterprises LLC".</li>
-                <li><b>Organization</b> is the entity registered as the operator of your specific IP address block with the regional internet registry. For home users this is often a brand or subsidiary name (e.g., "Spectrum" is Charter's consumer brand). For universities, businesses, and enterprises that manage their own IP allocations, it is typically the institution itself — for example, a UB campus address may show "University at Buffalo" or another related registry name as the organization.</li>
+                <li><b>Internet provider</b> is the company that sells you internet access - the legal business name registered as the owner of your IP address range. Examples: "Charter Communications", "Comcast Cable Communications LLC", "AT&T Enterprises LLC".</li>
+                <li><b>Organization</b> is the entity registered as the operator of your specific IP address block with the regional internet registry. For home users this is often a brand or subsidiary name (e.g., "Spectrum" is Charter's consumer brand). For universities, businesses, and enterprises that manage their own IP allocations, it is typically the institution itself - for example, a UB campus address may show "University at Buffalo" or another related registry name as the organization.</li>
               </ul>
               <p class="mb-0">The two fields are often the same or closely related for residential connections, but can differ significantly for business and campus users.</p>
             </div>

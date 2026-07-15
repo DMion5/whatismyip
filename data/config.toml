@@ -94,24 +94,22 @@ type = "campus"
 #
 # Add your institution's public and private IP ranges here.
 networks = [
-    # Example: your institution's assigned public IPv4 ranges
-    # "192.0.2.0/24",
-    # "198.51.100.0/24",
+    # Institution-owned public IP space
+    "67.20.192.0/19",
+    "69.12.16.0/21",
+    "128.205.0.0/16",
+    "2620:cc:8000::/48",
 
-    # Example: RFC 1918 private ranges in use on your network
-    # "10.0.0.0/8",
-    # "172.16.0.0/12",
-    # "192.168.0.0/16",
-    "128.205.10.0/24", 
-    "128.205.164.0/27",
-    "128.205.200.89",
-    "128.205.250.0/24",
-    "128.205.194.88",
-    "128.205.196.73",
-    "128.205.194.139",
-    "128.205.248.0/24",
-    "128.205.247.230"
+    # ISP-owned IP space
+    "8.22.104.0/21",
+    "8.35.160.0/20",
+    "8.37.48.0/21",
+    "38.95.240.0/20",
+    "67.99.160.0/20",
 
-    # Example: your institution's IPv6 ranges
-    # "2001:db8::/32",
+    # Private IP space and other
+    "10.0.0.0/8",
+    "199.33.167.0/24",
+    "199.110.242.0/25",
+    "2620:f2:1002::/64",
 ]

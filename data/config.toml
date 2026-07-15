@@ -68,10 +68,17 @@ description = "This diagnostic tool — always should be reachable"
 type = "self"
 
 [[connectivity.targets]]
-name = "Institution Homepage"
+name = "UB Homepage"
 url = "https://www.buffalo.edu/"
 description = "UB main website"
 type = "internet"
+
+[[connectivity.targets]]
+name = "Brightspace"
+url = "https://ublearns.buffalo.edu/"
+description = "UB Learns, powered by Brightspace, is the centrally supported Learning Management System (LMS) at the university."
+type = "campus"
+
 
 [[connectivity.targets]]
 name = "Google"
@@ -84,6 +91,8 @@ name = "IT Help Desk"
 url = "https://www.buffalo.edu/ubit/services/all/ubit-help-center.html"
 description = "UBIT support and service portal"
 type = "campus"
+
+
 
 [campus]
 

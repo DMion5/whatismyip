@@ -404,7 +404,7 @@ function downloadReport() {
 <body>
 <div class="hdr">
   <h1>Network Diagnostic Report</h1>
-  <p class="sub">UNC Chapel Hill ITS &mdash; What Is My IP?</p>
+  <p class="sub">UBIT &mdash; What Is My IP?</p>
   <p class="ts">${e(ts)}</p>
 </div>
 <div class="status">${e(statusMsg)}</div>

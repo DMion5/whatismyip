@@ -75,7 +75,7 @@ type = "internet"
 
 [[connectivity.targets]]
 name = "Microsoft 365"
-url = "https://office365.microsoft.com"
+url = "https://m365.cloud.microsoft/"
 description = "Microsoft 365"
 type = "internet"
 

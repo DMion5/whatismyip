@@ -60,6 +60,9 @@
 			document.documentElement.setAttribute('data-theme-preference', preference);
 			document.documentElement.setAttribute('data-theme', resolvedTheme);
 			document.documentElement.style.colorScheme = resolvedTheme;
+
+            document.documentElement.classList.remove('dark');
+            document.documentElement.classList.add('light'); 
 		})();
 	</script>
 

@@ -123,6 +123,8 @@ def get_ip_location(ip_address: str) -> dict[str, Any] | None:
     raw = response.json()
     app.logger.debug(f"ip_location details: {raw}")
 
+    on_campus = is_campus_ip(ip_address)
+
     
     # Normalize to a consistent structure regardless of which API is active.
     # ip-api.com uses "country"/"countryCode"; the fallback API uses "country_name"/"country_code2".

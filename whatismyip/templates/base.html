@@ -60,9 +60,6 @@
 			document.documentElement.setAttribute('data-theme-preference', preference);
 			document.documentElement.setAttribute('data-theme', resolvedTheme);
 			document.documentElement.style.colorScheme = resolvedTheme;
-
-            document.documentElement.classList.remove('dark');
-            document.documentElement.classList.add('light'); 
 		})();
 	</script>
 
@@ -240,7 +237,6 @@
 		</div>
 	</footer>
 
-	<script defer src="{{ url_for('static', filename='js/theme.js') }}?v={{ app_version }}"></script>
 	<script>
 		(function () {
 			var toggler = document.getElementById('site-navbar-toggler');

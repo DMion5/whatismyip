@@ -1,16 +1,30 @@
 @charset "UTF-8";
 /* CUSTOMIZE: Replace the --unc-* palette variables below with your institution's brand colors. */
 :root {
-  --unc-carolina-blue: #4B9CD3;
-  --unc-navy: #13294B;
-  --unc-white: #FFFFFF;
-  --unc-bolin-creek: #2C5080;
-  --unc-fordham-fountain: #B7D7ED;
-  --unc-cloud: #EDF5FB;
-  --unc-old-well-basin: #5B6670;
-  --unc-flat-gray: #A2AAAD;
-  --unc-cornerstone: #CFD3D5;
-  --unc-franklin-fog: #ECEDED;
+  /* University at Buffalo brand palette */ 
+  --ub-blue: #005BBB;
+  --ub-dark-blue: #002F56;
+  --ub-white: #FFFFFF; 
+  /* Supporting interface colors */
+  --ub-blue-hover: #004A99;
+  --ub-light-blue: #D6E9F8;
+  --ub-pale-blue: #EDF6FC;
+  --ub-slate: #4A5568;
+  --ub-gray: #8A8F98;
+  --ub-light-gray: #D1D5DB;
+  --ub-fog: #F1F3F5;
+
+    /* Temporary compatibility aliases */
+  --unc-carolina-blue: var(--ub-blue);
+  --unc-navy: var(--ub-dark-blue);
+  --unc-white: var(--ub-white);
+  --unc-bolin-creek: var(--ub-blue-hover);
+  --unc-fordham-fountain: var(--ub-light-blue);
+  --unc-cloud: var(--ub-pale-blue);
+  --unc-old-well-basin: var(--ub-slate);
+  --unc-flat-gray: var(--ub-gray);
+  --unc-cornerstone: var(--ub-light-gray);
+  --unc-franklin-fog: var(--ub-fog);
 
   --site-bg: var(--unc-white);
   --site-surface: var(--unc-white);

@@ -122,6 +122,8 @@ def get_ip_location(ip_address: str) -> dict[str, Any] | None:
 
     raw = response.json()
     app.logger.debug(f"ip_location details: {raw}")
+
+    
     # Normalize to a consistent structure regardless of which API is active.
     # ip-api.com uses "country"/"countryCode"; the fallback API uses "country_name"/"country_code2".
     result: dict | None = {
@@ -137,8 +139,9 @@ def get_ip_location(ip_address: str) -> dict[str, Any] | None:
         "mobile": raw.get("mobile"),
         "proxy": raw.get("proxy"),
         "hosting": raw.get("hosting"),
-        "lat": raw.get("lat"),
-        "lon": raw.get("lon"),
+        # If on UB Campus change Lon and Lat to UB North for Privacy Reasons
+        "lat": "43.001" if ipaddr.is_campus_ip else raw.get("lat"),
+        "lon": "78.790" if ipaddr.is_campus_ip else raw.get("lon"),
     }
 
     # Store in cache; evict oldest entry (insertion-order) when at capacity

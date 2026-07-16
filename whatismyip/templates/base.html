@@ -54,24 +54,8 @@
 
 	<script>
 		(function () {
-			const key = 'whatismyip-theme-preference';
-			const validThemes = ['light', 'dark', 'system'];
-			let preference = 'system';
-
-			try {
-				const savedPreference = localStorage.getItem(key);
-				if (validThemes.includes(savedPreference)) {
-					preference = savedPreference;
-				}
-			} catch (error) {
-				preference = 'system';
-			}
-
-			const prefersDark = window.matchMedia &&
-				window.matchMedia('(prefers-color-scheme: dark)').matches;
-			const resolvedTheme = preference === 'system'
-				? (prefersDark ? 'dark' : 'light')
-				: preference;
+			let preference = 'light';
+			const resolvedTheme = 'light';
 
 			document.documentElement.setAttribute('data-theme-preference', preference);
 			document.documentElement.setAttribute('data-theme', resolvedTheme);
@@ -122,15 +106,6 @@
 						<p class="site-header-tagline">
 							Network diagnostics &middot; UB Information Technology
 						</p>
-
-						<button
-							id="theme-toggle"
-							class="theme-toggle-btn"
-							type="button"
-							aria-label="Toggle theme"
-							title="Theme: System">
-							<i id="theme-toggle-icon" class="fa-solid fa-circle-half-stroke" aria-hidden="true"></i>
-						</button>
 					</div>
 				</div>
 			</div>

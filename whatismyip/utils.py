@@ -140,8 +140,8 @@ def get_ip_location(ip_address: str) -> dict[str, Any] | None:
         "proxy": raw.get("proxy"),
         "hosting": raw.get("hosting"),
         # If on UB Campus change Lon and Lat to UB North for Privacy Reasons
-        "lat": "43.001" if ipaddr.is_campus_ip else raw.get("lat"),
-        "lon": "78.790" if ipaddr.is_campus_ip else raw.get("lon"),
+        "lat": 43.001 if on_campus else raw.get("lat"),
+        "lon": -78.790 if on_campus else raw.get("lon"),
     }
 
     # Store in cache; evict oldest entry (insertion-order) when at capacity

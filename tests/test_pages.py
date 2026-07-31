@@ -46,6 +46,11 @@ def test_home_uses_my_ip_brand_and_logo(client):
     assert b"<span>My IP</span>" in response.data
     assert b"logo/my%20ip%20logo.png" in response.data
     assert b"IPv6 support is under construction." in response.data
+    assert response.data.index(b'id="second_address_section"') < response.data.index(
+        b"IPv6 support is under construction."
+    )
+    assert b"logo/favicon-32x32.png" in response.data
+    assert b"logo/favicon.svg" not in response.data
 
 
 def test_connectivity_page_renders(client):

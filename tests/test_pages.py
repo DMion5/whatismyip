@@ -45,6 +45,7 @@ def test_home_uses_my_ip_brand_and_logo(client):
     assert b"<title>My IP | UB Information Technology</title>" in response.data
     assert b"<span>My IP</span>" in response.data
     assert b"logo/my%20ip%20logo.png" in response.data
+    assert b"IPv6 support is under construction." in response.data
 
 
 def test_connectivity_page_renders(client):

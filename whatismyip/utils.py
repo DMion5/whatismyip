@@ -39,7 +39,7 @@ def get_client_address(
     client-supplied entries earlier in the chain.  When only one address is
     present (single-proxy deployment) that address is returned directly.
 
-    Example value: "2610:28:3091:1000:2::a,172.22.158.131"
+    Example value: "2620:cc:8000::a,10.0.0.131"
     """
     client_address = None
 

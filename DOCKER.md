@@ -46,8 +46,8 @@ city = "Your City"
 region = "Your State"
 country_code = "US"
 country_name = "United States"
-lat = 35.9049     # your campus latitude
-lon = -79.0469    # your campus longitude
+lat = 43.0010     # your campus latitude
+lon = -78.7900    # your campus longitude
 
 [campus]
 networks = [
@@ -136,7 +136,7 @@ docker compose restart
 
 ```toml
 [site]
-name = "State University ITS"   # shown when campus IPs can't be geolocated
+name = "Your Institution IT"   # shown when campus IPs can't be geolocated
 city = "Springfield"
 region = "Illinois"
 country_code = "US"
@@ -378,7 +378,7 @@ tar -czf whatismyip-backup-$(date +%Y%m%d).tar.gz data/
 
 ## Branding and customization
 
-The templates and static assets reference UNC Chapel Hill branding. To adapt for your institution:
+The templates and static assets reference University at Buffalo branding. To adapt for your institution:
 
 - **Institution name in the page footer and title**: edit `whatismyip/templates/base.html`
 - **Home page description**: edit `whatismyip/templates/home.html`

@@ -10,7 +10,7 @@ Only the latest release on the `main` branch (production) is actively maintained
 
 If you discover a vulnerability in this project, report it privately by emailing:
 
-**security@unc.edu**
+**sec-office@buffalo.edu**
 
 Please include as much of the following as possible:
 

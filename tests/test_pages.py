@@ -38,6 +38,15 @@ def test_trailing_slash_redirects(client, path, location):
 # --- Page content ---
 
 
+def test_home_uses_my_ip_brand_and_logo(client):
+    response = client.get("/")
+
+    assert response.status_code == 200
+    assert b"<title>My IP | UB Information Technology</title>" in response.data
+    assert b"<span>My IP</span>" in response.data
+    assert b"logo/my%20ip%20logo.png" in response.data
+
+
 def test_connectivity_page_renders(client):
     response = client.get("/connectivity")
     assert response.status_code == 200

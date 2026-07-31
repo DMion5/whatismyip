@@ -66,26 +66,26 @@ def test_sitemap_includes_core_pages(client):
     response = client.get("/sitemap.xml")
 
     assert response.status_code == 200
-    assert b"whatismyip.unc.edu/" in response.data
-    assert b"whatismyip.unc.edu/faq" in response.data
-    assert b"whatismyip.unc.edu/about" in response.data
-    assert b"whatismyip.unc.edu/metrics" in response.data
-    assert b"whatismyip.unc.edu/connectivity" in response.data
+    assert b"whatismyip-ncs-netapps-dev.apps.buffalo.edu/" in response.data
+    assert b"whatismyip-ncs-netapps-dev.apps.buffalo.edu/faq" in response.data
+    assert b"whatismyip-ncs-netapps-dev.apps.buffalo.edu/about" in response.data
+    assert b"whatismyip-ncs-netapps-dev.apps.buffalo.edu/metrics" in response.data
+    assert b"whatismyip-ncs-netapps-dev.apps.buffalo.edu/connectivity" in response.data
 
 
 @pytest.mark.parametrize(
     ("path", "canonical_url"),
     [
-        ("/", "https://whatismyip.unc.edu/"),
-        ("/about", "https://whatismyip.unc.edu/about"),
-        ("/faq", "https://whatismyip.unc.edu/faq"),
-        ("/metrics", "https://whatismyip.unc.edu/metrics"),
+        ("/", "https://myip.buffalo.edu/"),
+        ("/about", "https://myip.buffalo.edu/about"),
+        ("/faq", "https://myip.buffalo.edu/faq"),
+        ("/metrics", "https://myip.buffalo.edu/metrics"),
     ],
 )
 def test_pages_use_canonical_urls_from_sitemap(
     app, client, monkeypatch, path, canonical_url
 ):
-    monkeypatch.setitem(app.config, "SERVER_URL", "https://whatismyip.unc.edu")
+    monkeypatch.setitem(app.config, "SERVER_URL", "https://myip.buffalo.edu")
     monkeypatch.setitem(app.config, "METRICS_USERNAME", "")
     monkeypatch.setitem(app.config, "METRICS_PASSWORD", "")
     monkeypatch.setattr(
@@ -102,31 +102,31 @@ def test_pages_use_canonical_urls_from_sitemap(
     ("incoming_host", "path", "location"),
     [
         (
-            "ipv4.whatismyip.unc.edu",
+            "ipv4.myip.buffalo.edu",
             "/",
-            "https://whatismyip.unc.edu/",
+            "https://myip.buffalo.edu/",
         ),
         (
-            "ipv4.whatismyip.unc.edu",
+            "ipv4.myip.buffalo.edu",
             "/faq",
-            "https://whatismyip.unc.edu/faq",
+            "https://myip.buffalo.edu/faq",
         ),
         (
-            "ipv6.whatismyip.unc.edu",
+            "ipv6.myip.buffalo.edu",
             "/about?ref=dualstack",
-            "https://whatismyip.unc.edu/about?ref=dualstack",
+            "https://myip.buffalo.edu/about?ref=dualstack",
         ),
     ],
 )
 def test_split_stack_hostnames_redirect_to_primary_site(
     app, client, monkeypatch, incoming_host, path, location
 ):
-    monkeypatch.setitem(app.config, "SERVER_URL", "https://whatismyip.unc.edu")
+    monkeypatch.setitem(app.config, "SERVER_URL", "https://myip.buffalo.edu")
     monkeypatch.setitem(
-        app.config, "IPV4_SERVER_URL", "https://ipv4.whatismyip.unc.edu"
+        app.config, "IPV4_SERVER_URL", "https://ipv4.myip.buffalo.edu"
     )
     monkeypatch.setitem(
-        app.config, "IPV6_SERVER_URL", "https://ipv6.whatismyip.unc.edu"
+        app.config, "IPV6_SERVER_URL", "https://ipv6.myip.buffalo.edu"
     )
 
     response = client.get(path, headers={"Host": incoming_host})
@@ -136,16 +136,16 @@ def test_split_stack_hostnames_redirect_to_primary_site(
 
 
 def test_split_stack_hostnames_keep_hostinfo_route(app, client, monkeypatch):
-    monkeypatch.setitem(app.config, "SERVER_URL", "https://whatismyip.unc.edu")
+    monkeypatch.setitem(app.config, "SERVER_URL", "https://myip.buffalo.edu")
     monkeypatch.setitem(
-        app.config, "IPV4_SERVER_URL", "https://ipv4.whatismyip.unc.edu"
+        app.config, "IPV4_SERVER_URL", "https://ipv4.myip.buffalo.edu"
     )
     monkeypatch.setitem(
-        app.config, "IPV6_SERVER_URL", "https://ipv6.whatismyip.unc.edu"
+        app.config, "IPV6_SERVER_URL", "https://ipv6.myip.buffalo.edu"
     )
 
     with app.test_request_context(
-        "/hostinfo", headers={"Host": "ipv4.whatismyip.unc.edu"}
+        "/hostinfo", headers={"Host": "ipv4.myip.buffalo.edu"}
     ):
         response = redirect_split_stack_hosts_to_primary()
 
@@ -206,8 +206,8 @@ def test_hostinfo_campus_ip_populates_network_and_purpose(client, monkeypatch):
     monkeypatch.delenv("CLIENT_ADDRESS_V6", raising=False)
     monkeypatch.delenv("FORWARDED_FOR", raising=False)
     mock_network = {
-        "network": "152.2.0.0/16",
-        "comment": "UNC Chapel Hill",
+        "network": "128.205.0.0/16",
+        "comment": "University at Buffalo",
         "extattrs": {"Purpose": {"value": "Wired"}},
         "members": [],
         "options": [],
@@ -226,7 +226,7 @@ def test_hostinfo_campus_ip_populates_network_and_purpose(client, monkeypatch):
     assert response.status_code == 200
     data = response.get_json()
     assert data["is_campus"] is True
-    assert data["network"]["cidr"] == "152.2.0.0/16"
+    assert data["network"]["cidr"] == "128.205.0.0/16"
     assert data["network"]["purpose"] == "Wired"
 
 

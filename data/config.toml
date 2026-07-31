@@ -7,7 +7,7 @@
 # Your institution's display name.
 # Used as the ISP/organization label when a visitor's IP is a private (RFC 1918)
 # or campus address that cannot be looked up through the public geolocation API.
-name = "State University of New York at Buffalo"
+name = "University at Buffalo"
 
 # Primary campus location — used as the geolocation fallback for private/campus IPs.
 city = "Buffalo"
@@ -62,7 +62,7 @@ provider = "leaflet"
 # network path, not the server's.
 
 [[connectivity.targets]]
-name = "What Is My IP"
+name = "My IP"
 url = "https://whatismyip-ncs-netapps-dev.apps.buffalo.edu/"
 description = "This diagnostic tool — always should be reachable"
 type = "self"

@@ -2,7 +2,7 @@
 
 Thank you for your interest in contributing to this project. Contributions from other institutions adapting the tool for their own campus networks are especially welcome.
 
-> **Note:** The GitHub repository is a read-only mirror. The canonical repository is hosted on UNC's internal GitLab instance, which is not reachable from the public internet. Pull requests opened on GitHub cannot be merged directly — please open an issue on GitHub instead and we will incorporate the change on our end.
+> **Note:** This repository contains the University at Buffalo deployment. Open issues and pull requests in this GitHub repository.
 
 ## Development setup
 
@@ -65,6 +65,6 @@ Most institution-specific content is isolated to:
 
 - `data/config.toml` — network ranges, API credentials, site name
 - `whatismyip/templates/base.html` — utility bar, footer branding, social links
-- `whatismyip/static/css/whatismyip.css` — color palette (`--unc-*` variables)
+- `whatismyip/static/css/whatismyip.css` — University at Buffalo color palette (`--ub-*` variables)
 
 Search the templates for `CUSTOMIZE:` comments — they mark every place that needs updating for a new institution.

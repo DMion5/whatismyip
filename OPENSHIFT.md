@@ -1,6 +1,6 @@
 # Deploying on OpenShift
 
-This guide walks through deploying **What Is My IP** on OpenShift using Source-to-Image (S2I) — the same approach used in production at UNC. It is written for teams who manage OpenShift projects but are not necessarily Python developers.
+This guide walks through deploying **My IP** on OpenShift using Source-to-Image (S2I) — the same approach used for the University at Buffalo deployment. It is written for teams who manage OpenShift projects but are not necessarily Python developers.
 
 The application runs as a single pod backed by a PersistentVolumeClaim for configuration and metrics storage.
 
@@ -163,7 +163,7 @@ Campus network ranges and site details live in `data/config.toml` on the PVC. Ed
 
 ```toml
 [site]
-name = "Your Institution ITS"
+name = "Your Institution IT"
 city = "Your City"
 region = "Your State"
 country_code = "US"

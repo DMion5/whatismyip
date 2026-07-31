@@ -16,7 +16,7 @@ def app(tmp_path):
 
 def test_load_site_config_applies_campus_networks(tmp_path):
     cfg = tmp_path / "config.toml"
-    cfg.write_text('[campus]\nnetworks = ["152.2.0.0/16", "152.19.0.0/16"]\n')
+    cfg.write_text('[campus]\nnetworks = ["128.205.0.0/16", "67.20.192.0/19"]\n')
     from whatismyip.site_config import load_site_config
 
     app = create_app({"TESTING": True, "METRICS_DB_PATH": str(tmp_path / "m.sqlite3")})
@@ -35,7 +35,7 @@ def test_load_site_config_applies_campus_networks(tmp_path):
 
 def test_load_site_config_skips_invalid_cidr(tmp_path):
     cfg = tmp_path / "config.toml"
-    cfg.write_text('[campus]\nnetworks = ["not-a-cidr", "152.2.0.0/16"]\n')
+    cfg.write_text('[campus]\nnetworks = ["not-a-cidr", "128.205.0.0/16"]\n')
     from whatismyip.site_config import load_site_config
 
     app = create_app({"TESTING": True, "METRICS_DB_PATH": str(tmp_path / "m.sqlite3")})

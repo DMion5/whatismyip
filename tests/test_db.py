@@ -47,7 +47,7 @@ def test_log_metrics_event_writes_row(app):
             "hostinfo",
             ip_version=4,
             isp="Test ISP",
-            city="Chapel Hill",
+            city="Buffalo",
             is_campus=True,
         )
         db_path = app.config["METRICS_DB_PATH"]
@@ -61,7 +61,7 @@ def test_log_metrics_event_writes_row(app):
     assert row is not None
     assert row["ip_version"] == 4
     assert row["isp"] == "Test ISP"
-    assert row["city"] == "Chapel Hill"
+    assert row["city"] == "Buffalo"
     assert row["is_campus"] == 1
 
 

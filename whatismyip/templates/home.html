@@ -33,7 +33,7 @@
              onkeydown="if(event.key==='Enter'||event.key===' ')copyAddress('#address1')"
              role="button" tabindex="0" aria-label="Copy IPv4 address to clipboard">
           <div class="card-body">
-            <div id="address_box" class="d-flex align-items-center unc-ip">
+            <div id="address_box" class="d-flex align-items-center ip-address">
               <span class="flex-shrink-0 ip-bar-label"></span>
               <div class="flex-grow-1 text-center">
                 <h2 id="address1" class="ip-hero-text mb-0">{{ context.client_address | replace(':', ':<wbr>') | replace('.', '.<wbr>') | safe }}</h2>
@@ -51,7 +51,7 @@
              onkeydown="if(event.key==='Enter'||event.key===' ')copyAddress('#address2')"
              role="button" tabindex="0" aria-label="Copy IPv6 address to clipboard">
           <div class="card-body">
-            <div id="additional_ip" class="d-flex align-items-center unc-ip">
+            <div id="additional_ip" class="d-flex align-items-center ip-address">
               <span class="flex-shrink-0 ip-bar-label"></span>
               <div class="flex-grow-1 text-center">
                 <h2 id="address2" class="ip-hero-text mb-0">Detecting&hellip;</h2>
@@ -572,7 +572,7 @@
         VPN users can confirm their traffic is routing through campus before accessing IP-restricted resources such as
         licensed databases or administrative systems. Wireless users can verify they are on the correct network segment.
         If something looks wrong — an unexpected ISP, an off-campus address while on-site, or a missing VPN address —
-        this page gives you the specific details to share with ITS support.
+        this page gives you the specific details to share with UBIT support.
       </p>
     </div>
   </div>
@@ -586,8 +586,8 @@
 {
   "@context": "https://schema.org",
   "@type": "WebApplication",
-  "name": "What Is My IP? — UB Information Technology",
-  "alternateName": "UBIT What Is My IP?",
+  "name": "My IP — UB Information Technology",
+  "alternateName": "UBIT My IP",
   "url": "{{ site_url }}",
   "description": "Find your IP address and test your connection to the University at Buffalo campus network. Designed for on-campus, UB VPN and Wi-Fi users, the tool provides IPv4 and IPv6 detection, DNS provider information, DNS security filtering status, and detailed UB network diagnostics.",
   "applicationCategory": "NetworkingApplication",
@@ -630,8 +630,8 @@
 {
   "@context": "https://schema.org",
   "@type": "WebSite",
-  "name": "What Is My IP? — UB Information Technology",
-  "alternateName": "UBIT What Is My IP?",
+  "name": "My IP — UB Information Technology",
+  "alternateName": "UBIT My IP",
   "url": "{{ site_url }}",
   "publisher": {
     "@type": "Organization",

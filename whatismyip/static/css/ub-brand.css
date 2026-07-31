@@ -1,7 +1,7 @@
 @charset "UTF-8";
 
 /*
- * University at Buffalo branding layer for What Is My IP?
+ * University at Buffalo branding layer for My IP.
  *
  * This file intentionally uses plain text rather than recreating or modifying
  * an official UB logo. Add an approved institutional lockup only after review
@@ -17,22 +17,6 @@
 	--ub-solar-strand: #ffc72c;
 	--ub-capen-brick: #990000;
 	--ub-lake-lasalle: #00a69c;
-
-	/*
-	 * The upstream stylesheet still consumes --unc-* custom properties.
-	 * Re-map them here so the rest of the application receives UB colors
-	 * without requiring a large fork of whatismyip.css.
-	 */
-	--unc-carolina-blue: var(--ub-blue);
-	--unc-navy: var(--ub-harriman-blue);
-	--unc-white: var(--ub-white);
-	--unc-bolin-creek: var(--ub-harriman-blue);
-	--unc-fordham-fountain: var(--ub-baird-point);
-	--unc-cloud: var(--ub-baird-point);
-	--unc-old-well-basin: var(--ub-townsend-gray);
-	--unc-flat-gray: var(--ub-townsend-gray);
-	--unc-cornerstone: var(--ub-baird-point);
-	--unc-franklin-fog: var(--ub-baird-point);
 
 	--site-bg: var(--ub-white);
 	--site-surface: var(--ub-white);
@@ -185,16 +169,17 @@ h6,
 	text-decoration: none;
 }
 
-.ub-app-icon {
-	width: 2.4rem;
-	height: 2.4rem;
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	border-radius: 50%;
-	background: var(--ub-blue);
-	color: var(--ub-white);
-	font-size: 1rem;
+.ub-app-logo {
+	display: block;
+	width: auto;
+	height: 3.5rem;
+	object-fit: contain;
+}
+
+@media (max-width: 576px) {
+	.ub-app-logo {
+		height: 2.75rem;
+	}
 }
 
 .site-title {

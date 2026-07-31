@@ -62,7 +62,7 @@ provider = "leaflet"
 # network path, not the server's.
 
 [[connectivity.targets]]
-name = "What Is My IP"
+name = "My IP"
 url = "https://yoursite.edu/"
 description = "This diagnostic tool — always should be reachable"
 type = "self"

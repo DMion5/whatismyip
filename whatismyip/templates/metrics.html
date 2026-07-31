@@ -1,30 +1,30 @@
 {% extends "base.html" %}
 
-{% block title %}Site Statistics — What Is My IP? | UNC Chapel Hill ITS{% endblock %}
-{% block meta_description %}Usage statistics for the UNC Chapel Hill IP address tool: daily visit counts, campus vs. off-campus ratio, IPv4/IPv6 mix, and ISP and country breakdown.{% endblock %}
-{% block og_title %}Site Statistics — What Is My IP? | UNC Chapel Hill ITS{% endblock %}
-{% block og_description %}Usage statistics for the UNC Chapel Hill IP address tool: daily visit counts, campus vs. off-campus ratio, IPv4/IPv6 mix, and ISP and country breakdown.{% endblock %}
+{% block title %}Site Statistics — My IP | UB Information Technology{% endblock %}
+{% block meta_description %}Usage statistics for the University at Buffalo IP address tool: daily visit counts, campus vs. off-campus ratio, IPv4/IPv6 mix, and ISP and country breakdown.{% endblock %}
+{% block og_title %}Site Statistics — My IP | UB Information Technology{% endblock %}
+{% block og_description %}Usage statistics for the University at Buffalo IP address tool: daily visit counts, campus vs. off-campus ratio, IPv4/IPv6 mix, and ISP and country breakdown.{% endblock %}
 {% block og_url %}{{ site_url }}/metrics{% endblock %}
-{% block twitter_title %}Site Statistics — What Is My IP? | UNC Chapel Hill ITS{% endblock %}
-{% block twitter_description %}Aggregated usage statistics for the UNC Chapel Hill IP address diagnostic tool: visit counts, campus split, IPv4/IPv6 mix, and ISP breakdown.{% endblock %}
+{% block twitter_title %}Site Statistics — My IP | UB Information Technology{% endblock %}
+{% block twitter_description %}Aggregated usage statistics for the University at Buffalo IP address diagnostic tool: visit counts, campus split, IPv4/IPv6 mix, and ISP breakdown.{% endblock %}
 
 {% block structured_data %}
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "WebPage",
-  "name": "Site Statistics — What Is My IP?",
+  "name": "Site Statistics — My IP",
   "url": "{{ site_url }}/metrics",
-  "description": "Aggregated usage statistics for the UNC Chapel Hill IP address diagnostic tool. Shows daily lookup counts, campus vs. off-campus split, IPv4/IPv6 mix, ISP breakdown, and country distribution.",
+  "description": "Aggregated usage statistics for the University at Buffalo IP address diagnostic tool. Shows daily lookup counts, campus vs. off-campus split, IPv4/IPv6 mix, ISP breakdown, and country distribution.",
   "isPartOf": {
     "@type": "WebSite",
-    "name": "What Is My IP? — UNC Chapel Hill",
+    "name": "My IP — University at Buffalo",
     "url": "{{ site_url }}"
   },
   "publisher": {
     "@type": "Organization",
-    "name": "UNC Information Technology Services",
-    "url": "https://its.unc.edu"
+    "name": "UB Information Technology",
+    "url": "https://www.buffalo.edu/ubit.html"
   }
 }
 </script>
@@ -473,7 +473,7 @@
   var gridColor  = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.07)';
   var accentBlue = '#4B9CD3';
   var accentFill = isDark ? 'rgba(75,156,211,0.18)' : 'rgba(75,156,211,0.12)';
-  // In dark mode avoid --unc-bolin-creek (#2C5080) — it matches the card surface and disappears.
+  // In dark mode avoid --ub-blue-hover — it matches the card surface and disappears.
   var pieColors  = isDark
     ? ['#4B9CD3', '#90C8E8', '#B7D7ED', '#CFD3D5']
     : ['#4B9CD3', '#2C5080', '#B7D7ED', '#5B6670'];

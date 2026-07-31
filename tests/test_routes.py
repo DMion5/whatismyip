@@ -66,11 +66,11 @@ def test_sitemap_includes_core_pages(client):
     response = client.get("/sitemap.xml")
 
     assert response.status_code == 200
-    assert b"whatismyip-ncs-netapps-dev.apps.buffalo.edu/" in response.data
-    assert b"whatismyip-ncs-netapps-dev.apps.buffalo.edu/faq" in response.data
-    assert b"whatismyip-ncs-netapps-dev.apps.buffalo.edu/about" in response.data
-    assert b"whatismyip-ncs-netapps-dev.apps.buffalo.edu/metrics" in response.data
-    assert b"whatismyip-ncs-netapps-dev.apps.buffalo.edu/connectivity" in response.data
+    assert b"myip.buffalo.edu/" in response.data
+    assert b"myip.buffalo.edu/faq" in response.data
+    assert b"myip.buffalo.edu/about" in response.data
+    assert b"myip.buffalo.edu/metrics" in response.data
+    assert b"myip.buffalo.edu/connectivity" in response.data
 
 
 @pytest.mark.parametrize(
@@ -122,12 +122,8 @@ def test_split_stack_hostnames_redirect_to_primary_site(
     app, client, monkeypatch, incoming_host, path, location
 ):
     monkeypatch.setitem(app.config, "SERVER_URL", "https://myip.buffalo.edu")
-    monkeypatch.setitem(
-        app.config, "IPV4_SERVER_URL", "https://ipv4.myip.buffalo.edu"
-    )
-    monkeypatch.setitem(
-        app.config, "IPV6_SERVER_URL", "https://ipv6.myip.buffalo.edu"
-    )
+    monkeypatch.setitem(app.config, "IPV4_SERVER_URL", "https://ipv4.myip.buffalo.edu")
+    monkeypatch.setitem(app.config, "IPV6_SERVER_URL", "https://ipv6.myip.buffalo.edu")
 
     response = client.get(path, headers={"Host": incoming_host})
 
@@ -137,12 +133,8 @@ def test_split_stack_hostnames_redirect_to_primary_site(
 
 def test_split_stack_hostnames_keep_hostinfo_route(app, client, monkeypatch):
     monkeypatch.setitem(app.config, "SERVER_URL", "https://myip.buffalo.edu")
-    monkeypatch.setitem(
-        app.config, "IPV4_SERVER_URL", "https://ipv4.myip.buffalo.edu"
-    )
-    monkeypatch.setitem(
-        app.config, "IPV6_SERVER_URL", "https://ipv6.myip.buffalo.edu"
-    )
+    monkeypatch.setitem(app.config, "IPV4_SERVER_URL", "https://ipv4.myip.buffalo.edu")
+    monkeypatch.setitem(app.config, "IPV6_SERVER_URL", "https://ipv6.myip.buffalo.edu")
 
     with app.test_request_context(
         "/hostinfo", headers={"Host": "ipv4.myip.buffalo.edu"}
@@ -155,8 +147,8 @@ def test_split_stack_hostnames_keep_hostinfo_route(app, client, monkeypatch):
 # --- /hostinfo tests ---
 
 
-def test_hostinfo_simulate_ipv4_returns_fixture(client):
-    response = client.get("/hostinfo?simulate=4")
+def test_hostinfo_simulate_oncampus_returns_fixture(client):
+    response = client.get("/hostinfo?simulate=oncampus")
     assert response.status_code == 200
     data = response.get_json()
     assert data["client_address"] == "192.0.2.50"
@@ -166,13 +158,45 @@ def test_hostinfo_simulate_ipv4_returns_fixture(client):
     assert "user_device" in data
 
 
-def test_hostinfo_simulate_ipv6_returns_fixture(client):
-    response = client.get("/hostinfo?simulate=6")
+def test_hostinfo_simulate_oncampus6_returns_fixture(client):
+    response = client.get("/hostinfo?simulate=oncampus6")
     assert response.status_code == 200
     data = response.get_json()
     assert data["client_address"] == "2001:db8::50"
     assert "network" in data
     assert "address_details" in data
+
+
+def test_hostinfo_legacy_ipv6_simulation_returns_ipv6_fixture(client):
+    response = client.get("/hostinfo?simulate=6")
+    assert response.status_code == 200
+    assert response.get_json()["client_address"] == "2001:db8::50"
+
+
+@pytest.mark.parametrize(
+    ("mode", "address"),
+    [
+        ("offcampus", "203.0.113.75"),
+        ("offcampus6", "2001:db8:cafe::75"),
+    ],
+)
+def test_hostinfo_simulate_offcampus_returns_remote_fixture(client, mode, address):
+    response = client.get(f"/hostinfo?simulate={mode}")
+    assert response.status_code == 200
+    data = response.get_json()
+    assert data["client_address"] == address
+    assert data["is_campus"] is False
+    assert data["iplocation"]["city"] == "Buffalo"
+
+
+def test_home_offcampus_ipv6_simulation_is_not_marked_as_campus(client):
+    response = client.get("/?simulate=offcampus6")
+
+    assert response.status_code == 200
+    assert (
+        b'<script type="application/json" id="is_campus">false</script>'
+        in response.data
+    )
 
 
 def _no_ptr(*a, **kw):
@@ -230,6 +254,27 @@ def test_hostinfo_campus_ip_populates_network_and_purpose(client, monkeypatch):
     assert data["network"]["purpose"] == "Wired"
 
 
+def test_hostinfo_vpn_ip_uses_vpn_purpose_without_ipam_network(client, monkeypatch):
+    monkeypatch.delenv("CLIENT_ADDRESS", raising=False)
+    monkeypatch.delenv("CLIENT_ADDRESS_V4", raising=False)
+    monkeypatch.delenv("CLIENT_ADDRESS_V6", raising=False)
+    monkeypatch.delenv("FORWARDED_FOR", raising=False)
+    monkeypatch.setattr("whatismyip.routes.api.is_campus_ip", lambda ip: True)
+    monkeypatch.setattr("whatismyip.routes.api.is_vpn_ip", lambda ip: True)
+    monkeypatch.setattr("whatismyip.routes.api.get_network", lambda ip: None)
+    monkeypatch.setattr("whatismyip.routes.api.get_address_objects", lambda ip: None)
+    monkeypatch.setattr("whatismyip.routes.api.get_nac_info", lambda ip, mac=None: None)
+    monkeypatch.setattr(
+        "whatismyip.routes.api.log_metrics_event", lambda *a, **kw: None
+    )
+    monkeypatch.setattr("whatismyip.routes.api.resolver.query", _no_ptr)
+
+    response = client.get("/hostinfo", environ_base={"REMOTE_ADDR": "10.0.0.1"})
+
+    assert response.status_code == 200
+    assert response.get_json()["network"]["purpose"] == "VPN"
+
+
 def test_hostinfo_external_failures_degrade_gracefully(client, monkeypatch):
     def _ipam_down(*a, **kw):
         raise Exception("IPAM down")
@@ -249,3 +294,14 @@ def test_hostinfo_external_failures_degrade_gracefully(client, monkeypatch):
     response = client.get("/hostinfo", environ_base={"REMOTE_ADDR": "10.0.0.1"})
     assert response.status_code == 200
     assert response.get_json()["client_address"] == "10.0.0.1"
+
+
+def test_connectivity_page_renders_configured_status_page(app, client, monkeypatch):
+    status_url = "https://status.example.edu"
+    monkeypatch.setitem(app.config, "STATUS_PAGE_URL", status_url)
+
+    response = client.get("/connectivity")
+
+    assert response.status_code == 200
+    assert b"UBIT System Status" in response.data
+    assert status_url.encode() in response.data

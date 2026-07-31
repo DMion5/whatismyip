@@ -16,17 +16,28 @@ from flask import current_app as app
 from whatismyip.extreme import XMC_NBI
 
 
-def is_campus_ip(ip_address: str) -> bool:
-    """
-    Check if the IP address falls within a configured campus network.
-    Networks are loaded from data/config.toml at startup via app.config["CAMPUS_NETWORKS"].
-    """
-    networks = app.config.get("CAMPUS_NETWORKS", [])
+def _is_ip_in_networks(ip_address: str, config_key: str) -> bool:
+    """Return whether an address belongs to a configured network list."""
+    networks = app.config.get(config_key, [])
     try:
         ip = ipaddress.ip_address(ip_address)
     except ValueError:
         return False
     return any(ip in net for net in networks)
+
+
+def is_vpn_ip(ip_address: str) -> bool:
+    """Check whether an address belongs to a configured VPN egress network."""
+    return _is_ip_in_networks(ip_address, "VPN_NETWORKS")
+
+
+def is_campus_ip(ip_address: str) -> bool:
+    """
+    Check whether an address falls within a campus or VPN network.
+
+    Networks are loaded from data/config.toml at startup.
+    """
+    return _is_ip_in_networks(ip_address, "CAMPUS_NETWORKS") or is_vpn_ip(ip_address)
 
 
 def get_client_address(
@@ -125,7 +136,6 @@ def get_ip_location(ip_address: str) -> dict[str, Any] | None:
 
     on_campus = is_campus_ip(ip_address)
 
-    
     # Normalize to a consistent structure regardless of which API is active.
     # ip-api.com uses "country"/"countryCode"; the fallback API uses "country_name"/"country_code2".
     result: dict | None = {

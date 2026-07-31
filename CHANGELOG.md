@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented here. This project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) conventions.
 
+## [1.11.0] - 2026-07-31
+
+### Added
+
+- Configurable VPN address ranges, VPN installation guidance, campus SSID descriptions, network purpose/group/contact details, and optional live Atlassian Statuspage incidents.
+- IPv4/IPv6-separated lookup trends, page-view tracking for the metrics page, accessible chart data tables, and configurable metrics display and retention windows.
+- Off-campus IPv4 and IPv6 simulation modes and a printable network report.
+- Prominent upstream attribution in the license, repository notice, README, About page, and site footer.
+
+### Changed
+
+- Metrics queries now use one aggregate count query, query an in-memory SQLite backup to reduce network-storage round trips, cache results per database/window, initialize schemas once per database, and exclude incomplete current-day data.
+- Connectivity results, link/button text, heading structure, focus states, contrast, chart colors, IP copy controls, maps, and dynamic status announcements received accessibility and usability improvements.
+- Proxy, iCloud Private Relay, Cloudflare WARP, NAT, DNS, and dual-stack checks now coordinate their asynchronous results more reliably.
+
+### Fixed
+
+- Introductory connection text can no longer be overwritten by later asynchronous checks.
+- Configured VPN ranges are treated as campus connections even when IPAM has no matching network.
+- Simulation fixtures and colors retain University at Buffalo and My IP branding.
+- The custom My IP logo and generated favicon set were replaced with a neutral placeholder asset.
+
 ## [1.9.1] - 2026-07-13
 
 ### Changed

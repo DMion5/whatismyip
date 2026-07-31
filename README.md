@@ -4,9 +4,16 @@ A Flask web application that tells users their IP address and provides detailed 
 
 Built and operated for the University at Buffalo by [UB Information Technology](https://www.buffalo.edu/ubit.html). Designed to be adapted for other higher-education institutions.
 
+My IP is a modified derivative of
+[UNC ITS's What Is My IP project](https://github.com/unc-network/whatismyip),
+originally developed by William E. Whitaker, Jr. and UNC Information Technology
+Services. The original MIT license and copyright notice are preserved in
+[LICENSE.md](LICENSE.md); additional attribution is documented in
+[NOTICE.md](NOTICE.md).
+
 > **Note:** This repository contains the University at Buffalo deployment. Please open issues in this GitHub repository for review.
 
-![What Is My IP screenshot](docs/whatismyip.png)
+![My IP screenshot](docs/whatismyip.png)
 
 ---
 
@@ -220,6 +227,27 @@ security_filter_test_url = ""
 # "google"  uses the Google Maps JavaScript API — requires FLASK_GOOGLE_MAPS_API_KEY
 provider = "leaflet"
 
+[status_page]
+# Optional Atlassian Statuspage base URL for live incidents on /connectivity
+url = ""
+
+[vpn]
+provider_name = "Cisco Secure Client"
+install_url = ""
+# VPN egress ranges are treated as campus connections
+networks = []
+
+[metrics]
+window_days = 30
+retention_days = 90
+
+[wireless]
+[[wireless.ssids]]
+name = "eduroam"
+description = "Primary campus wireless network"
+usage = "For campus affiliates"
+expected = true
+
 [campus]
 # CIDR blocks treated as campus addresses
 networks = [
@@ -232,6 +260,8 @@ networks = [
 The `[site]` block provides the ISP name and geolocation used when a visitor's IP is a private or campus address that the public geolocation API cannot resolve.
 
 Networks are parsed into `ipaddress.ip_network` objects at startup — changes require a restart.
+
+The optional `[status_page]`, `[vpn]`, `[wireless]`, and `[metrics]` sections configure live service status, VPN guidance and address classification, SSID descriptions, and the metrics display/retention windows. See `data/config.toml.example` for the full schema.
 
 ### DNS security filtering test
 
@@ -305,11 +335,11 @@ UB-specific branding and service details are concentrated in these locations.
 
 ### Static assets (`whatismyip/static/`)
 
-| Path                                       | What to change                                      |
-| ------------------------------------------ | --------------------------------------------------- |
-| `logo/`                                    | Favicon set, web manifest, and app icons — replace  |
-| `img/laptop-logo-transparent-cropped.png`  | Header logo — replace with your own                 |
-| `logo/ub-logo-two-line.png`                | University at Buffalo wordmark used in the header   |
+| Path                                | What to change                                      |
+| ----------------------------------- | --------------------------------------------------- |
+| `logo/placeholder-logo.svg`         | Neutral application logo and favicon placeholder   |
+| `logo/site.webmanifest`             | Installable web-app name and placeholder icon       |
+| `logo/ub-logo-two-line.png`         | University at Buffalo wordmark used in the header   |
 
 ### Integrations
 
@@ -337,4 +367,6 @@ pytest tests/ --cov=whatismyip --cov-report=term-missing   # with coverage
 
 MIT License — see [LICENSE.md](LICENSE.md).
 
-Copyright (c) 2022 William Whitaker.
+This is a derivative of the
+[original UNC ITS repository](https://github.com/unc-network/whatismyip).
+See [NOTICE.md](NOTICE.md) for authorship and modification attribution.

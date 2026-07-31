@@ -38,19 +38,28 @@ def test_trailing_slash_redirects(client, path, location):
 # --- Page content ---
 
 
-def test_home_uses_my_ip_brand_and_logo(client):
+def test_home_uses_my_ip_brand_and_placeholder_logo(client):
     response = client.get("/")
 
     assert response.status_code == 200
     assert b"<title>My IP | UB Information Technology</title>" in response.data
     assert b"<span>My IP</span>" in response.data
-    assert b"logo/my%20ip%20logo.png" in response.data
+    assert b"logo/placeholder-logo.svg" in response.data
+    assert b"logo/my%20ip%20logo.png" not in response.data
     assert b"IPv6 support is under construction." in response.data
     assert response.data.index(b'id="second_address_section"') < response.data.index(
         b"IPv6 support is under construction."
     )
-    assert b"logo/favicon-32x32.png" in response.data
-    assert b"logo/favicon.svg" not in response.data
+    assert b'image/svg+xml" href="/static/logo/placeholder-logo.svg' in response.data
+
+
+def test_about_credits_original_project(client):
+    response = client.get("/about")
+
+    assert response.status_code == 200
+    assert b"https://github.com/unc-network/whatismyip" in response.data
+    assert b"William E. Whitaker, Jr." in response.data
+    assert b"UNC Information Technology Services" in response.data
 
 
 def test_connectivity_page_renders(client):
@@ -69,6 +78,14 @@ def test_robots_txt_is_served(client):
 def test_sitemap_xml_is_served(client):
     response = client.get("/sitemap.xml")
     assert response.status_code == 200
+
+
+def test_legacy_favicon_route_serves_placeholder(client):
+    response = client.get("/favicon.ico")
+
+    assert response.status_code == 200
+    assert response.mimetype == "image/svg+xml"
+    assert b"My IP placeholder logo" in response.data
 
 
 # --- IndexNow key file ---

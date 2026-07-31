@@ -368,6 +368,27 @@ button:focus-visible {
 }
 
 /* Error and warning accents */
+.ipv6-construction-notice {
+	background: #fff8e1;
+	border: 1px solid var(--ub-solar-strand);
+	border-left: 5px solid var(--ub-solar-strand);
+	color: var(--ub-harriman-blue);
+}
+
+.ipv6-construction-notice > i {
+	color: #8a6100;
+	font-size: 1.15rem;
+}
+
+html[data-theme="dark"] .ipv6-construction-notice {
+	background: rgba(255, 199, 44, 0.14);
+	color: var(--ub-white);
+}
+
+html[data-theme="dark"] .ipv6-construction-notice > i {
+	color: var(--ub-solar-strand);
+}
+
 .alert-danger,
 .text-danger {
 	color: var(--ub-capen-brick) !important;

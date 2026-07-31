@@ -1,6 +1,6 @@
 {
-  "name": "UB Network Diagnostics",
-  "short_name": "UB NetDiag",
+  "name": "My IP",
+  "short_name": "My IP",
   "description": "View your IP address and test University at Buffalo network connectivity.",
   "start_url": "/",
   "scope": "/",

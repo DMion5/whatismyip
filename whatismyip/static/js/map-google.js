@@ -44,8 +44,8 @@ function loadCampusMap(address, title, lat, lon) {
 	$('#map_label').hide();
 
 	var useCampusLatLon = lat && lon && !isNaN(lat) && !isNaN(lon);
-	var startLat = useCampusLatLon ? lat : 35.9049;
-	var startLon = useCampusLatLon ? lon : -79.0469;
+	var startLat = useCampusLatLon ? lat : 43.0010;
+	var startLon = useCampusLatLon ? lon : -78.7900;
 
 	if (mapInitialized) {
 		useCampusLatLon ? placeLatLonMarker(lat, lon, title) : codeAddress(address, title);

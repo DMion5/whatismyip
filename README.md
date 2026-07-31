@@ -1,10 +1,10 @@
-# What Is My IP?
+# My IP
 
 A Flask web application that tells users their IP address and provides detailed network diagnostics — especially useful for campus networks where users need to know whether they appear on-campus, what VLAN they're on, or whether a VPN is active.
 
-Built and operated by [UNC Information Technology Services](https://its.unc.edu/). Designed to be adapted for other higher-education institutions.
+Built and operated for the University at Buffalo by [UB Information Technology](https://www.buffalo.edu/ubit.html). Designed to be adapted for other higher-education institutions.
 
-> **Note:** This GitHub repository is a read-only mirror. The canonical repository is hosted on UNC's internal GitLab instance, which is not reachable from the public internet. Please open issues here on GitHub and we will review them.
+> **Note:** This repository contains the University at Buffalo deployment. Please open issues in this GitHub repository for review.
 
 ![What Is My IP screenshot](docs/whatismyip.png)
 
@@ -87,7 +87,7 @@ The MAC from IPAM is passed into Step 3 as the preferred lookup key.
 After NAC returns, `switchPortId` is inspected with a regex to determine connection type:
 
 - **Wired** — `switchPortId` is a plain port string (e.g. `GigabitEthernet1/0/24`): calls `get_nit_building(switchIP)` which looks up the building by the switch's IP address.
-- **Wireless** — `switchPortId` matches the AP pattern `<name> (<mac>):<ssid>`: the AP name is parsed for a building ID prefix (e.g. `EP-0162-...` → building `0162`), then `get_nit_building_by_id(bldg_id)` is called directly.
+- **Wireless** — `switchPortId` matches the AP pattern `<name> (<mac>):<ssid>`: the AP name is parsed for a building ID prefix (e.g. `UBIT-CAPEN-...` → building `CAPEN`), then `get_nit_building_by_id(bldg_id)` is called directly.
 
 Both NIT calls return a building record with `official_name`, `full_name`, `address`, `building_id`, `latitude`, and `longitude`.
 
@@ -163,7 +163,7 @@ Open <http://127.0.0.1:5000>.
 Set `CLIENT_ADDRESS` in your `.env` (no `FLASK_` prefix) to override the detected address for every request. This is useful for testing campus-specific lookups without being on the campus network:
 
 ```bash
-CLIENT_ADDRESS=152.2.1.2   # treated as the visitor's IP for all routes
+CLIENT_ADDRESS=128.205.1.2   # treated as the visitor's IP for all routes
 ```
 
 Remove or unset the variable to go back to real address detection.
@@ -290,9 +290,9 @@ The app is designed for container deployment. Key points:
 
 ---
 
-## Adapting for your institution
+## University at Buffalo deployment
 
-Most content that refers to UNC can be found in these locations. Search for `CUSTOMIZE:` comments in the templates to find the exact lines.
+UB-specific branding and service details are concentrated in these locations.
 
 ### Templates (`whatismyip/templates/`)
 
@@ -309,7 +309,7 @@ Most content that refers to UNC can be found in these locations. Search for `CUS
 | ------------------------------------------ | --------------------------------------------------- |
 | `logo/`                                    | Favicon set, web manifest, and app icons — replace  |
 | `img/laptop-logo-transparent-cropped.png`  | Header logo — replace with your own                 |
-| `img/UNCwebsite_textreatment_white.png`    | UNC wordmark in the footer — replace or remove      |
+| `logo/ub-logo-two-line.png`                | University at Buffalo wordmark used in the header   |
 
 ### Integrations
 
@@ -317,7 +317,7 @@ If your institution doesn't use Infoblox or Extreme XMC, the relevant modules ca
 
 The Meraki integration (`meraki.py`) is entirely opt-in — omitting `FLASK_MERAKI_API_KEY` disables it with no effect on other features.
 
-The building lookup (`get_nit_building`, `get_nit_building_by_id` in `utils.py`) uses a UNC-specific internal API. Replace these functions with your own building directory API or remove them if you don't need building-level detail.
+The building lookup (`get_nit_building`, `get_nit_building_by_id` in `utils.py`) uses a UB-specific internal API. Replace these functions with your own building directory API or remove them if you don't need building-level detail.
 
 ---
 
@@ -337,4 +337,4 @@ pytest tests/ --cov=whatismyip --cov-report=term-missing   # with coverage
 
 MIT License — see [LICENSE.md](LICENSE.md).
 
-Copyright (c) 2022 William Whitaker, UNC Information Technology Services.
+Copyright (c) 2022 William Whitaker.

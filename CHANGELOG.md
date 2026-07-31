@@ -17,7 +17,7 @@ All notable changes to this project will be documented here. This project follow
 - **Page views over time chart** — the `/metrics` dashboard now shows a windowed daily line chart of page views alongside the existing IP lookup trend, and an all-time breakdown table (page, views, share) below it.
 - **Dedicated `/health` endpoint** — lightweight plain-text `200 OK` with no template or database overhead, for liveness and readiness probes. Replaces the previous `/about` probe target. Docker Compose healthcheck updated to use it; OpenShift probe will be updated once this version reaches production.
 - **OpenShift deployment guide** — `OPENSHIFT.md` covers the full deployment workflow: S2I build setup, secret creation for all integrations, PVC provisioning, Route setup, config.toml upload, and day-to-day operations (logs, rollback, backup). Includes notes on the Recreate strategy requirement (SQLite + ReadWriteOnce PVC) and dual-stack DNS setup.
-- **`openshift/deployment.yaml`** — clean deployment manifest derived from the UNC production deployment: runtime metadata stripped, `CHANGEME` placeholders for institution-specific values, all optional integration secrets marked `optional: true`, and probes targeting `/health`.
+- **`openshift/deployment.yaml`** — clean deployment manifest derived from the UB production deployment: runtime metadata stripped, `CHANGEME` placeholders for institution-specific values, all optional integration secrets marked `optional: true`, and probes targeting `/health`.
 - **`openshift/pvc.yaml`** — PersistentVolumeClaim manifest for the data directory.
 
 ### Changed
@@ -60,7 +60,7 @@ All notable changes to this project will be documented here. This project follow
 
 ### Changed
 
-- **DNS provider FAQ entry added** — new accordion question "What does the DNS provider check show?" explains the DNS leak test angle: on campus or VPN users should see UNC or Akamai (UNC forwards all DNS queries through Akamai for security filtering); seeing a home ISP instead indicates a DNS leak or misconfiguration. Includes scenarios for privacy DNS services. JSON-LD structured data updated to match.
+- **DNS provider FAQ entry added** — new accordion question "What does the DNS provider check show?" explains the DNS leak test angle: on campus or VPN users should see UB or Akamai (UB forwards DNS queries through Akamai for security filtering); seeing a home ISP instead indicates a DNS leak or misconfiguration. Includes scenarios for privacy DNS services. JSON-LD structured data updated to match.
 - **Site meta tags updated for DNS detection** — keywords expanded to include "DNS leak test", "DNS provider", "DNS resolver"; descriptions across meta, Open Graph, and Twitter cards now call out DNS provider detection alongside DNS security filtering.
 - **Home page and FAQ feature lists updated** — "What does this tool show?" sections on both pages now include Wi-Fi connection details and DNS provider detection as campus features. JSON-LD featureList updated to include "DNS provider detection" and "DNS leak test".
 - **NAC redundant group description fields hidden** — the two raw group description fields from XMC are no longer shown in the NAC table since the same information is already present in the Groups row.
@@ -125,7 +125,7 @@ All notable changes to this project will be documented here. This project follow
 
 ### Changed
 
-- **"DNS Security Filtering" renamed to "Campus DNS Security"** — the label in the Campus Connectivity card, the downloadable support report, and the FAQ question have all been updated to clarify that this is a campus-specific protection. The UNC knowledge base article link in the FAQ retains the official UNC service name.
+- **"DNS Security Filtering" renamed to "Campus DNS Security"** — the label in the Campus Connectivity card, the downloadable support report, and the FAQ question have all been updated to clarify that this is a campus-specific protection. The UB knowledge base article link in the FAQ retains the official UB service name.
 - **Navbar and footer order** — FAQ moved before About in the navbar to surface the most commonly-needed informational page sooner. The footer "Explore" column reordered to match (Speed Test → Connectivity → FAQ → About → Site Statistics); Connectivity was also missing from the footer and has been added.
 
 ---
@@ -243,9 +243,9 @@ All notable changes to this project will be documented here. This project follow
 
 ### Changed
 
-- **Dark navy navbar and footer** — the navbar and footer now use a dark navy background (`--unc-navy` in light mode, `--unc-bolin-creek` for dark mode contrast) via CSS custom properties (`--site-chrome`, `--site-chrome-text`, `--site-chrome-link`). Navbar links are uppercase with letter-spacing, matching the ITS website style; hover color is Carolina Blue. Footer links use a lighter tint for legibility on the dark background.
-- **Full-width navbar** — the navbar color now extends edge-to-edge, matching the ITS website layout. The link container remains constrained to the page width.
-- **Compressed page title area** — vertical padding reduced and logo scaled down to match ITS website spacing conventions. Italic style removed from the site title. Tagline "Network diagnostics · UNC Information Technology Services" added below the title.
+- **Dark navy navbar and footer** — the navbar and footer now use UB dark blue (`--ub-dark-blue` in light mode, `--ub-blue-hover` for dark mode contrast) via CSS custom properties (`--site-chrome`, `--site-chrome-text`, `--site-chrome-link`). Navbar links are uppercase with letter-spacing, matching the UBIT website style; hover color is UB Blue. Footer links use a lighter tint for legibility on the dark background.
+- **Full-width navbar** — the navbar color now extends edge-to-edge, matching the UBIT website layout. The link container remains constrained to the page width.
+- **Compressed page title area** — vertical padding reduced and logo scaled down to match UBIT website spacing conventions. Italic style removed from the site title. Tagline "Network diagnostics · UB Information Technology" added below the title.
 - **IP address bars redesigned as a hero element** — carolina blue tonal gradient background, larger IP text (2.6 rem, 700 weight), and elevated box shadow. IP version labels restored to the left side to keep the bars compact.
 - **Loading animation on second IP bar** — a skeleton pulse plays while the second address is being detected, replaced by the result when it arrives.
 - **Report button relocated** — moved from the navbar to the status row on the home page, right-justified alongside the connection status message. Keeps the navbar uncluttered and keeps the button adjacent to the data it exports.
@@ -343,7 +343,7 @@ All notable changes to this project will be documented here. This project follow
 - Dedicated Speed Test page (`/speedtest`) with the Ookla Speedtest Custom iframe; home page links to it rather than embedding it inline
 - FAQ page with accordion format, color-coded question groups, Font Awesome icons, and JSON-LD structured data
 - Organization breakdown card on the metrics dashboard alongside ISP and country breakdowns
-- UNC utility bar served locally (HTML + CSS) — eliminates the deferred external script that was causing a flash of unstyled content on page load
+- UB utility bar served locally (HTML + CSS) — eliminates the deferred external script that was causing a flash of unstyled content on page load
 - HTTP caching: `Cache-Control: public, max-age=300` on HTML pages; `max-age=86400` on static assets; 5-minute in-memory TTL on the metrics SQLite queries
 - `alt=""` stamped on Leaflet-generated map tile and marker images via MutationObserver (fixes Bing Webmaster Tools SEO notice)
 - Application version (`1.0.0`) defined in `__init__.py`, injected into all templates, and displayed in the footer
@@ -370,6 +370,6 @@ All notable changes to this project will be documented here. This project follow
 
 ## [0.x] - 2022-03-23 through 2026-06-27
 
-Four years of active development and production use at UNC Chapel Hill ITS. This period covers the initial build, dual-stack IPv4/IPv6 detection, Infoblox IPAM integration, Extreme Networks NAC integration, geolocation, DNS security filtering, the metrics dashboard, dark mode, map support, and numerous refinements based on real-world use.
+Four years of active development and production use supporting the University at Buffalo deployment. This period covers the initial build, dual-stack IPv4/IPv6 detection, Infoblox IPAM integration, Extreme Networks NAC integration, geolocation, DNS security filtering, the metrics dashboard, dark mode, map support, and numerous refinements based on real-world use.
 
 The full history of contributions during this period is available in the git log.

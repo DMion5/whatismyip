@@ -1,5 +1,5 @@
 @charset "UTF-8";
-/* CUSTOMIZE: Replace the --unc-* palette variables below with your institution's brand colors. */
+/* University at Buffalo palette and application theme colors. */
 :root {
   /* University at Buffalo brand palette */ 
   --ub-blue: #005BBB;
@@ -14,29 +14,17 @@
   --ub-light-gray: #D1D5DB;
   --ub-fog: #F1F3F5;
 
-    /* Temporary compatibility aliases */
-  --unc-carolina-blue: var(--ub-blue);
-  --unc-navy: var(--ub-dark-blue);
-  --unc-white: var(--ub-white);
-  --unc-bolin-creek: var(--ub-blue-hover);
-  --unc-fordham-fountain: var(--ub-light-blue);
-  --unc-cloud: var(--ub-pale-blue);
-  --unc-old-well-basin: var(--ub-slate);
-  --unc-flat-gray: var(--ub-gray);
-  --unc-cornerstone: var(--ub-light-gray);
-  --unc-franklin-fog: var(--ub-fog);
-
-  --site-bg: var(--unc-white);
-  --site-surface: var(--unc-white);
-  --site-subtle-bg: var(--unc-cloud);
-  --site-text: var(--unc-navy);
-  --site-muted-text: var(--unc-old-well-basin);
-  --site-link: var(--unc-carolina-blue);
-  --site-link-hover: var(--unc-bolin-creek);
-  --site-border: var(--unc-cornerstone);
-  --site-chrome: var(--unc-navy);
-  --site-chrome-text: var(--unc-white);
-  --site-chrome-link: var(--unc-fordham-fountain);
+  --site-bg: var(--ub-white);
+  --site-surface: var(--ub-white);
+  --site-subtle-bg: var(--ub-pale-blue);
+  --site-text: var(--ub-dark-blue);
+  --site-muted-text: var(--ub-slate);
+  --site-link: var(--ub-blue);
+  --site-link-hover: var(--ub-blue-hover);
+  --site-border: var(--ub-light-gray);
+  --site-chrome: var(--ub-dark-blue);
+  --site-chrome-text: var(--ub-white);
+  --site-chrome-link: var(--ub-light-blue);
 }
 
 html,
@@ -45,17 +33,17 @@ body {
 }
 
 html[data-theme="dark"] {
-  --site-bg: var(--unc-navy);
-  --site-surface: var(--unc-bolin-creek);
-  --site-subtle-bg: var(--unc-old-well-basin);
-  --site-text: var(--unc-white);
-  --site-muted-text: var(--unc-cornerstone);
-  --site-link: var(--unc-fordham-fountain);
-  --site-link-hover: var(--unc-white);
-  --site-border: var(--unc-flat-gray);
-  --site-chrome: var(--unc-bolin-creek);
-  --site-chrome-text: var(--unc-white);
-  --site-chrome-link: var(--unc-fordham-fountain);
+  --site-bg: var(--ub-dark-blue);
+  --site-surface: var(--ub-blue-hover);
+  --site-subtle-bg: var(--ub-slate);
+  --site-text: var(--ub-white);
+  --site-muted-text: var(--ub-light-gray);
+  --site-link: var(--ub-light-blue);
+  --site-link-hover: var(--ub-white);
+  --site-border: var(--ub-gray);
+  --site-chrome: var(--ub-blue-hover);
+  --site-chrome-text: var(--ub-white);
+  --site-chrome-link: var(--ub-light-blue);
 }
 
 body {
@@ -73,14 +61,14 @@ main[role="main"] {
   flex: 1 0 auto;
 }
 
-.unc-ip {
+.ip-address {
   /* font-family: TimesNewRoman, "Times New Roman", Times, Baskerville, Georgia, serif; */
   font-family: "Open Sans",Helvetica,Arial,sans-serif;
   overflow-wrap: anywhere;
   min-width: 0;
 }
 
-.unc-ip .flex-grow-1 {
+.ip-address .flex-grow-1 {
   min-width: 0;
 }
 
@@ -94,7 +82,7 @@ main[role="main"] {
   color: #FFFFFF;
 }
 
-.unc-title {
+.ub-title {
   float: left;
   text-transform: uppercase;
   padding-left: 8px;
@@ -102,8 +90,8 @@ main[role="main"] {
   font-family: "Times New Roman",serif;;
 }
 
-.unc-page-title {
-  color: var(--unc-carolina-blue);
+.ub-page-title {
+  color: var(--ub-blue);
   position: relative;
 }
 
@@ -116,7 +104,7 @@ main[role="main"] {
 .site-page-heading {
   font-size: 1.6rem;
   font-weight: 700;
-  color: var(--unc-carolina-blue);
+  color: var(--ub-blue);
   margin-bottom: 0.2rem;
 }
 
@@ -139,7 +127,7 @@ main[role="main"] {
   font-size: 2.1rem;
   font-weight: 700;
   line-height: 1.1;
-  color: var(--unc-carolina-blue);
+  color: var(--ub-blue);
 }
 
 .metrics-stat-secondary {
@@ -188,7 +176,7 @@ main[role="main"] {
 
 .theme-toggle-btn:focus-visible {
   outline: 0;
-  border-color: var(--unc-carolina-blue);
+  border-color: var(--ub-blue);
   box-shadow: 0 0 0 0.2rem rgba(75, 156, 211, 0.25);
 }
 
@@ -260,7 +248,7 @@ html[data-theme="dark"] {
 .signal-fair { color: var(--signal-fair); }
 .signal-poor { color: var(--signal-poor); }
 
-.faq-accent-primary { border-left: 4px solid var(--unc-carolina-blue) !important; }
+.faq-accent-primary { border-left: 4px solid var(--ub-blue) !important; }
 .faq-accent-success  { border-left: 4px solid #5a9a5a !important; }
 .faq-accent-warning  { border-left: 4px solid #c9a227 !important; }
 .faq-accent-info     { border-left: 4px solid #3a8fa3 !important; }
@@ -345,13 +333,13 @@ html[data-theme="dark"] .text-muted {
   font-weight: 600;
 }
 .site-navbar .nav-link:hover {
-  color: var(--unc-carolina-blue);
+  color: var(--ub-blue);
   opacity: 1;
 }
 .site-navbar .nav-link.active {
   color: var(--site-chrome-text) !important;
   opacity: 1;
-  border-bottom: 2px solid var(--unc-carolina-blue);
+  border-bottom: 2px solid var(--ub-blue);
 }
 
 .site-navbar-toggler {
@@ -361,7 +349,7 @@ html[data-theme="dark"] .text-muted {
   line-height: 1;
 }
 .site-navbar-toggler:focus-visible {
-  outline: 2px solid var(--unc-carolina-blue);
+  outline: 2px solid var(--ub-blue);
   outline-offset: 2px;
 }
 @media (max-width: 767.98px) {
@@ -372,7 +360,7 @@ html[data-theme="dark"] .text-muted {
   }
   .site-navbar .nav-link.active {
     border-bottom: none;
-    border-left: 2px solid var(--unc-carolina-blue);
+    border-left: 2px solid var(--ub-blue);
     padding-left: 0.5rem;
   }
 }
@@ -380,17 +368,17 @@ html[data-theme="dark"] .text-muted {
 .nav-report-btn {
   font-size: 0.8rem;
   padding: 0.25rem 0.7rem;
-  border: 1px solid var(--unc-carolina-blue);
+  border: 1px solid var(--ub-blue);
   border-radius: 4px;
-  background-color: var(--unc-carolina-blue);
+  background-color: var(--ub-blue);
   color: #fff;
   white-space: nowrap;
   cursor: pointer;
   transition: background-color 0.15s ease, border-color 0.15s ease;
 }
 .nav-report-btn:hover:not(:disabled) {
-  background-color: var(--unc-bolin-creek);
-  border-color: var(--unc-bolin-creek);
+  background-color: var(--ub-blue-hover);
+  border-color: var(--ub-blue-hover);
   color: #fff;
 }
 .nav-report-btn:disabled {
@@ -399,39 +387,39 @@ html[data-theme="dark"] .text-muted {
 }
 
 /* Modify the background color */
-.navbar-unc {
+.navbar-ub {
   background-color: #4B9CD3;
 }
-.bg-unc-blue {
+.bg-ub-blue {
   background-color: #4B9CD3;
 }
-.bg-unc-link-blue {
+.bg-ub-link-blue {
   background-color: #007FAE;
 }
-.bg-unc-navy {
+.bg-ub-navy {
   background-color: #13294B;
 }
 
 /* Modify brand and text color */
-.navbar-unc .navbar-brand,
-.navbar-unc .navbar-text {
+.navbar-ub .navbar-brand,
+.navbar-ub .navbar-text {
   color: #FFFFFF;
 }
 
 /* Modify link color */
-.navbar-unc .nav-link {
+.navbar-ub .nav-link {
   color: #FFFFFF!important;
 }
 
 .btn-primary {
   color: #fff;
-  background-color: var(--unc-carolina-blue);
-  border-color: var(--unc-carolina-blue);
+  background-color: var(--ub-blue);
+  border-color: var(--ub-blue);
 }
 .btn-primary:hover {
   color: #fff;
-  background-color: var(--unc-bolin-creek);
-  border-color: var(--unc-bolin-creek);
+  background-color: var(--ub-blue-hover);
+  border-color: var(--ub-blue-hover);
 }
 /* .btn-primary:not(:disabled):not(.disabled):active, .btn-primary:not(:disabled):not(.disabled).active, .show > .btn-primary.dropdown-toggle {
   color: #fff;
@@ -474,7 +462,7 @@ a:hover {
 }
 
 html[data-theme="dark"] #copy-notification {
-  border: 1px solid var(--unc-cornerstone);
+  border: 1px solid var(--ub-light-gray);
 }
 
 #additionalDetails.collapsing {
@@ -572,7 +560,7 @@ html[data-theme="dark"] #copy-notification {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: var(--unc-carolina-blue);
+  background: var(--ub-blue);
   color: #fff;
   display: flex;
   align-items: center;
@@ -589,7 +577,7 @@ html[data-theme="dark"] #copy-notification {
 .nac-connector {
   width: 2px;
   height: 24px;
-  background: var(--unc-carolina-blue);
+  background: var(--ub-blue);
   margin-left: 19px; /* center under 40px icon: 20px - 1px */
   flex-shrink: 0;
 }
@@ -597,8 +585,8 @@ html[data-theme="dark"] #copy-notification {
 .nac-connector.wireless {
   background: repeating-linear-gradient(
     to bottom,
-    var(--unc-carolina-blue) 0,
-    var(--unc-carolina-blue) 5px,
+    var(--ub-blue) 0,
+    var(--ub-blue) 5px,
     transparent 5px,
     transparent 10px
   );
@@ -700,8 +688,8 @@ html[data-theme="dark"] #copy-notification {
   .nac-connector.wireless {
     background: repeating-linear-gradient(
       to right,
-      var(--unc-carolina-blue) 0,
-      var(--unc-carolina-blue) 6px,
+      var(--ub-blue) 0,
+      var(--ub-blue) 6px,
       transparent 6px,
       transparent 13px
     );

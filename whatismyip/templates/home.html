@@ -600,29 +600,32 @@
       <h2 class="card-title h5"><i class="fa-solid fa-circle-question text-primary me-2" aria-hidden="true"></i>What does this tool show?</h2>
       <div class="row mt-2">
         <div class="col-md-6">
-          <p class="mb-1">All visitors see:</p>
+          <p class="mb-1">All visitors can see:</p>
           <ul class="mb-0">
-            <li>IPv4 and IPv6 address detection</li>
-            <li>Internet Service Provider (ISP) and geolocation</li>
-            <li>Internet DNS provider and security filtering status</li>
-            <li>IP geolocation map (city-level accuracy)</li>
+            <li>The public IP address detected for this visit</li>
+            <li>Internet Service Provider (ISP) and approximate geolocation, when available</li>
+            <li>Internet DNS provider and configured security filtering status, when available</li>
+            <li>An IP geolocation map based on approximate city-level data</li>
+            <li>IPv6 results when available; IPv6 support is currently under construction</li>
           </ul>
         </div>
         <div class="col-md-6 mt-3 mt-md-0">
-          <p class="mb-1">Campus and VPN visitors also see:</p>
+          <p class="mb-1">Recognized campus and VPN visitors may also see:</p>
           <ul class="mb-0">
-            <li>Campus network and VLAN assignment</li>
-            <li>Network Access Control (NAC) details</li>
-            <li>Wi-Fi connection details — SSID, access point, and signal quality</li>
+            <li>Campus network and Virtual Local Area Network (VLAN) assignment</li>
+            <li>Network Access Control (NAC) details, when provided by UB network systems</li>
+            <li>Wi-Fi connection details — SSID, access point, and signal quality — when available</li>
             <li>Building location map (street-level, where available)</li>
           </ul>
         </div>
       </div>
-      <p class="mt-3 mb-0">Knowing your network details helps diagnose connectivity problems before calling the help desk.
-        VPN users can confirm their traffic is routing through campus before accessing IP-restricted resources such as
-        licensed databases or administrative systems. Wireless users can verify they are on the correct network segment.
+      <p class="mt-3 mb-0">Knowing your network details can help diagnose connectivity problems, either on your own or
+        with assistance from the UBIT Help Center. Help Center staff may ask you to visit this page so they can use the
+        information shown here to help identify the problem. Anyone using VPN can confirm whether traffic is routing
+        through campus before accessing IP-restricted resources such as licensed databases or administrative systems.
+        Anyone using Wi-Fi can verify that the detected network information is what they expect.
         If something looks wrong — an unexpected ISP, an off-campus address while on-site, or a missing VPN address —
-        this page gives you the specific details to share with UBIT support.
+        this page gives you specific details to share with the UBIT Help Center.
       </p>
     </div>
   </div>
@@ -639,7 +642,7 @@
   "name": "My IP — UB Information Technology",
   "alternateName": "UBIT My IP",
   "url": "{{ site_url }}",
-  "description": "Find your IP address and test your connection to the University at Buffalo campus network. Designed for on-campus, UB VPN and Wi-Fi users, the tool provides IPv4 and IPv6 detection, DNS provider information, DNS security filtering status, and detailed UB network diagnostics.",
+  "description": "Find your IP address and test your connection to the University at Buffalo campus network. The tool provides public IP detection, DNS information, VPN checks, and additional UB network diagnostics when supported by campus systems.",
   "applicationCategory": "NetworkingApplication",
   "operatingSystem": "Any",
   "isAccessibleForFree": true,
@@ -662,7 +665,7 @@
   },
   "featureList": [
     "IP address lookup",
-    "IPv4 and IPv6 detection",
+    "Public IP address detection",
     "UB VPN detection",
     "UB campus network detection",
     "Wi-Fi connection details",

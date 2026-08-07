@@ -59,6 +59,9 @@ def test_home_uses_my_ip_brand_without_application_logo(client):
     )
     assert b'image/x-icon" sizes="32x32" href="/static/logo/favicon.ico' in response.data
     assert b'rel="shortcut icon" href="/static/logo/favicon.ico' in response.data
+    assert b"Check your network connection and identify problems" in response.data
+    assert b"Help Center staff may ask you to visit this page" in response.data
+    assert b"IPv6 support is currently under construction" in response.data
 
 
 def test_about_credits_original_project(client):
@@ -68,11 +71,33 @@ def test_about_credits_original_project(client):
     assert b"https://github.com/unc-network/whatismyip" in response.data
     assert b"William E. Whitaker, Jr." in response.data
     assert b"UNC Information Technology Services" in response.data
+    assert (
+        b"blob/de380dc8cf75e2db30f81100f53c7307121cd25f/NOTICE.md"
+        in response.data
+    )
+    assert b"blob/master/NOTICE.md" not in response.data
+    assert b"Copyright &copy;" not in response.data
 
 
 def test_connectivity_page_renders(client):
     response = client.get("/connectivity")
     assert response.status_code == 200
+    assert b"UB SharePoint" in response.data
+    assert b"UB OneDrive" in response.data
+    assert b"Microsoft Sign-in" in response.data
+    assert b"UBIT Help Center Online" in response.data
+    assert b"https://support.buffalo.edu/" in response.data
+
+
+def test_faq_matches_available_features_and_support_controls(client):
+    response = client.get("/faq")
+
+    assert response.status_code == 200
+    assert b"What is a VLAN?" in response.data
+    assert b"Print Report (PDF)" in response.data
+    assert b"Report</b> button in the navigation bar" not in response.data
+    assert b"IPv6 support is currently under construction" in response.data
+    assert b"Is an API available?" not in response.data
 
 
 # --- Static file serving ---

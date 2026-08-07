@@ -13,7 +13,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
 	<title>{% block title %}My IP | UB Information Technology{% endblock %}</title>
-	<meta name="description" content="{% block meta_description %}View your public IP address and test University at Buffalo network connectivity, IPv4, IPv6, VPN, DNS and campus network information.{% endblock %}">
+	<meta name="description" content="{% block meta_description %}View your public IP address and test University at Buffalo network connectivity, VPN, DNS and available campus network information.{% endblock %}">
 	<meta name="keywords" content="{% block meta_keywords %}UB network diagnostics, University at Buffalo, UBIT, IP address, IPv4, IPv6, VPN, DNS, campus network{% endblock %}">
 	<meta name="author" content="UB Information Technology">
 	<meta name="robots" content="index, follow">
@@ -21,7 +21,7 @@
 	<meta property="og:title" content="{% block og_title %}My IP | UB Information Technology{% endblock %}">
 	<meta property="og:site_name" content="My IP">
 	<meta property="og:url" content="{% block og_url %}{{ site_url }}{% endblock %}">
-	<meta property="og:description" content="{% block og_description %}Check your IP address and University at Buffalo network connection, including IPv4, IPv6, VPN, DNS and campus network details.{% endblock %}">
+	<meta property="og:description" content="{% block og_description %}Check your IP address and University at Buffalo network connection, including VPN, DNS and available campus network details.{% endblock %}">
 	<meta property="og:type" content="website">
 	<meta property="og:image" content="{{ site_url }}{{ url_for('static', filename='logo/placeholder-logo.svg') }}">
 	<meta property="og:image:width" content="512">
@@ -100,7 +100,7 @@
 						{% block site_heading_close %}</p>{% endblock %}
 
 						<p class="site-header-tagline">
-							Network diagnostics &middot; UB Information Technology
+							Check your network connection and identify problems
 						</p>
 					</div>
 				</div>
@@ -214,11 +214,18 @@
 				<div class="col">
 					<p class="ub-footer-meta text-center mb-1">
 						<small>
-							Copyright &copy; <script>document.write(new Date().getFullYear())</script>
-							University at Buffalo
+							My IP
 							&nbsp;&middot;&nbsp;
 							<a href="https://github.com/DMion5/whatismyip/blob/master/CHANGELOG.md">
 								v{{ app_version }}
+							</a>
+							&nbsp;&middot;&nbsp;
+							<a href="https://github.com/DMion5/whatismyip/blob/de380dc8cf75e2db30f81100f53c7307121cd25f/LICENSE.md">
+								MIT License
+							</a>
+							&nbsp;&middot;&nbsp;
+							<a href="https://github.com/DMion5/whatismyip/blob/de380dc8cf75e2db30f81100f53c7307121cd25f/NOTICE.md">
+								Attribution notice
 							</a>
 						</small>
 					</p>

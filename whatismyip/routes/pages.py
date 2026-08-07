@@ -101,11 +101,11 @@ def static_from_root() -> Response:
 
 @bp.route("/favicon.ico")
 def favicon() -> Response:
-    """Serve the neutral placeholder as the legacy root favicon."""
+    """Serve the UB favicon from the legacy root path."""
     return send_from_directory(
         current_app.static_folder or current_app.root_path,
-        "logo/placeholder-logo.svg",
-        mimetype="image/svg+xml",
+        "logo/favicon.ico",
+        mimetype="image/x-icon",
     )
 
 

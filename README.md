@@ -337,7 +337,8 @@ UB-specific branding and service details are concentrated in these locations.
 
 | Path                                | What to change                                      |
 | ----------------------------------- | --------------------------------------------------- |
-| `logo/placeholder-logo.svg`         | Neutral application logo and favicon placeholder   |
+| `logo/placeholder-logo.svg`         | Neutral application logo used beside the site name |
+| `logo/favicon.ico`                  | University at Buffalo browser favicon               |
 | `logo/site.webmanifest`             | Installable web-app name and placeholder icon       |
 | `logo/ub-logo-two-line.png`         | University at Buffalo wordmark used in the header   |
 

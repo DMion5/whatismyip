@@ -50,7 +50,8 @@ def test_home_uses_my_ip_brand_and_placeholder_logo(client):
     assert response.data.index(b'id="second_address_section"') < response.data.index(
         b"IPv6 support is under construction."
     )
-    assert b'image/svg+xml" href="/static/logo/placeholder-logo.svg' in response.data
+    assert b'image/x-icon" sizes="32x32" href="/static/logo/favicon.ico' in response.data
+    assert b'rel="shortcut icon" href="/static/logo/favicon.ico' in response.data
 
 
 def test_about_credits_original_project(client):
@@ -80,12 +81,12 @@ def test_sitemap_xml_is_served(client):
     assert response.status_code == 200
 
 
-def test_legacy_favicon_route_serves_placeholder(client):
+def test_legacy_favicon_route_serves_ub_icon(client):
     response = client.get("/favicon.ico")
 
     assert response.status_code == 200
-    assert response.mimetype == "image/svg+xml"
-    assert b"My IP placeholder logo" in response.data
+    assert response.mimetype == "image/x-icon"
+    assert response.data.startswith(b"\x00\x00\x01\x00")
 
 
 # --- IndexNow key file ---

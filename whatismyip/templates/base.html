@@ -41,7 +41,8 @@
 	<link rel="canonical" href="{{ site_url }}{{ request.path }}">
 	{% endblock %}
 
-	<link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='logo/placeholder-logo.svg') }}?v={{ app_version }}">
+	<link rel="icon" type="image/x-icon" sizes="32x32" href="{{ url_for('static', filename='logo/favicon.ico') }}?v={{ app_version }}">
+	<link rel="shortcut icon" href="{{ url_for('static', filename='logo/favicon.ico') }}?v={{ app_version }}">
 	<link rel="manifest" href="{{ url_for('static', filename='logo/site.webmanifest') }}?v={{ app_version }}">
 
 	<meta name="theme-color" content="#005bbb">

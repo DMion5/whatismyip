@@ -21,8 +21,8 @@
 	--site-bg: var(--ub-white);
 	--site-surface: var(--ub-white);
 	--site-subtle-bg: var(--ub-baird-point);
-	--site-text: var(--ub-harriman-blue);
-	--site-muted-text: var(--ub-townsend-gray);
+	--site-text: #000000;
+	--site-muted-text: #262626;
 	--site-link: var(--ub-blue);
 	--site-link-hover: var(--ub-harriman-blue);
 	--site-border: var(--ub-baird-point);
@@ -189,7 +189,7 @@ h6,
 }
 
 .site-header-tagline {
-	color: var(--ub-townsend-gray);
+	color: var(--site-muted-text);
 	font-size: 0.84rem;
 	font-weight: 700;
 	letter-spacing: 0.03em;
@@ -267,6 +267,11 @@ html[data-theme="dark"] .site-header-tagline {
 
 .text-primary {
 	color: var(--ub-blue) !important;
+}
+
+/* Keep body and secondary copy crisp against the white light-theme surface. */
+html:not([data-theme="dark"]) .text-muted {
+	color: var(--site-muted-text) !important;
 }
 
 /* The main IP address card */

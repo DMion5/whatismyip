@@ -38,13 +38,20 @@ def test_trailing_slash_redirects(client, path, location):
 # --- Page content ---
 
 
-def test_home_uses_my_ip_brand_and_placeholder_logo(client):
+def test_home_uses_my_ip_brand_without_application_logo(client):
     response = client.get("/")
 
     assert response.status_code == 200
     assert b"<title>My IP | UB Information Technology</title>" in response.data
     assert b"<span>My IP</span>" in response.data
     assert b"logo/placeholder-logo.svg" in response.data
+    assert b'class="ub-app-logo"' not in response.data
+    app_symbol = response.data.split(b'class="ub-app-symbol"', 1)[1].split(
+        b"</span>", 1
+    )[0]
+    assert b"fa-network-wired" not in app_symbol
+    assert b"fa-location-dot" in app_symbol
+    assert b'class="ub-university-logo"' in response.data
     assert b"logo/my%20ip%20logo.png" not in response.data
     assert b"IPv6 support is under construction." in response.data
     assert response.data.index(b'id="second_address_section"') < response.data.index(

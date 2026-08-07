@@ -74,8 +74,8 @@
 	<header class="ub-global-header">
 		<div class="container ub-global-header-inner">
 			<a class="ub-university-link" href="https://www.buffalo.edu/" aria-label="University at Buffalo home">
-	<img class="ub-university-logo" src="/static/logo/ub-logo-two-line.png" alt="University at Buffalo">
-</a>
+				<img class="ub-university-logo" src="/static/logo/ub-logo-two-line.png" alt="University at Buffalo">
+			</a>
 
 			<nav class="ub-global-links" aria-label="University services">
 				<a href="https://myub.buffalo.edu/">MyUB / HUB</a>
@@ -92,11 +92,9 @@
 					<div class="py-3 text-center ub-page-title">
 						{% block site_heading_open %}<p class="mb-0 site-title">{% endblock %}
 						<a class="ub-app-title" href="{{ site_url }}">
-							<img
-								class="ub-app-logo"
-								src="{{ url_for('static', filename='logo/placeholder-logo.svg') }}"
-								alt=""
-								aria-hidden="true">
+							<span class="ub-app-symbol" aria-hidden="true">
+								<i class="fa-solid fa-location-dot"></i>
+							</span>
 							<span>My IP</span>
 						</a>
 						{% block site_heading_close %}</p>{% endblock %}

@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented here. This project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) conventions.
 
+## [1.11.1] - 2026-08-27
+
+### Added
+
+- Optional HPE Aruba Networking Central mobility enrichment for wireless connection details.
+
+### Fixed
+
+- Aruba mobility details are collected independently when NAC is unavailable.
+- Browser and intermediary caching is disabled so newly deployed frontend changes appear immediately.
+
 ## [1.11.0] - 2026-07-31
 
 ### Added

@@ -93,8 +93,4 @@ def home() -> Response:
     if not data["simulate"]:
         log_page_view("Home")
 
-    resp = make_response(render_template("home.html", context=data))
-    if not data["simulate"]:
-        resp.cache_control.public = True
-        resp.cache_control.max_age = 300
-    return resp
+    return make_response(render_template("home.html", context=data))

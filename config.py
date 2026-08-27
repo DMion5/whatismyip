@@ -60,8 +60,8 @@ class Config:  # pylint: disable=too-few-public-methods
     METRICS_TIME_WINDOW_DAYS = 30
     METRICS_RETENTION_DAYS = 90  # rows older than this are pruned on startup
 
-    # Browser cache lifetime for static assets (CSS, JS, images) in seconds
-    SEND_FILE_MAX_AGE_DEFAULT = 86400  # 1 day
+    # Disable browser caching so every deployment is visible immediately.
+    SEND_FILE_MAX_AGE_DEFAULT = 0
 
 
 class ProductionConfig(Config):  # pylint: disable=too-few-public-methods

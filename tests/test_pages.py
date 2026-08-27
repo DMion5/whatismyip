@@ -57,7 +57,9 @@ def test_home_uses_my_ip_brand_without_application_logo(client):
     assert response.data.index(b'id="second_address_section"') < response.data.index(
         b"IPv6 support is under construction."
     )
-    assert b'image/x-icon" sizes="32x32" href="/static/logo/favicon.ico' in response.data
+    assert (
+        b'image/x-icon" sizes="32x32" href="/static/logo/favicon.ico' in response.data
+    )
     assert b'rel="shortcut icon" href="/static/logo/favicon.ico' in response.data
     assert b"Check your network connection and identify problems" in response.data
     assert b"Help Center staff may ask you to visit this page" in response.data
@@ -71,10 +73,7 @@ def test_about_credits_original_project(client):
     assert b"https://github.com/unc-network/whatismyip" in response.data
     assert b"William E. Whitaker, Jr." in response.data
     assert b"UNC Information Technology Services" in response.data
-    assert (
-        b"blob/de380dc8cf75e2db30f81100f53c7307121cd25f/NOTICE.md"
-        in response.data
-    )
+    assert b"blob/de380dc8cf75e2db30f81100f53c7307121cd25f/NOTICE.md" in response.data
     assert b"blob/master/NOTICE.md" not in response.data
     assert b"Copyright &copy;" not in response.data
 
@@ -119,6 +118,21 @@ def test_legacy_favicon_route_serves_ub_icon(client):
     assert response.status_code == 200
     assert response.mimetype == "image/x-icon"
     assert response.data.startswith(b"\x00\x00\x01\x00")
+
+
+@pytest.mark.parametrize(
+    "path",
+    ["/", "/about", "/hostinfo?simulate=oncampus", "/static/js/whatismyip.js"],
+)
+def test_responses_disable_browser_caching(client, path):
+    response = client.get(path)
+
+    assert response.status_code == 200
+    assert response.headers["Cache-Control"] == (
+        "no-store, no-cache, must-revalidate, max-age=0"
+    )
+    assert response.headers["Pragma"] == "no-cache"
+    assert response.headers["Expires"] == "0"
 
 
 # --- IndexNow key file ---

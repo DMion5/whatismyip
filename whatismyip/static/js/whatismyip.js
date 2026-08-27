@@ -387,7 +387,7 @@ function downloadReport() {
 			? am.from_channel + ' → ' + am.channel
 			: am.channel;
 		wirelessSection = section('Wireless Connection', [
-			rpt('Data Source', wirelessEndSystem.wireless_provider),
+			rpt('Data Source', wirelessEndSystem.wireless_provider || (r4.nac.aruba_mobility ? 'Aruba Central' : null)),
 			rpt('Manufacturer', mc.manufacturer),
 			rpt('Device', mc.description),
 			rpt('OS', mc.os),
@@ -795,6 +795,10 @@ function test_ipv4_url(default_version) {
 			}
 			if (result['nac']['aruba_mobility']) {
 				var am = result['nac']['aruba_mobility'];
+				merakiRow('wireless-provider', 'Aruba Central');
+				merakiRow('meraki-mac', am.client_mac);
+				merakiRow('wireless-ssid', am.ssid);
+				merakiRow('wireless-ap-name', am.destination_ap);
 				merakiRow('aruba-occurred-at', formatWirelessTimestamp(am.occurred_at));
 				merakiRow('aruba-rssi', am.rssi !== null && am.rssi !== undefined ? am.rssi + ' dBm' : null);
 				merakiRow('aruba-bssid', am.bssid);

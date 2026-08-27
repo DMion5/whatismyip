@@ -20,6 +20,7 @@ from user_agents import parse
 from whatismyip.db import log_metrics_event
 from whatismyip.infoblox import get_address_objects, get_network
 from whatismyip.utils import (
+    enrich_with_aruba_mobility,
     get_client_address,
     get_ip_location,
     get_nac_info,
@@ -706,8 +707,12 @@ def hostinfo() -> Response:
             current_app.logger.warning(f"NAC info lookup failed: {error}")
             nac_data = None
 
-        if nac_data:
-            data["nac"] = nac_data
+        if not nac_data:
+            nac_data = {"endSystem": None, "endSystemInfo": None}
+
+        end_system = nac_data.get("endSystem") or {}
+        client_mac = addr_details["mac"] or end_system.get("macAddress")
+        data["nac"] = enrich_with_aruba_mobility(nac_data, client_mac)
 
     log_metrics_event(
         "hostinfo",

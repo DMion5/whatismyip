@@ -5,7 +5,12 @@ import ipaddress
 import pytest
 
 from whatismyip import create_app
-from whatismyip.utils import get_nac_info, is_campus_ip, is_vpn_ip
+from whatismyip.utils import (
+    enrich_with_aruba_mobility,
+    get_nac_info,
+    is_campus_ip,
+    is_vpn_ip,
+)
 
 
 @pytest.fixture
@@ -76,6 +81,7 @@ def test_nac_wireless_record_is_enriched_with_aruba_mobility(app, monkeypatch):
 
     with app.app_context():
         result = get_nac_info("192.0.2.50", "c2:54:ea:89:12:5f")
+        result = enrich_with_aruba_mobility(result, "c2:54:ea:89:12:5f")
 
     assert result["aruba_mobility"]["destination_ap"] == "UB-202-AP02"
     assert result["endSystem"]["wireless_provider"] == "Aruba Central"

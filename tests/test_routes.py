@@ -254,6 +254,53 @@ def test_hostinfo_campus_ip_populates_network_and_purpose(client, monkeypatch):
     assert data["network"]["purpose"] == "Wired"
 
 
+def test_hostinfo_aruba_enrichment_survives_nac_failure(client, monkeypatch):
+    monkeypatch.delenv("CLIENT_ADDRESS", raising=False)
+    monkeypatch.delenv("CLIENT_ADDRESS_V4", raising=False)
+    monkeypatch.delenv("CLIENT_ADDRESS_V6", raising=False)
+    monkeypatch.delenv("FORWARDED_FOR", raising=False)
+    mock_network = {
+        "network": "128.205.0.0/16",
+        "comment": "University at Buffalo",
+        "extattrs": {"Purpose": {"value": "Wireless"}},
+        "members": [],
+        "options": [],
+        "vlans": [],
+    }
+    monkeypatch.setattr("whatismyip.routes.api.is_campus_ip", lambda _ip: True)
+    monkeypatch.setattr("whatismyip.routes.api.get_network", lambda _ip: mock_network)
+    monkeypatch.setattr(
+        "whatismyip.routes.api.get_address_objects",
+        lambda _ip: {"mac_address": "c2:54:ea:89:12:5f"},
+    )
+    monkeypatch.setattr(
+        "whatismyip.routes.api.get_nac_info",
+        lambda _ip, mac=None: (_ for _ in ()).throw(RuntimeError("NAC unavailable")),
+    )
+    monkeypatch.setattr(
+        "whatismyip.routes.api.enrich_with_aruba_mobility",
+        lambda nac, mac: {
+            **nac,
+            "aruba_mobility": {
+                "client_mac": mac,
+                "destination_ap": "wls-cc3-5",
+                "ssid": "eduroam",
+            },
+        },
+    )
+    monkeypatch.setattr(
+        "whatismyip.routes.api.log_metrics_event", lambda *args, **kwargs: None
+    )
+    monkeypatch.setattr("whatismyip.routes.api.resolver.query", _no_ptr)
+
+    response = client.get("/hostinfo", environ_base={"REMOTE_ADDR": "128.205.1.1"})
+
+    assert response.status_code == 200
+    data = response.get_json()
+    assert data["nac"]["aruba_mobility"]["destination_ap"] == "wls-cc3-5"
+    assert data["nac"]["aruba_mobility"]["client_mac"] == "c2:54:ea:89:12:5f"
+
+
 def test_hostinfo_vpn_ip_uses_vpn_purpose_without_ipam_network(client, monkeypatch):
     monkeypatch.delenv("CLIENT_ADDRESS", raising=False)
     monkeypatch.delenv("CLIENT_ADDRESS_V4", raising=False)

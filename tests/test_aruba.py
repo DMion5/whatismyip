@@ -122,6 +122,22 @@ def test_mobility_lookup_uses_correct_endpoint_and_normalizes_response(
     }
 
 
+def test_static_token_accepts_bearer_prefix(app, monkeypatch):
+    authorization = []
+
+    def fake_get(_url, **kwargs):
+        authorization.append(kwargs["headers"]["authorization"])
+        return FakeResponse(200, {"items": [{"destinationAp": "wls-cc3-5"}]})
+
+    monkeypatch.setattr("whatismyip.aruba.requests.get", fake_get)
+    app.config["ARUBA_CENTRAL_ACCESS_TOKEN"] = "  Bearer test-token  "
+
+    with app.app_context():
+        assert get_aruba_mobility("c2:54:ea:89:12:5f") is not None
+
+    assert authorization == ["Bearer test-token"]
+
+
 def test_client_credentials_token_is_cached(app, monkeypatch):
     post_calls = []
     get_calls = []

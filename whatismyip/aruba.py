@@ -125,7 +125,10 @@ def _get_access_token(force_refresh: bool = False) -> tuple[str | None, bool]:
         return _request_client_credentials_token(force_refresh), True
 
     # Useful for short-lived testing only. Production should use client credentials.
-    return app.config.get("ARUBA_CENTRAL_ACCESS_TOKEN", "") or None, False
+    access_token = str(app.config.get("ARUBA_CENTRAL_ACCESS_TOKEN", "") or "").strip()
+    if access_token.lower().startswith("bearer "):
+        access_token = access_token[7:].strip()
+    return access_token or None, False
 
 
 def _as_int(value: Any) -> int | None:

@@ -33,11 +33,13 @@ var ipv6Resolved = false;
 function buildNacDiagram(nac, userDevice) {
 	var es = nac.endSystem || {};
 	var bldg = nac.nit_building || {};
-	var isWireless = es.connection_type === 'wireless';
+	var arubaClient = nac.aruba_client || {};
+	var arubaMobility = nac.aruba_mobility || {};
+	var isWireless = es.connection_type === 'wireless' || Boolean(nac.aruba_client || nac.aruba_mobility);
 
 	var bldgName = bldg.number
 		? 'Bldg ' + bldg.number
-		: (bldg.official_name || bldg.full_name || '');
+		: (bldg.official_name || bldg.full_name || arubaClient.site || '');
 	var bldgSub = (bldg.official_name || bldg.full_name || '');
 
 	function esc(s) {
@@ -72,6 +74,9 @@ function buildNacDiagram(nac, userDevice) {
 
 	if (isWireless) {
 		var controller = es.wireless_controller || es.switchIP || null;
+		var clientMac = es.macAddress || arubaClient.client_mac || arubaMobility.client_mac || '';
+		var accessPoint = es.wireless_ap_name || arubaClient.access_point || arubaMobility.destination_ap || 'Access Point';
+		var ssid = es.wireless_ssid || arubaClient.ssid || arubaMobility.ssid || '';
 		var wirelessLabel = '', wirelessClass = '';
 		var wirelessSignal = nac.wireless_signal || nac.meraki_signal || {};
 		if (wirelessSignal.rssi != null) {
@@ -79,10 +84,20 @@ function buildNacDiagram(nac, userDevice) {
 			var quality = rssi >= -65 ? 'Good' : rssi >= -70 ? 'Fair' : 'Poor';
 			wirelessClass = rssi >= -65 ? 'signal-good' : rssi >= -70 ? 'signal-fair' : 'signal-poor';
 			wirelessLabel = rssi + ' dBm — ' + quality;
+		} else if (arubaClient.snr != null) {
+			var snr = arubaClient.snr;
+			var snrQuality = snr >= 25 ? 'Good' : snr >= 15 ? 'Fair' : 'Poor';
+			wirelessClass = snr >= 25 ? 'signal-good' : snr >= 15 ? 'signal-fair' : 'signal-poor';
+			wirelessLabel = snr + ' dB SNR — ' + snrQuality;
+		} else if (arubaMobility.rssi != null) {
+			var mobilityRssi = arubaMobility.rssi;
+			var mobilityQuality = mobilityRssi >= -65 ? 'Good' : mobilityRssi >= -70 ? 'Fair' : 'Poor';
+			wirelessClass = mobilityRssi >= -65 ? 'signal-good' : mobilityRssi >= -70 ? 'signal-fair' : 'signal-poor';
+			wirelessLabel = mobilityRssi + ' dBm — ' + mobilityQuality;
 		}
-		html += node(deviceIcon, 'Your Device', es.macAddress || '');
+		html += node(deviceIcon, 'Your Device', clientMac);
 		html += connector(true, wirelessLabel, wirelessClass);
-		html += node('fa-wifi', es.wireless_ap_name || 'Access Point', es.wireless_ssid || '');
+		html += node('fa-wifi', accessPoint, ssid);
 		if (bldgName) {
 			html += connector(false);
 			html += node('fa-building', bldgName, bldgSub !== bldgName ? bldgSub : '');
@@ -704,16 +719,20 @@ function test_ipv4_url(default_version) {
 			function escHtml(s) { return $('<span>').text(String(s)).html(); }
 			function nacRow(label, html) { nacTbody.append(`<tr><th>${label}</th><td>${html}</td></tr>`); }
 
-			if (result['nac']['endSystem']) {
+			var hasConnectionPath = result['nac']['endSystem'] || result['nac']['aruba_client'] || result['nac']['aruba_mobility'];
+			if (hasConnectionPath) {
 				$('#nac-diagram-row').show();
-				$('#nac-card').show();
 
-				// Build connection diagram
+				// Build the connection diagram from NAC, Aruba, or both.
 				var diagHtml = buildNacDiagram(result['nac'], result['user_device']);
 				if (diagHtml) {
 					$('#nac-diagram').html(diagHtml);
 					$('#nac-diagram-card').show();
 				}
+			}
+
+			if (result['nac']['endSystem']) {
+				$('#nac-card').show();
 
 				var es = result['nac']['endSystem'];
 				var ei = result['nac']['endSystemInfo'] || {};

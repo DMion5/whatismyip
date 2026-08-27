@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented here. This project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) conventions.
 
+## [1.11.3] - 2026-08-27
+
+### Fixed
+
+- Restored the client-to-access-point-to-building connection path when Aruba Central data is available without a NAC end-system record.
+
 ## [1.11.2] - 2026-08-27
 
 ### Added

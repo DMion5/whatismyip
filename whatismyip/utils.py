@@ -171,17 +171,23 @@ def enrich_with_aruba_mobility(
         app.config.get("ARUBA_CENTRAL_CLIENT_ID")
         and app.config.get("ARUBA_CENTRAL_CLIENT_SECRET")
     ) or app.config.get("ARUBA_CENTRAL_ACCESS_TOKEN")
-    if not aruba_configured or not client_mac or data.get("aruba_mobility"):
+    if not aruba_configured or not client_mac:
         return data
 
     try:
-        from whatismyip.aruba import get_aruba_mobility
+        from whatismyip.aruba import get_aruba_client_details, get_aruba_mobility
 
-        mobility = get_aruba_mobility(client_mac)
-        if not mobility:
+        client_details = data.get("aruba_client") or get_aruba_client_details(
+            client_mac
+        )
+        mobility = data.get("aruba_mobility") or get_aruba_mobility(client_mac)
+        if not client_details and not mobility:
             return data
 
-        data["aruba_mobility"] = mobility
+        if client_details:
+            data["aruba_client"] = client_details
+        if mobility:
+            data["aruba_mobility"] = mobility
         end_system = data.get("endSystem")
         if not isinstance(end_system, dict):
             return data
@@ -192,16 +198,18 @@ def enrich_with_aruba_mobility(
             return data
 
         end_system["wireless_provider"] = "Aruba Central"
-        if mobility.get("ssid") and not end_system.get("wireless_ssid"):
-            end_system["wireless_ssid"] = mobility["ssid"]
-        if mobility.get("destination_ap") and not end_system.get("wireless_ap_name"):
-            end_system["wireless_ap_name"] = mobility["destination_ap"]
-        if mobility.get("bssid"):
-            end_system["wireless_bssid"] = mobility["bssid"]
+        aruba_ssid = (client_details or {}).get("ssid") or (mobility or {}).get("ssid")
+        if aruba_ssid and not end_system.get("wireless_ssid"):
+            end_system["wireless_ssid"] = aruba_ssid
+        aruba_ap = (client_details or {}).get("access_point") or (mobility or {}).get(
+            "destination_ap"
+        )
+        if aruba_ap and not end_system.get("wireless_ap_name"):
+            end_system["wireless_ap_name"] = aruba_ap
 
         # A mobility event may be historical, so use its destination for
         # location only when NAC did not already resolve a building.
-        ap_name = mobility.get("destination_ap") if not data.get("nit_building") else ""
+        ap_name = aruba_ap if not data.get("nit_building") else ""
         ap_match = re.match(r"^(?P<tier>[^-]+)-(?P<bldg_id>\d+)-", ap_name)
         if ap_match:
             end_system["wireless_ap_tier"] = ap_match.group("tier")

@@ -8,6 +8,7 @@ import pytest
 from whatismyip import create_app
 from whatismyip.aruba import (
     _clear_token_cache,
+    get_aruba_client_details,
     get_aruba_mobility,
     normalize_mac_address,
 )
@@ -113,13 +114,59 @@ def test_mobility_lookup_uses_correct_endpoint_and_normalizes_response(
         "destination_ap": "UB-101-AP02",
         "from_channel": "36",
         "channel": "44",
-        "from_bssid": "00:11:22:33:44:55",
-        "bssid": "00:11:22:33:44:66",
         "rssi": -61,
         "radio_band": "5GHz",
         "roam_protocol": "11r",
         "roam_time_ms": 42,
     }
+
+
+def test_client_details_lookup_normalizes_requested_wireless_fields(app, monkeypatch):
+    calls = []
+
+    def fake_get(url, **kwargs):
+        calls.append((url, kwargs))
+        return FakeResponse(
+            200,
+            {
+                "clientName": "Dharma's iPhone",
+                "macAddress": "c2:54:ea:89:12:5f",
+                "wlanName": "eduroam",
+                "connectedTo": "wls-cap-101",
+                "authenticationType": "802.1X",
+                "wirelessSecurity": "WPA2-Enterprise",
+                "wirelessChannel": "44",
+                "wirelessBand": "5GHZ",
+                "siteName": "North Campus",
+                "snr": "31",
+                "bssid": "00:11:22:33:44:66",
+            },
+        )
+
+    monkeypatch.setattr("whatismyip.aruba.requests.get", fake_get)
+    app.config["ARUBA_CENTRAL_ACCESS_TOKEN"] = "short-lived-test-token"
+
+    with app.app_context():
+        result = get_aruba_client_details("C2-54-EA-89-12-5F")
+
+    assert calls[0][0] == (
+        "https://us5.api.central.arubanetworks.com/network-monitoring/v1/"
+        "clients/c2:54:ea:89:12:5f"
+    )
+    assert calls[0][1]["params"] is None
+    assert result == {
+        "client_mac": "c2:54:ea:89:12:5f",
+        "name": "Dharma's iPhone",
+        "ssid": "eduroam",
+        "access_point": "wls-cap-101",
+        "auth_type": "802.1X",
+        "encryption_method": "WPA2-Enterprise",
+        "channel": "44",
+        "radio_band": "5GHZ",
+        "site": "North Campus",
+        "snr": 31,
+    }
+    assert "bssid" not in result
 
 
 def test_static_token_accepts_bearer_prefix(app, monkeypatch):

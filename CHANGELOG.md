@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented here. This project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) conventions.
 
+## [1.11.2] - 2026-08-27
+
+### Added
+
+- Current Aruba Central wireless client details: authentication type, channel, encryption method, client name, site, and signal-to-noise ratio.
+
+### Changed
+
+- Removed BSSID from Aruba wireless details and support reports.
+
 ## [1.11.1] - 2026-08-27
 
 ### Added

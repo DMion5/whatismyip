@@ -69,12 +69,25 @@ def test_nac_wireless_record_is_enriched_with_aruba_mobility(app, monkeypatch):
         lambda building_id: {"building_id": building_id},
     )
     monkeypatch.setattr(
+        "whatismyip.aruba.get_aruba_client_details",
+        lambda _mac: {
+            "client_mac": "c2:54:ea:89:12:5f",
+            "name": "Dharma's iPhone",
+            "ssid": "eduroam",
+            "access_point": "UB-202-AP02",
+            "auth_type": "802.1X",
+            "encryption_method": "WPA2-Enterprise",
+            "channel": "44",
+            "site": "North Campus",
+            "snr": 31,
+        },
+    )
+    monkeypatch.setattr(
         "whatismyip.aruba.get_aruba_mobility",
         lambda _mac: {
             "client_mac": "c2:54:ea:89:12:5f",
             "ssid": "eduroam",
             "destination_ap": "UB-202-AP02",
-            "bssid": "00:11:22:33:44:66",
             "rssi": -61,
         },
     )
@@ -84,8 +97,10 @@ def test_nac_wireless_record_is_enriched_with_aruba_mobility(app, monkeypatch):
         result = enrich_with_aruba_mobility(result, "c2:54:ea:89:12:5f")
 
     assert result["aruba_mobility"]["destination_ap"] == "UB-202-AP02"
+    assert result["aruba_client"]["auth_type"] == "802.1X"
+    assert result["aruba_client"]["snr"] == 31
     assert result["endSystem"]["wireless_provider"] == "Aruba Central"
-    assert result["endSystem"]["wireless_bssid"] == "00:11:22:33:44:66"
+    assert "wireless_bssid" not in result["endSystem"]
     # Mobility history must not replace NAC's current AP or its building.
     assert result["endSystem"]["wireless_ap_name"] == "UB-101-AP01"
     assert result["nit_building"] == {"building_id": "101"}

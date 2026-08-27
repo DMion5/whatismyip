@@ -42,6 +42,15 @@ class Config:  # pylint: disable=too-few-public-methods
     MERAKI_API_KEY = ""
     MERAKI_ORG_ID = ""
 
+    # HPE Aruba Networking Central API
+    ARUBA_CENTRAL_BASE_URL = "https://us5.api.central.arubanetworks.com"
+    ARUBA_CENTRAL_TOKEN_URL = "https://sso.common.cloud.hpe.com/as/token.oauth2"
+    ARUBA_CENTRAL_CLIENT_ID = ""
+    ARUBA_CENTRAL_CLIENT_SECRET = ""
+    ARUBA_CENTRAL_ACCESS_TOKEN = ""
+    ARUBA_CENTRAL_SITE_ID = ""
+    ARUBA_CENTRAL_SITE_NAME = ""
+
     # Google Maps API Key
     GOOGLE_MAPS_API_KEY = ""
 

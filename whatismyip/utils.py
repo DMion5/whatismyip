@@ -274,6 +274,7 @@ def get_nac_info(ip_address: str, mac: str | None = None) -> dict[str, Any] | No
         elif meraki_match:
             # MAC-only wireless — enrich via Meraki API if configured
             data["endSystem"]["connection_type"] = "wireless"
+            data["endSystem"]["wireless_provider"] = "Cisco Meraki"
             data["endSystem"]["wireless_controller"] = (
                 data["endSystem"]["switchIP"]
                 if "switchIP" in data["endSystem"]
@@ -332,6 +333,7 @@ def get_nac_info(ip_address: str, mac: str | None = None) -> dict[str, Any] | No
                                 )
                                 if signal:
                                     data["meraki_signal"] = signal
+                                    data["wireless_signal"] = signal
                 except Exception as e:
                     app.logger.warning(
                         f"Meraki enrichment failed, continuing without it: {e}"
@@ -341,6 +343,55 @@ def get_nac_info(ip_address: str, mac: str | None = None) -> dict[str, Any] | No
             data["endSystem"]["connection_type"] = "wired"
             data["nit_building"] = get_nit_building(end_system_data["switchIP"])
             app.logger.debug(f"NIT building info: {data['nit_building']}")
+
+    # Aruba Central is a supplemental source. NAC remains authoritative for the
+    # connection type, while the latest mobility event can add RF and roam data.
+    end_system = data.get("endSystem")
+    aruba_configured = (
+        app.config.get("ARUBA_CENTRAL_CLIENT_ID")
+        and app.config.get("ARUBA_CENTRAL_CLIENT_SECRET")
+    ) or app.config.get("ARUBA_CENTRAL_ACCESS_TOKEN")
+    if (
+        end_system
+        and end_system.get("connection_type") == "wireless"
+        and aruba_configured
+    ):
+        client_mac = end_system.get("macAddress") or mac
+        if client_mac:
+            try:
+                from whatismyip.aruba import get_aruba_mobility
+
+                mobility = get_aruba_mobility(client_mac)
+                if mobility:
+                    data["aruba_mobility"] = mobility
+                    end_system["wireless_provider"] = "Aruba Central"
+                    if mobility.get("ssid") and not end_system.get("wireless_ssid"):
+                        end_system["wireless_ssid"] = mobility["ssid"]
+                    if mobility.get("destination_ap") and not end_system.get(
+                        "wireless_ap_name"
+                    ):
+                        end_system["wireless_ap_name"] = mobility["destination_ap"]
+                    if mobility.get("bssid"):
+                        end_system["wireless_bssid"] = mobility["bssid"]
+
+                    # A mobility event may be historical, so use its destination
+                    # for location only when NAC did not already resolve a building.
+                    ap_name = (
+                        mobility.get("destination_ap")
+                        if not data.get("nit_building")
+                        else ""
+                    )
+                    ap_match = re.match(r"^(?P<tier>[^-]+)-(?P<bldg_id>\d+)-", ap_name)
+                    if ap_match:
+                        end_system["wireless_ap_tier"] = ap_match.group("tier")
+                        end_system["wireless_ap_bldg_id"] = ap_match.group("bldg_id")
+                        data["nit_building"] = get_nit_building_by_id(
+                            ap_match.group("bldg_id")
+                        )
+            except Exception as e:
+                app.logger.warning(
+                    f"Aruba Central enrichment failed, continuing without it: {e}"
+                )
 
     execution_time = time.time() - start_time
     app.logger.debug(f"get_endSystemInfo complete in {execution_time} seconds")

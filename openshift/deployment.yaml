@@ -146,6 +146,40 @@ spec:
                   key: ORG_ID
                   optional: true
 
+            # ── HPE Aruba Networking Central (optional) ─────────────────────────────
+            - name: FLASK_ARUBA_CENTRAL_BASE_URL
+              value: https://us5.api.central.arubanetworks.com
+            - name: FLASK_ARUBA_CENTRAL_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: aruba-central
+                  key: CLIENT_ID
+                  optional: true
+            - name: FLASK_ARUBA_CENTRAL_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: aruba-central
+                  key: CLIENT_SECRET
+                  optional: true
+            - name: FLASK_ARUBA_CENTRAL_ACCESS_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: aruba-central
+                  key: ACCESS_TOKEN
+                  optional: true
+            - name: FLASK_ARUBA_CENTRAL_SITE_ID
+              valueFrom:
+                secretKeyRef:
+                  name: aruba-central
+                  key: SITE_ID
+                  optional: true
+            - name: FLASK_ARUBA_CENTRAL_SITE_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: aruba-central
+                  key: SITE_NAME
+                  optional: true
+
             # ── Google Maps (optional) ───────────────────────────────────────────────
             - name: FLASK_GOOGLE_MAPS_API_KEY
               valueFrom:

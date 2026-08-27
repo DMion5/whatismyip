@@ -7,6 +7,13 @@ function formatIPAddress(ip) {
 	return $('<span>').text(ip).html().replace(/([.:])/g, '$1<wbr>');
 }
 
+function formatWirelessTimestamp(value) {
+	if (value === null || value === undefined || value === '') return null;
+	var numeric = Number(value);
+	var date = new Date(isNaN(numeric) ? value : (numeric > 1e12 ? numeric : numeric * 1000));
+	return isNaN(date.getTime()) ? String(value) : date.toLocaleString();
+}
+
 var reportDataIPv4 = null;
 var reportDataIPv6 = null;
 var reportNetworkPurpose = null;
@@ -66,8 +73,9 @@ function buildNacDiagram(nac, userDevice) {
 	if (isWireless) {
 		var controller = es.wireless_controller || es.switchIP || null;
 		var wirelessLabel = '', wirelessClass = '';
-		if (nac.meraki_signal && nac.meraki_signal.rssi != null) {
-			var rssi = nac.meraki_signal.rssi;
+		var wirelessSignal = nac.wireless_signal || nac.meraki_signal || {};
+		if (wirelessSignal.rssi != null) {
+			var rssi = wirelessSignal.rssi;
 			var quality = rssi >= -65 ? 'Good' : rssi >= -70 ? 'Fair' : 'Poor';
 			wirelessClass = rssi >= -65 ? 'signal-good' : rssi >= -70 ? 'signal-fair' : 'signal-poor';
 			wirelessLabel = rssi + ' dBm — ' + quality;
@@ -360,33 +368,50 @@ function downloadReport() {
 	}
 	var nacSection = nacRows.length ? section('Campus NAC Details', nacRows) : '';
 
-	var merakiSection = '';
-	if (r4.nac && (r4.nac.meraki_client || r4.nac.meraki_ap || r4.nac.meraki_signal)) {
+	var wirelessSection = '';
+	var wirelessEndSystem = r4.nac ? (r4.nac.endSystem || {}) : {};
+	if (r4.nac && (wirelessEndSystem.connection_type === 'wireless' || r4.nac.aruba_mobility || r4.nac.meraki_client || r4.nac.meraki_ap || r4.nac.meraki_signal)) {
 		var mc = r4.nac.meraki_client || {};
 		var ma = r4.nac.meraki_ap || {};
-		var ms = r4.nac.meraki_signal || {};
+		var ms = r4.nac.wireless_signal || r4.nac.meraki_signal || {};
+		var am = r4.nac.aruba_mobility || {};
 		var rssiText = ms.rssi !== undefined && ms.rssi !== null
 			? ms.rssi + ' dBm (' + (ms.rssi >= -65 ? 'Good' : ms.rssi >= -70 ? 'Fair' : 'Poor') + ')'
 			: null;
 		var snrText = ms.snr !== undefined && ms.snr !== null
 			? ms.snr + ' dB (' + (ms.snr >= 25 ? 'Good' : ms.snr >= 15 ? 'Fair' : 'Poor') + ')'
 			: null;
-		var lastSeenText = mc.last_seen ? new Date(mc.last_seen * 1000).toLocaleString() : null;
-		merakiSection = section('Wireless Connection', [
+		var lastSeenText = mc.last_seen ? formatWirelessTimestamp(mc.last_seen) : null;
+		var roamPath = [am.source_ap, am.destination_ap].filter(Boolean).join(' → ');
+		var channel = am.from_channel && am.channel && am.from_channel !== am.channel
+			? am.from_channel + ' → ' + am.channel
+			: am.channel;
+		wirelessSection = section('Wireless Connection', [
+			rpt('Data Source', wirelessEndSystem.wireless_provider),
 			rpt('Manufacturer', mc.manufacturer),
 			rpt('Device', mc.description),
 			rpt('OS', mc.os),
 			rpt('User', mc.user),
 			rpt('Status', mc.status),
-			rpt('SSID', mc.ssid),
+			rpt('SSID', wirelessEndSystem.wireless_ssid || mc.ssid || am.ssid),
 			rpt('VLAN', mc.vlan),
 			rpt('Last Seen', lastSeenText),
-			rpt('Client MAC', mc.mac),
+			rpt('Latest Mobility Event', formatWirelessTimestamp(am.occurred_at)),
+			rpt('Client MAC', mc.mac || am.client_mac || wirelessEndSystem.macAddress),
 			rpt('Signal (RSSI)', rssiText),
+			rpt('Mobility Event RSSI', am.rssi !== null && am.rssi !== undefined ? am.rssi + ' dBm' : null),
 			rpt('Signal/Noise (SNR)', snrText),
 			rpt('Capabilities', mc.wireless_capabilities),
-			rpt('AP Name', ma.name),
+			rpt('AP Name', wirelessEndSystem.wireless_ap_name || ma.name || am.destination_ap),
+			rpt('AP MAC', wirelessEndSystem.wireless_ap_mac),
+			rpt('BSSID', am.bssid || wirelessEndSystem.wireless_bssid),
 			rpt('AP Model', ma.model),
+			rpt('Radio Band', am.radio_band),
+			rpt('Channel', channel),
+			rpt('Latest Roam', roamPath),
+			rpt('Roam Protocol', am.roam_protocol),
+			rpt('Roam Time', am.roam_time_ms !== null && am.roam_time_ms !== undefined ? am.roam_time_ms + ' ms' : null),
+			rpt('Controller', wirelessEndSystem.wireless_controller),
 		]);
 	}
 
@@ -480,7 +505,7 @@ ${secondarySection}
 ${connectSection}
 ${dnsSection}
 ${nacSection}
-${merakiSection}
+${wirelessSection}
 ${bldgSection}
 ${netConfigSection}
 ${deviceSection}
@@ -733,7 +758,7 @@ function test_ipv4_url(default_version) {
 			// Wireless connection card — common fields from endSystem (Aruba + Meraki)
 			var showMerakiCard = false;
 			function merakiRow(rowId, val) {
-				if (val) {
+				if (val !== null && val !== undefined && val !== '') {
 					$('#' + rowId).text(val);
 					$('#' + rowId + '-row').show();
 					showMerakiCard = true;
@@ -741,6 +766,8 @@ function test_ipv4_url(default_version) {
 			}
 			var es = result['nac']['endSystem'];
 			if (es && es['connection_type'] === 'wireless') {
+				merakiRow('wireless-provider', es['wireless_provider']);
+				merakiRow('meraki-mac', es['macAddress']);
 				merakiRow('wireless-ssid', es['wireless_ssid']);
 				var ssidInfoEl = document.getElementById('ssid_info');
 				if (ssidInfoEl && es['wireless_ssid']) {
@@ -765,6 +792,20 @@ function test_ipv4_url(default_version) {
 				merakiRow('wireless-ap-name', es['wireless_ap_name']);
 				merakiRow('wireless-ap-mac', es['wireless_ap_mac']);
 				merakiRow('wireless-controller', es['wireless_controller']);
+			}
+			if (result['nac']['aruba_mobility']) {
+				var am = result['nac']['aruba_mobility'];
+				merakiRow('aruba-occurred-at', formatWirelessTimestamp(am.occurred_at));
+				merakiRow('aruba-rssi', am.rssi !== null && am.rssi !== undefined ? am.rssi + ' dBm' : null);
+				merakiRow('aruba-bssid', am.bssid);
+				merakiRow('aruba-radio-band', am.radio_band);
+				var arubaChannel = am.from_channel && am.channel && am.from_channel !== am.channel
+					? am.from_channel + ' → ' + am.channel
+					: am.channel;
+				merakiRow('aruba-channel', arubaChannel);
+				merakiRow('aruba-roam-path', [am.source_ap, am.destination_ap].filter(Boolean).join(' → '));
+				merakiRow('aruba-roam-protocol', am.roam_protocol);
+				merakiRow('aruba-roam-time', am.roam_time_ms !== null && am.roam_time_ms !== undefined ? am.roam_time_ms + ' ms' : null);
 			}
 			if (result['nac']['meraki_client']) {
 				var mc = result['nac']['meraki_client'];
@@ -795,8 +836,9 @@ function test_ipv4_url(default_version) {
 			if (result['nac']['meraki_ap']) {
 				merakiRow('meraki-ap-model', result['nac']['meraki_ap'].model);
 			}
-			if (result['nac']['meraki_signal']) {
-				var ms = result['nac']['meraki_signal'];
+			var wirelessSignal = result['nac']['wireless_signal'] || result['nac']['meraki_signal'];
+			if (wirelessSignal) {
+				var ms = wirelessSignal;
 				if (ms.rssi !== null && ms.rssi !== undefined) {
 					var rssiIcon = ms.rssi >= -65 ? 'fa-circle-check text-success' : ms.rssi >= -70 ? 'fa-triangle-exclamation text-warning' : 'fa-circle-xmark text-danger';
 					var rssiCls  = ms.rssi >= -65 ? '' : ms.rssi >= -70 ? 'text-warning' : 'text-danger';

@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented here. This project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) conventions.
 
+## [1.11.4] - 2026-08-27
+
+### Changed
+
+- Stacked the full-width Connection Path card above the More Details control for a cleaner responsive layout.
+
 ## [1.11.3] - 2026-08-27
 
 ### Fixed

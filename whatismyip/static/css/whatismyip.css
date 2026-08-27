@@ -670,16 +670,12 @@ html[data-theme="dark"] .ip-copy-card:focus-visible {
   word-break: break-word;
 }
 
-.nac-btn-col {
-  flex-shrink: 0;
+.details-toggle {
+  min-width: 160px;
 }
 
 /* Horizontal layout on md+ screens */
 @media (min-width: 768px) {
-  .nac-btn-col {
-    width: 160px;
-  }
-
   .nac-diagram {
     flex-direction: row;
     align-items: flex-start;
@@ -755,5 +751,11 @@ html[data-theme="dark"] .ip-copy-card:focus-visible {
     left: 50%;
     top: 5px;
     transform: translateX(-50%);
+  }
+}
+
+@media (max-width: 767.98px) {
+  .details-toggle {
+    width: 100%;
   }
 }

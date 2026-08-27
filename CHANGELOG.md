@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented here. This project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) conventions.
 
+## [1.11.5] - 2026-08-27
+
+### Added
+
+- Manually invoked `scripts/list_aruba_sites.py` pod utility for securely listing all Aruba Central sites with the configured client credentials.
+
 ## [1.11.4] - 2026-08-27
 
 ### Changed

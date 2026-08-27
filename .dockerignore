@@ -28,8 +28,9 @@ CHANGELOG.md
 CONTRIBUTING.md
 SECURITY.md
 
-# Scripts (run on the host, not inside the container)
-scripts/
+# Scripts are host-only unless explicitly included for pod operations.
+scripts/*
+!scripts/list_aruba_sites.py
 
 # Version control and editor
 .git/

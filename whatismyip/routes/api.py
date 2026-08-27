@@ -17,6 +17,7 @@ from flask import (
 )
 from user_agents import parse
 
+from whatismyip.aruba_sites import get_aruba_site_location
 from whatismyip.db import log_metrics_event
 from whatismyip.infoblox import get_address_objects, get_network
 from whatismyip.utils import (
@@ -137,6 +138,14 @@ _SIMULATE_HOSTINFO = {
                 "latitude": 43.0010,
                 "longitude": -78.7900,
             },
+            "aruba_client": {
+                "name": "Demo wireless client",
+                "ssid": "eduroam",
+                "access_point": "UBIT-CAPEN-AP-Demo",
+                "site": "Capen Hall",
+                "snr": 31,
+            },
+            "aruba_site_location": get_aruba_site_location("Capen Hall"),
             "meraki_ap": {
                 "name": "UBIT-CAPEN-AP-Demo",
                 "serial": "Q2XY-DEMO-0001",

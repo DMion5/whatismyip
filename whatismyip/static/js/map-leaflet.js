@@ -43,9 +43,9 @@ function placeLeafletMarker(lat, lon, title) {
 	});
 }
 
-function loadCampusMap(address, title, lat, lon) {
+function loadCampusMap(address, title, lat, lon, zoom) {
 	if (!lat || !lon || isNaN(lat) || isNaN(lon)) return;
-	initLeafletMap(lat, lon, 17);
+	initLeafletMap(lat, lon, zoom || 17);
 	placeLeafletMarker(lat, lon, title || address);
 }
 

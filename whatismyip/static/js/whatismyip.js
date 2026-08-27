@@ -668,7 +668,17 @@ function test_ipv4_url(default_version) {
 			}
 
 			// Do the Map work
-			if (result['nac']['nit_building'] && result['nac']['nit_building']['address']) {
+			if (result['nac']['aruba_site_location']) {
+				// Aruba's current site is the best location signal for a campus wireless client.
+				var arubaSite = result['nac']['aruba_site_location'];
+				var siteLat = parseFloat(arubaSite['latitude']);
+				var siteLon = parseFloat(arubaSite['longitude']);
+				var siteZoom = parseInt(arubaSite['zoom'], 10) || 19;
+				var siteLabel = arubaSite['name'];
+				loadCampusMap(arubaSite['address'], siteLabel, siteLat, siteLon, siteZoom);
+				$('#map').attr('aria-label', 'Map showing detected Aruba site ' + siteLabel);
+				$('#map_label').text('Detected building: ' + siteLabel).show();
+			} else if (result['nac']['nit_building'] && result['nac']['nit_building']['address']) {
 				// Building lat/lon preferred; address passed as fallback for Google Maps geocoder
 				var bldgMapLat = parseFloat(result['nac']['nit_building']['latitude']);
 				var bldgMapLon = parseFloat(result['nac']['nit_building']['longitude']);

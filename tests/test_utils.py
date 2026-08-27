@@ -78,7 +78,7 @@ def test_nac_wireless_record_is_enriched_with_aruba_mobility(app, monkeypatch):
             "auth_type": "802.1X",
             "encryption_method": "WPA2-Enterprise",
             "channel": "44",
-            "site": "North Campus",
+            "site": "Capen Hall",
             "snr": 31,
         },
     )
@@ -99,6 +99,7 @@ def test_nac_wireless_record_is_enriched_with_aruba_mobility(app, monkeypatch):
     assert result["aruba_mobility"]["destination_ap"] == "UB-202-AP02"
     assert result["aruba_client"]["auth_type"] == "802.1X"
     assert result["aruba_client"]["snr"] == 31
+    assert result["aruba_site_location"]["name"] == "Capen Hall"
     assert result["endSystem"]["wireless_provider"] == "Aruba Central"
     assert "wireless_bssid" not in result["endSystem"]
     # Mobility history must not replace NAC's current AP or its building.

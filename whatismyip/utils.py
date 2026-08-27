@@ -186,6 +186,11 @@ def enrich_with_aruba_mobility(
 
         if client_details:
             data["aruba_client"] = client_details
+            from whatismyip.aruba_sites import get_aruba_site_location
+
+            site_location = get_aruba_site_location(client_details.get("site"))
+            if site_location:
+                data["aruba_site_location"] = site_location
         if mobility:
             data["aruba_mobility"] = mobility
         end_system = data.get("endSystem")

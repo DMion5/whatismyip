@@ -63,7 +63,8 @@ def test_home_uses_my_ip_brand_without_application_logo(client):
     assert b'rel="shortcut icon" href="/static/logo/favicon.ico' in response.data
     assert b"Check your network connection and identify problems" in response.data
     assert b"Help Center staff may ask you to visit this page" in response.data
-    assert b">Auth Type<" in response.data
+    assert b">Auth Type<" not in response.data
+    assert b"Operating system information is inferred from your browser" in response.data
     assert b">Encryption Method<" in response.data
     assert b">Site<" in response.data
     assert b">BSSID<" not in response.data

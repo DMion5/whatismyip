@@ -97,7 +97,7 @@ def test_nac_wireless_record_is_enriched_with_aruba_mobility(app, monkeypatch):
         result = enrich_with_aruba_mobility(result, "c2:54:ea:89:12:5f")
 
     assert result["aruba_mobility"]["destination_ap"] == "UB-202-AP02"
-    assert result["aruba_client"]["auth_type"] == "802.1X"
+    assert "auth_type" not in result["aruba_client"]
     assert result["aruba_client"]["snr"] == 31
     assert result["aruba_site_location"]["name"] == "Capen Hall"
     assert result["endSystem"]["wireless_provider"] == "Aruba Central"

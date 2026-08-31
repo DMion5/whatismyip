@@ -159,7 +159,6 @@ def test_client_details_lookup_normalizes_requested_wireless_fields(app, monkeyp
         "name": "Dharma's iPhone",
         "ssid": "eduroam",
         "access_point": "wls-cap-101",
-        "auth_type": "802.1X",
         "encryption_method": "WPA2-Enterprise",
         "channel": "44",
         "radio_band": "5GHZ",

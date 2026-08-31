@@ -347,7 +347,18 @@
               </tr>
               <tr id="device-os-row" style="display:none;">
                 <th scope="row">Operating System</th>
-                <td id="device-os"></td>
+                <td>
+                  <span id="device-os"></span>
+                  <span
+                    class="text-muted ms-1"
+                    role="img"
+                    tabindex="0"
+                    data-mdb-toggle="tooltip"
+                    data-mdb-placement="top"
+                    title="Operating system information is inferred from your browser and may be inaccurate or intentionally obscured."
+                    aria-label="Operating system information is inferred from your browser and may be inaccurate or intentionally obscured."
+                  ><i class="fa-solid fa-circle-info" aria-hidden="true"></i></span>
+                </td>
               </tr>
               <tr id="device-type-row" style="display:none;">
                 <th scope="row">Device Type</th>
@@ -531,10 +542,6 @@
               <tr id="aruba-name-row" style="display:none;">
                 <th scope="row">Name</th>
                 <td id="aruba-name"></td>
-              </tr>
-              <tr id="aruba-auth-type-row" style="display:none;">
-                <th scope="row">Auth Type</th>
-                <td id="aruba-auth-type"></td>
               </tr>
               <tr id="aruba-encryption-method-row" style="display:none;">
                 <th scope="row">Encryption Method</th>

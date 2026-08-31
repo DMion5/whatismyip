@@ -185,6 +185,8 @@ def enrich_with_aruba_mobility(
             return data
 
         if client_details:
+            client_details = dict(client_details)
+            client_details.pop("auth_type", None)
             data["aruba_client"] = client_details
             from whatismyip.aruba_sites import get_aruba_site_location
 

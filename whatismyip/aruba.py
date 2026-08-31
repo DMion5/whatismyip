@@ -163,7 +163,6 @@ def _normalize_client_details(client_mac: str, item: dict[str, Any]) -> dict[str
         "name": item.get("clientName"),
         "ssid": item.get("wlanName"),
         "access_point": item.get("connectedTo"),
-        "auth_type": item.get("authenticationType"),
         "encryption_method": item.get("wirelessSecurity") or item.get("keyManagement"),
         "channel": item.get("wirelessChannel"),
         "radio_band": item.get("wirelessBand"),

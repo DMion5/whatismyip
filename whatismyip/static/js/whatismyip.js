@@ -411,7 +411,6 @@ function downloadReport() {
 			rpt('User', mc.user),
 			rpt('Status', mc.status),
 			rpt('Name', ac.name),
-			rpt('Auth Type', ac.auth_type),
 			rpt('Encryption Method', ac.encryption_method),
 			rpt('Site', ac.site),
 			rpt('SSID', wirelessEndSystem.wireless_ssid || mc.ssid || ac.ssid || am.ssid),
@@ -849,7 +848,6 @@ function test_ipv4_url(default_version) {
 				merakiRow('wireless-provider', 'Aruba Central');
 				merakiRow('meraki-mac', arubaClient.client_mac);
 				merakiRow('aruba-name', arubaClient.name);
-				merakiRow('aruba-auth-type', arubaClient.auth_type);
 				merakiRow('aruba-encryption-method', arubaClient.encryption_method);
 				merakiRow('aruba-site', arubaClient.site);
 				merakiRow('wireless-ssid', arubaClient.ssid);

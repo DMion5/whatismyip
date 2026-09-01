@@ -16,17 +16,28 @@ from flask import current_app as app
 from whatismyip.extreme import XMC_NBI
 
 
-def is_campus_ip(ip_address: str) -> bool:
-    """
-    Check if the IP address falls within a configured campus network.
-    Networks are loaded from data/config.toml at startup via app.config["CAMPUS_NETWORKS"].
-    """
-    networks = app.config.get("CAMPUS_NETWORKS", [])
+def _is_ip_in_networks(ip_address: str, config_key: str) -> bool:
+    """Return whether an address belongs to a configured network list."""
+    networks = app.config.get(config_key, [])
     try:
         ip = ipaddress.ip_address(ip_address)
     except ValueError:
         return False
     return any(ip in net for net in networks)
+
+
+def is_vpn_ip(ip_address: str) -> bool:
+    """Check whether an address belongs to a configured VPN egress network."""
+    return _is_ip_in_networks(ip_address, "VPN_NETWORKS")
+
+
+def is_campus_ip(ip_address: str) -> bool:
+    """
+    Check whether an address falls within a campus or VPN network.
+
+    Networks are loaded from data/config.toml at startup.
+    """
+    return _is_ip_in_networks(ip_address, "CAMPUS_NETWORKS") or is_vpn_ip(ip_address)
 
 
 def get_client_address(
@@ -125,7 +136,6 @@ def get_ip_location(ip_address: str) -> dict[str, Any] | None:
 
     on_campus = is_campus_ip(ip_address)
 
-    
     # Normalize to a consistent structure regardless of which API is active.
     # ip-api.com uses "country"/"countryCode"; the fallback API uses "country_name"/"country_code2".
     result: dict | None = {
@@ -151,6 +161,72 @@ def get_ip_location(ip_address: str) -> dict[str, Any] | None:
         del _location_cache[next(iter(_location_cache))]
     _location_cache[ip_address] = (time.monotonic(), result)
     return result
+
+
+def enrich_with_aruba_mobility(
+    data: dict[str, Any], client_mac: str | None
+) -> dict[str, Any]:
+    """Add Aruba mobility data without making it dependent on NAC availability."""
+    aruba_configured = (
+        app.config.get("ARUBA_CENTRAL_CLIENT_ID")
+        and app.config.get("ARUBA_CENTRAL_CLIENT_SECRET")
+    ) or app.config.get("ARUBA_CENTRAL_ACCESS_TOKEN")
+    if not aruba_configured or not client_mac:
+        return data
+
+    try:
+        from whatismyip.aruba import get_aruba_client_details, get_aruba_mobility
+
+        client_details = data.get("aruba_client") or get_aruba_client_details(
+            client_mac
+        )
+        mobility = data.get("aruba_mobility") or get_aruba_mobility(client_mac)
+        if not client_details and not mobility:
+            return data
+
+        if client_details:
+            client_details = dict(client_details)
+            client_details.pop("auth_type", None)
+            data["aruba_client"] = client_details
+            from whatismyip.aruba_sites import get_aruba_site_location
+
+            site_location = get_aruba_site_location(client_details.get("site"))
+            if site_location:
+                data["aruba_site_location"] = site_location
+        if mobility:
+            data["aruba_mobility"] = mobility
+        end_system = data.get("endSystem")
+        if not isinstance(end_system, dict):
+            return data
+
+        # Only merge mobility history into the current-connection fields when
+        # NAC independently confirms that the client is wireless.
+        if end_system.get("connection_type") != "wireless":
+            return data
+
+        end_system["wireless_provider"] = "Aruba Central"
+        aruba_ssid = (client_details or {}).get("ssid") or (mobility or {}).get("ssid")
+        if aruba_ssid and not end_system.get("wireless_ssid"):
+            end_system["wireless_ssid"] = aruba_ssid
+        aruba_ap = (client_details or {}).get("access_point") or (mobility or {}).get(
+            "destination_ap"
+        )
+        if aruba_ap and not end_system.get("wireless_ap_name"):
+            end_system["wireless_ap_name"] = aruba_ap
+
+        # A mobility event may be historical, so use its destination for
+        # location only when NAC did not already resolve a building.
+        ap_name = aruba_ap if not data.get("nit_building") else ""
+        ap_match = re.match(r"^(?P<tier>[^-]+)-(?P<bldg_id>\d+)-", ap_name)
+        if ap_match:
+            end_system["wireless_ap_tier"] = ap_match.group("tier")
+            end_system["wireless_ap_bldg_id"] = ap_match.group("bldg_id")
+            data["nit_building"] = get_nit_building_by_id(ap_match.group("bldg_id"))
+    except Exception as error:
+        app.logger.warning(
+            "Aruba Central enrichment failed, continuing without it: %s", error
+        )
+    return data
 
 
 def get_nac_info(ip_address: str, mac: str | None = None) -> dict[str, Any] | None:
@@ -264,6 +340,7 @@ def get_nac_info(ip_address: str, mac: str | None = None) -> dict[str, Any] | No
         elif meraki_match:
             # MAC-only wireless — enrich via Meraki API if configured
             data["endSystem"]["connection_type"] = "wireless"
+            data["endSystem"]["wireless_provider"] = "Cisco Meraki"
             data["endSystem"]["wireless_controller"] = (
                 data["endSystem"]["switchIP"]
                 if "switchIP" in data["endSystem"]
@@ -322,6 +399,7 @@ def get_nac_info(ip_address: str, mac: str | None = None) -> dict[str, Any] | No
                                 )
                                 if signal:
                                     data["meraki_signal"] = signal
+                                    data["wireless_signal"] = signal
                 except Exception as e:
                     app.logger.warning(
                         f"Meraki enrichment failed, continuing without it: {e}"

@@ -63,7 +63,7 @@ provider = "leaflet"
 
 [[connectivity.targets]]
 name = "My IP"
-url = "https://whatismyip-ncs-netapps-dev.apps.buffalo.edu/"
+url = "https://myip.buffalo.edu/"
 description = "This diagnostic tool — always should be reachable"
 type = "self"
 
@@ -76,8 +76,26 @@ type = "internet"
 [[connectivity.targets]]
 name = "Microsoft 365"
 url = "https://m365.cloud.microsoft/"
-description = "Microsoft 365"
+description = "Microsoft 365 web applications"
 type = "internet"
+
+[[connectivity.targets]]
+name = "Microsoft Sign-in"
+url = "https://login.microsoftonline.com/"
+description = "Microsoft identity service used to sign in to UB Microsoft 365 applications"
+type = "campus"
+
+[[connectivity.targets]]
+name = "UB SharePoint"
+url = "https://ubuffalo.sharepoint.com/"
+description = "University at Buffalo SharePoint service"
+type = "campus"
+
+[[connectivity.targets]]
+name = "UB OneDrive"
+url = "https://ubuffalo-my.sharepoint.com/"
+description = "University at Buffalo OneDrive service"
+type = "campus"
 
 [[connectivity.targets]]
 name = "Brightspace"
@@ -93,12 +111,38 @@ description = "General internet connectivity check"
 type = "internet"
 
 [[connectivity.targets]]
-name = "IT Help Desk"
-url = "https://ubuffalo.teamdynamix.com/TDClient/42/ITPortal/Home/"
-description = "UBIT support and service portal on teamdynamix"
+name = "UBIT Help Center Online"
+url = "https://support.buffalo.edu/"
+description = "UBIT support and service portal"
 type = "campus"
 
 
+
+[status_page]
+
+# Optional Atlassian Statuspage base URL. Leave empty to hide the live status card.
+url = ""
+
+[vpn]
+
+provider_name = "Cisco Secure Client"
+# Add the UBIT installation guide URL to enable the off-campus VPN card.
+install_url = ""
+# Add UB VPN egress CIDRs here to classify those visitors as connected via VPN.
+networks = []
+
+[wireless]
+
+[[wireless.ssids]]
+name = "eduroam"
+description = "Secure wireless for UB students, faculty, and staff"
+usage = "Use your full UB email address and password"
+expected = true
+
+[metrics]
+
+window_days = 30
+retention_days = 90
 
 [campus]
 

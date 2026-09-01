@@ -11,6 +11,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application source
 COPY whatismyip/ whatismyip/
+COPY scripts/ scripts/
 COPY config.py wsgi.py gunicorn.conf.py ./
 
 # Include the example config so the app can self-bootstrap when no volume is mounted.

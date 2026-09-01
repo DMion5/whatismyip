@@ -3,37 +3,37 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
 <url>
-    <loc>https://whatismyip-ncs-netapps-dev.apps.buffalo.edu/</loc>
+    <loc>https://myip.buffalo.edu/</loc>
     <lastmod>2026-07-10</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
 </url>
 <url>
-    <loc>https://whatismyip-ncs-netapps-dev.apps.buffalo.edu/speedtest</loc>
+    <loc>https://myip.buffalo.edu/speedtest</loc>
     <lastmod>2026-07-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
 </url>
 <url>
-    <loc>https://whatismyip-ncs-netapps-dev.apps.buffalo.edu/connectivity</loc>
+    <loc>https://myip.buffalo.edu/connectivity</loc>
     <lastmod>2026-07-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
 </url>
 <url>
-    <loc>https://whatismyip-ncs-netapps-dev.apps.buffalo.edu/faq</loc>
+    <loc>https://myip.buffalo.edu/faq</loc>
     <lastmod>2026-07-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
 </url>
 <url>
-    <loc>https://whatismyip-ncs-netapps-dev.apps.buffalo.edu/about</loc>
+    <loc>https://myip.buffalo.edu/about</loc>
     <lastmod>2026-07-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
 </url>
 <url>
-    <loc>https://whatismyip-ncs-netapps-dev.apps.buffalo.edu/metrics</loc>
+    <loc>https://myip.buffalo.edu/metrics</loc>
     <lastmod>2026-07-05</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.5</priority>

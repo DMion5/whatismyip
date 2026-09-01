@@ -17,13 +17,16 @@ from flask import (
 )
 from user_agents import parse
 
+from whatismyip.aruba_sites import get_aruba_site_location
 from whatismyip.db import log_metrics_event
 from whatismyip.infoblox import get_address_objects, get_network
 from whatismyip.utils import (
+    enrich_with_aruba_mobility,
     get_client_address,
     get_ip_location,
     get_nac_info,
     is_campus_ip,
+    is_vpn_ip,
 )
 
 bp = Blueprint("api", __name__)
@@ -73,21 +76,21 @@ _SIMULATE_HOSTINFO = {
             "hosting": False,
         },
         "network": {
-            "cidr": "10.23.0.0/16",
+            "cidr": "192.0.2.0/24",
             "comment": "North Campus eduroam demo network",
             "ip_version": "4",
-            "netmask": "255.255.0.0",
-            "prefixlen": "16",
-            "contact": None,
-            "contact_name": None,
-            "contact_email": None,
+            "netmask": "255.255.255.0",
+            "prefixlen": "24",
+            "contact": "demo",
+            "contact_name": "Demo Network Administrator",
+            "contact_email": "demo@buffalo.edu",
             "contact_dept": "UBIT",
             "cost_center": None,
             "purpose": "Wireless",
             "router_device": "UBIT-WIRELESS-VR",
             "dhcp_servers": [],
-            "dhcp_routers": "10.23.0.1",
-            "dhcp_dns_servers": ["128.205.6.8", "128.205.106.8"],
+            "dhcp_routers": "192.0.2.1",
+            "dhcp_dns_servers": ["192.0.2.100", "192.0.2.101"],
             "dhcp_domain_name": "wireless.buffalo.edu",
             "dhcp_lease_time": None,
             "dhcp_ntp_servers": [],
@@ -112,20 +115,20 @@ _SIMULATE_HOSTINFO = {
                 "ipAddress": "192.0.2.50",
                 "nacApplianceGroupName": "Wireless Meraki",
                 "nacProfileName": "Default NAC Profile",
-                "nacApplianceIP": "172.29.145.91",
+                "nacApplianceIP": "192.0.2.1",
                 "policy": "Filter-Id='Enterasys:version=1:policy=Wireless-Meraki'",
                 "reason": "Default-Wireless-Meraki",
-                "switchIP": "128.205.1.249",
-                "switchPortId": "CC-6E-2A-D6-2E-40:eduroam",
+                "switchIP": "192.0.2.1",
+                "switchPortId": "02:00:5E:00:53:40:eduroam",
                 "switchPort": "1",
                 "extendedState": "NO_ERROR",
                 "connection_type": "wireless",
                 "wireless_ap_name": "UBIT-CAPEN-AP-Demo",
-                "wireless_ap_mac": "CC-6E-2A-D6-2E-40",
+                "wireless_ap_mac": "02:00:5E:00:53:40",
                 "wireless_ap_tier": "UBIT",
                 "wireless_ap_bldg_id": "CAPEN",
                 "wireless_ssid": "eduroam",
-                "wireless_controller": "128.205.1.249",
+                "wireless_controller": "192.0.2.1",
             },
             "nit_building": {
                 "full_name": "Capen Hall",
@@ -135,14 +138,22 @@ _SIMULATE_HOSTINFO = {
                 "latitude": 43.0010,
                 "longitude": -78.7900,
             },
+            "aruba_client": {
+                "name": "Demo wireless client",
+                "ssid": "eduroam",
+                "access_point": "UBIT-CAPEN-AP-Demo",
+                "site": "Capen Hall",
+                "snr": 31,
+            },
+            "aruba_site_location": get_aruba_site_location("Capen Hall"),
             "meraki_ap": {
                 "name": "UBIT-CAPEN-AP-Demo",
-                "serial": "Q5BD-SDFT-MDL8",
+                "serial": "Q2XY-DEMO-0001",
                 "model": "CW9172H",
                 "address": "160 Founders Promenade, Buffalo, NY 14260",
                 "lat": 43.0010,
                 "lon": -78.7900,
-                "network_id": "N_401946266742816948",
+                "network_id": "N_000000000000000001",
             },
             "meraki_client": {
                 "manufacturer": "Apple",
@@ -159,6 +170,162 @@ _SIMULATE_HOSTINFO = {
                 "snr": 31,
             },
         },
+    },
+    "offcampus": {
+        "forwarded_for": "",
+        "remote_address": "203.0.113.75",
+        "remote_port": "51234",
+        "request_method": "GET",
+        "server_protocol": "HTTP/1.1",
+        "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)",
+        "proxy_detected": None,
+        "client_address": "203.0.113.75",
+        "is_campus": False,
+        "user_device": {
+            "browser": "Chrome",
+            "browser_version": "125.0.0",
+            "os": "Mac OS X",
+            "os_version": "10.15.7",
+            "device_family": None,
+            "device_brand": None,
+            "device_model": None,
+            "is_mobile": False,
+            "is_tablet": False,
+            "is_pc": True,
+            "is_bot": False,
+        },
+        "ptr": None,
+        "iplocation": {
+            "country_code2": "US",
+            "country_name": "United States",
+            "ip": "203.0.113.75",
+            "ip_number": None,
+            "ip_version": 4,
+            "isp": "Charter Communications",
+            "org": "Charter Communications",
+            "asn": "AS20115",
+            "region": "New York",
+            "response_code": None,
+            "response_message": None,
+            "city": "Buffalo",
+            "lat": 42.8864,
+            "lon": -78.8784,
+            "mobile": False,
+            "proxy": False,
+            "hosting": False,
+        },
+        "network": {
+            "cidr": None,
+            "comment": None,
+            "ip_version": "4",
+            "netmask": None,
+            "prefixlen": None,
+            "contact": None,
+            "contact_name": None,
+            "contact_email": None,
+            "contact_dept": None,
+            "cost_center": None,
+            "purpose": None,
+            "router_device": None,
+            "dhcp_servers": [],
+            "dhcp_routers": None,
+            "dhcp_dns_servers": [],
+            "dhcp_domain_name": None,
+            "dhcp_lease_time": None,
+            "dhcp_ntp_servers": [],
+            "vlan_id": None,
+            "vlan_name": None,
+        },
+        "address_details": {
+            "mac": None,
+            "names": [],
+            "types": [],
+            "usage": [],
+            "contact": None,
+            "contact_name": None,
+            "contact_email": None,
+            "contact_dept": None,
+            "comment": None,
+        },
+        "nac": {},
+    },
+    "offcampus6": {
+        "forwarded_for": "",
+        "remote_address": "2001:db8:cafe::75",
+        "remote_port": "51235",
+        "request_method": "GET",
+        "server_protocol": "HTTP/1.1",
+        "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)",
+        "proxy_detected": None,
+        "client_address": "2001:db8:cafe::75",
+        "is_campus": False,
+        "user_device": {
+            "browser": "Chrome",
+            "browser_version": "125.0.0",
+            "os": "Mac OS X",
+            "os_version": "10.15.7",
+            "device_family": None,
+            "device_brand": None,
+            "device_model": None,
+            "is_mobile": False,
+            "is_tablet": False,
+            "is_pc": True,
+            "is_bot": False,
+        },
+        "ptr": None,
+        "iplocation": {
+            "country_code2": "US",
+            "country_name": "United States",
+            "ip": "2001:db8:cafe::75",
+            "ip_number": None,
+            "ip_version": 6,
+            "isp": "Charter Communications",
+            "org": "Charter Communications",
+            "asn": "AS20115",
+            "region": "New York",
+            "response_code": None,
+            "response_message": None,
+            "city": "Buffalo",
+            "lat": 42.8864,
+            "lon": -78.8784,
+            "mobile": False,
+            "proxy": False,
+            "hosting": False,
+        },
+        "network": {
+            "cidr": None,
+            "comment": None,
+            "ip_version": "6",
+            "netmask": None,
+            "prefixlen": None,
+            "contact": None,
+            "contact_name": None,
+            "contact_email": None,
+            "contact_dept": None,
+            "cost_center": None,
+            "purpose": None,
+            "router_device": None,
+            "dhcp_servers": [],
+            "dhcp_routers": None,
+            "dhcp_dns_servers": [],
+            "dhcp_domain_name": None,
+            "dhcp_lease_time": None,
+            "dhcp_ntp_servers": [],
+            "vlan_id": None,
+            "vlan_name": None,
+        },
+        "address_details": {
+            "mac": None,
+            "names": [],
+            "types": [],
+            "usage": [],
+            "contact": None,
+            "contact_name": None,
+            "contact_email": None,
+            "contact_dept": None,
+            "comment": None,
+        },
+        "nac": {},
     },
     6: {
         "forwarded_for": "",
@@ -246,8 +413,15 @@ def hostinfo() -> Response:
     """Return JSON structure with IP address information."""
     simulate = request.args.get("simulate")
     if simulate:
-        ip_ver = int(simulate) if simulate in ("4", "6") else 4
-        sim_data = dict(_SIMULATE_HOSTINFO[ip_ver])
+        if simulate == "offcampus":
+            sim_data = dict(_SIMULATE_HOSTINFO["offcampus"])
+        elif simulate == "offcampus6":
+            sim_data = dict(_SIMULATE_HOSTINFO["offcampus6"])
+        elif simulate in ("oncampus6", "6"):
+            sim_data = dict(_SIMULATE_HOSTINFO[6])
+        else:
+            # "oncampus" is canonical; legacy "4"/"1" fall back to campus IPv4.
+            sim_data = dict(_SIMULATE_HOSTINFO[4])
         sim_data["server_time"] = int(time.time() * 1000)
         return jsonify(sim_data)
 
@@ -300,6 +474,7 @@ def hostinfo() -> Response:
     ip = ipaddress.ip_address(str(data["client_address"]))
 
     data["is_campus"] = is_campus_ip(data["client_address"])
+    is_vpn = is_vpn_ip(data["client_address"])
 
     ua = parse(data["user_agent"])
     data["user_device"] = {
@@ -387,6 +562,7 @@ def hostinfo() -> Response:
         "contact_dept": None,
         "cost_center": None,
         "purpose": None,
+        "vpn_group": None,
         "router_device": None,
         "dhcp_servers": [],
         "dhcp_routers": None,
@@ -425,6 +601,9 @@ def hostinfo() -> Response:
         net_details["purpose"] = (
             network.get("extattrs", {}).get("Purpose", {}).get("value", None)
         )
+        net_details["vpn_group"] = (
+            network.get("extattrs", {}).get("VPN Group", {}).get("value", None)
+        )
         net_details["router_device"] = (
             network.get("extattrs", {}).get("Router Device", {}).get("value", None)
         )
@@ -457,10 +636,13 @@ def hostinfo() -> Response:
             net_details["vlan_id"] = vlan_list[0].get("id", None)
             net_details["vlan_name"] = vlan_list[0].get("name", None)
 
+    if is_vpn and not net_details["purpose"]:
+        net_details["purpose"] = "VPN"
+
     data["network"] = net_details
 
     if data["is_campus"]:
-        if network is None:
+        if network is None and not is_vpn:
             current_app.logger.error(
                 f"On-campus IP {data['client_address']} has no matching network in IPAM"
             )
@@ -534,8 +716,12 @@ def hostinfo() -> Response:
             current_app.logger.warning(f"NAC info lookup failed: {error}")
             nac_data = None
 
-        if nac_data:
-            data["nac"] = nac_data
+        if not nac_data:
+            nac_data = {"endSystem": None, "endSystemInfo": None}
+
+        end_system = nac_data.get("endSystem") or {}
+        client_mac = addr_details["mac"] or end_system.get("macAddress")
+        data["nac"] = enrich_with_aruba_mobility(nac_data, client_mac)
 
     log_metrics_event(
         "hostinfo",

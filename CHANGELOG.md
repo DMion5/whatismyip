@@ -2,6 +2,67 @@
 
 All notable changes to this project will be documented here. This project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) conventions.
 
+## [1.11.5] - 2026-08-27
+
+### Added
+
+- Manually invoked `scripts/list_aruba_sites.py` pod utility for securely listing all Aruba Central sites with the configured client credentials.
+
+## [1.11.4] - 2026-08-27
+
+### Changed
+
+- Stacked the full-width Connection Path card above the More Details control for a cleaner responsive layout.
+
+## [1.11.3] - 2026-08-27
+
+### Fixed
+
+- Restored the client-to-access-point-to-building connection path when Aruba Central data is available without a NAC end-system record.
+
+## [1.11.2] - 2026-08-27
+
+### Added
+
+- Current Aruba Central wireless client details: authentication type, channel, encryption method, client name, site, and signal-to-noise ratio.
+
+### Changed
+
+- Removed BSSID from Aruba wireless details and support reports.
+
+## [1.11.1] - 2026-08-27
+
+### Added
+
+- Optional HPE Aruba Networking Central mobility enrichment for wireless connection details.
+
+### Fixed
+
+- Aruba mobility details are collected independently when NAC is unavailable.
+- Browser and intermediary caching is disabled so newly deployed frontend changes appear immediately.
+
+## [1.11.0] - 2026-07-31
+
+### Added
+
+- Configurable VPN address ranges, VPN installation guidance, campus SSID descriptions, network purpose/group/contact details, and optional live Atlassian Statuspage incidents.
+- IPv4/IPv6-separated lookup trends, page-view tracking for the metrics page, accessible chart data tables, and configurable metrics display and retention windows.
+- Off-campus IPv4 and IPv6 simulation modes and a printable network report.
+- Prominent upstream attribution in the license, repository notice, README, About page, and site footer.
+
+### Changed
+
+- Metrics queries now use one aggregate count query, query an in-memory SQLite backup to reduce network-storage round trips, cache results per database/window, initialize schemas once per database, and exclude incomplete current-day data.
+- Connectivity results, link/button text, heading structure, focus states, contrast, chart colors, IP copy controls, maps, and dynamic status announcements received accessibility and usability improvements.
+- Proxy, iCloud Private Relay, Cloudflare WARP, NAT, DNS, and dual-stack checks now coordinate their asynchronous results more reliably.
+
+### Fixed
+
+- Introductory connection text can no longer be overwritten by later asynchronous checks.
+- Configured VPN ranges are treated as campus connections even when IPAM has no matching network.
+- Simulation fixtures and colors retain University at Buffalo and My IP branding.
+- The custom My IP logo and generated favicon set were replaced with a neutral placeholder asset.
+
 ## [1.9.1] - 2026-07-13
 
 ### Changed

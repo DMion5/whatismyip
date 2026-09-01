@@ -13,7 +13,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
 	<title>{% block title %}My IP | UB Information Technology{% endblock %}</title>
-	<meta name="description" content="{% block meta_description %}View your public IP address and test University at Buffalo network connectivity, IPv4, IPv6, VPN, DNS and campus network information.{% endblock %}">
+	<meta name="description" content="{% block meta_description %}View your public IP address and test University at Buffalo network connectivity, VPN, DNS and available campus network information.{% endblock %}">
 	<meta name="keywords" content="{% block meta_keywords %}UB network diagnostics, University at Buffalo, UBIT, IP address, IPv4, IPv6, VPN, DNS, campus network{% endblock %}">
 	<meta name="author" content="UB Information Technology">
 	<meta name="robots" content="index, follow">
@@ -21,17 +21,17 @@
 	<meta property="og:title" content="{% block og_title %}My IP | UB Information Technology{% endblock %}">
 	<meta property="og:site_name" content="My IP">
 	<meta property="og:url" content="{% block og_url %}{{ site_url }}{% endblock %}">
-	<meta property="og:description" content="{% block og_description %}Check your IP address and University at Buffalo network connection, including IPv4, IPv6, VPN, DNS and campus network details.{% endblock %}">
+	<meta property="og:description" content="{% block og_description %}Check your IP address and University at Buffalo network connection, including VPN, DNS and available campus network details.{% endblock %}">
 	<meta property="og:type" content="website">
-	<meta property="og:image" content="{{ site_url }}{{ url_for('static', filename='logo/my ip logo.png') }}">
-	<meta property="og:image:width" content="661">
-	<meta property="og:image:height" content="485">
-	<meta property="og:image:alt" content="My IP logo">
+	<meta property="og:image" content="{{ site_url }}{{ url_for('static', filename='logo/placeholder-logo.svg') }}">
+	<meta property="og:image:width" content="512">
+	<meta property="og:image:height" content="512">
+	<meta property="og:image:alt" content="Placeholder logo for My IP">
 
 	<meta name="twitter:card" content="summary">
 	<meta name="twitter:title" content="{% block twitter_title %}My IP | UB Information Technology{% endblock %}">
 	<meta name="twitter:description" content="{% block twitter_description %}Check your IP address and University at Buffalo network connection.{% endblock %}">
-	<meta name="twitter:image" content="{{ site_url }}{{ url_for('static', filename='logo/my ip logo.png') }}">
+	<meta name="twitter:image" content="{{ site_url }}{{ url_for('static', filename='logo/placeholder-logo.svg') }}">
 
 	{% if bing_verification_token %}
 	<meta name="msvalidate.01" content="{{ bing_verification_token }}">
@@ -41,16 +41,12 @@
 	<link rel="canonical" href="{{ site_url }}{{ request.path }}">
 	{% endblock %}
 
-	<link rel="icon" href="{{ url_for('static', filename='logo/favicon.ico') }}?v={{ app_version }}" sizes="48x48">
-	<link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='logo/apple-touch-icon.png') }}?v={{ app_version }}">
-	<link rel="icon" type="image/png" sizes="96x96" href="{{ url_for('static', filename='logo/favicon-96x96.png') }}?v={{ app_version }}">
-	<link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='logo/favicon-32x32.png') }}?v={{ app_version }}">
-	<link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='logo/favicon-16x16.png') }}?v={{ app_version }}">
+	<link rel="icon" type="image/x-icon" sizes="32x32" href="{{ url_for('static', filename='logo/favicon.ico') }}?v={{ app_version }}">
+	<link rel="shortcut icon" href="{{ url_for('static', filename='logo/favicon.ico') }}?v={{ app_version }}">
 	<link rel="manifest" href="{{ url_for('static', filename='logo/site.webmanifest') }}?v={{ app_version }}">
 
 	<meta name="theme-color" content="#005bbb">
 	<meta name="msapplication-TileColor" content="#005bbb">
-	<meta name="msapplication-config" content="/static/logo/browserconfig.xml">
 
 	<script>
 		(function () {
@@ -78,8 +74,8 @@
 	<header class="ub-global-header">
 		<div class="container ub-global-header-inner">
 			<a class="ub-university-link" href="https://www.buffalo.edu/" aria-label="University at Buffalo home">
-	<img class="ub-university-logo" src="/static/logo/ub-logo-two-line.png" alt="University at Buffalo">
-</a>
+				<img class="ub-university-logo" src="/static/logo/ub-logo-two-line.png" alt="University at Buffalo">
+			</a>
 
 			<nav class="ub-global-links" aria-label="University services">
 				<a href="https://myub.buffalo.edu/">MyUB / HUB</a>
@@ -96,17 +92,15 @@
 					<div class="py-3 text-center ub-page-title">
 						{% block site_heading_open %}<p class="mb-0 site-title">{% endblock %}
 						<a class="ub-app-title" href="{{ site_url }}">
-							<img
-								class="ub-app-logo"
-								src="{{ url_for('static', filename='logo/my ip logo.png') }}"
-								alt=""
-								aria-hidden="true">
+							<span class="ub-app-symbol" aria-hidden="true">
+								<i class="fa-solid fa-location-dot"></i>
+							</span>
 							<span>My IP</span>
 						</a>
 						{% block site_heading_close %}</p>{% endblock %}
 
 						<p class="site-header-tagline">
-							Network diagnostics &middot; UB Information Technology
+							Check your network connection and identify problems
 						</p>
 					</div>
 				</div>
@@ -220,17 +214,27 @@
 				<div class="col">
 					<p class="ub-footer-meta text-center mb-1">
 						<small>
-							Copyright &copy; <script>document.write(new Date().getFullYear())</script>
-							University at Buffalo
+							My IP
 							&nbsp;&middot;&nbsp;
 							<a href="https://github.com/DMion5/whatismyip/blob/master/CHANGELOG.md">
 								v{{ app_version }}
+							</a>
+							&nbsp;&middot;&nbsp;
+							<a href="https://github.com/DMion5/whatismyip/blob/de380dc8cf75e2db30f81100f53c7307121cd25f/LICENSE.md">
+								MIT License
+							</a>
+							&nbsp;&middot;&nbsp;
+							<a href="https://github.com/DMion5/whatismyip/blob/de380dc8cf75e2db30f81100f53c7307121cd25f/NOTICE.md">
+								Attribution notice
 							</a>
 						</small>
 					</p>
 					<p class="ub-footer-credit text-center mb-0">
 						<small>
 							My IP is operated and maintained for University at Buffalo by UB Information Technology.
+							Based on the
+							<a href="https://github.com/unc-network/whatismyip">open-source What Is My IP project</a>
+							originally developed by William E. Whitaker, Jr. and UNC Information Technology Services.
 						</small>
 					</p>
 				</div>

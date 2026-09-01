@@ -7,8 +7,15 @@ function formatIPAddress(ip) {
 	return $('<span>').text(ip).html().replace(/([.:])/g, '$1<wbr>');
 }
 
-var reportDataPrimary = null;
-var reportDataSecondary = null;
+function formatWirelessTimestamp(value) {
+	if (value === null || value === undefined || value === '') return null;
+	var numeric = Number(value);
+	var date = new Date(isNaN(numeric) ? value : (numeric > 1e12 ? numeric : numeric * 1000));
+	return isNaN(date.getTime()) ? String(value) : date.toLocaleString();
+}
+
+var reportDataIPv4 = null;
+var reportDataIPv6 = null;
 var reportNetworkPurpose = null;
 var reportClockStatus = null;
 var reportConnectV4 = '—';
@@ -19,15 +26,20 @@ var reportDnsEdnsGeo = null;
 var reportDnsEdnsIp = null;
 var reportDnsFiltering = null;
 var reportInternetIp = null;
+var proxyNoticeShown = false;
+var ipv4Resolved = false;
+var ipv6Resolved = false;
 
 function buildNacDiagram(nac, userDevice) {
 	var es = nac.endSystem || {};
 	var bldg = nac.nit_building || {};
-	var isWireless = es.connection_type === 'wireless';
+	var arubaClient = nac.aruba_client || {};
+	var arubaMobility = nac.aruba_mobility || {};
+	var isWireless = es.connection_type === 'wireless' || Boolean(nac.aruba_client || nac.aruba_mobility);
 
 	var bldgName = bldg.number
 		? 'Bldg ' + bldg.number
-		: (bldg.official_name || bldg.full_name || '');
+		: (bldg.official_name || bldg.full_name || arubaClient.site || '');
 	var bldgSub = (bldg.official_name || bldg.full_name || '');
 
 	function esc(s) {
@@ -62,16 +74,30 @@ function buildNacDiagram(nac, userDevice) {
 
 	if (isWireless) {
 		var controller = es.wireless_controller || es.switchIP || null;
+		var clientMac = es.macAddress || arubaClient.client_mac || arubaMobility.client_mac || '';
+		var accessPoint = es.wireless_ap_name || arubaClient.access_point || arubaMobility.destination_ap || 'Access Point';
+		var ssid = es.wireless_ssid || arubaClient.ssid || arubaMobility.ssid || '';
 		var wirelessLabel = '', wirelessClass = '';
-		if (nac.meraki_signal && nac.meraki_signal.rssi != null) {
-			var rssi = nac.meraki_signal.rssi;
+		var wirelessSignal = nac.wireless_signal || nac.meraki_signal || {};
+		if (wirelessSignal.rssi != null) {
+			var rssi = wirelessSignal.rssi;
 			var quality = rssi >= -65 ? 'Good' : rssi >= -70 ? 'Fair' : 'Poor';
 			wirelessClass = rssi >= -65 ? 'signal-good' : rssi >= -70 ? 'signal-fair' : 'signal-poor';
 			wirelessLabel = rssi + ' dBm — ' + quality;
+		} else if (arubaClient.snr != null) {
+			var snr = arubaClient.snr;
+			var snrQuality = snr >= 25 ? 'Good' : snr >= 15 ? 'Fair' : 'Poor';
+			wirelessClass = snr >= 25 ? 'signal-good' : snr >= 15 ? 'signal-fair' : 'signal-poor';
+			wirelessLabel = snr + ' dB SNR — ' + snrQuality;
+		} else if (arubaMobility.rssi != null) {
+			var mobilityRssi = arubaMobility.rssi;
+			var mobilityQuality = mobilityRssi >= -65 ? 'Good' : mobilityRssi >= -70 ? 'Fair' : 'Poor';
+			wirelessClass = mobilityRssi >= -65 ? 'signal-good' : mobilityRssi >= -70 ? 'signal-fair' : 'signal-poor';
+			wirelessLabel = mobilityRssi + ' dBm — ' + mobilityQuality;
 		}
-		html += node(deviceIcon, 'Your Device', es.macAddress || '');
+		html += node(deviceIcon, 'Your Device', clientMac);
 		html += connector(true, wirelessLabel, wirelessClass);
-		html += node('fa-wifi', es.wireless_ap_name || 'Access Point', es.wireless_ssid || '');
+		html += node('fa-wifi', accessPoint, ssid);
 		if (bldgName) {
 			html += connector(false);
 			html += node('fa-building', bldgName, bldgSub !== bldgName ? bldgSub : '');
@@ -104,7 +130,7 @@ function showCopyNotification(message, isError = false) {
 	const notification = $('#copy-notification');
 	notification.stop(true, true);
 	notification.text(message);
-	notification.css('backgroundColor', isError ? '#b42318' : '#4b9cd3');
+	notification.css('backgroundColor', isError ? '#b42318' : '#005bbb');
 	notification.fadeIn(150).delay(1300).fadeOut(250);
 }
 
@@ -140,24 +166,64 @@ function copyAddress(addressSelector) {
 }
 
 function checkAddressMismatch() {
-	if (!reportDataPrimary || !reportDataSecondary) return;
-	if (reportDataPrimary['is_campus'] === reportDataSecondary['is_campus']) return;
+	if (!reportDataIPv4 || !reportDataIPv6) return;
 
-	var offCampus = reportDataPrimary['is_campus'] ? reportDataSecondary : reportDataPrimary;
+	if (reportDataIPv4['is_campus'] === reportDataIPv6['is_campus']) return;
+
+	var offCampus = reportDataIPv4['is_campus'] ? reportDataIPv6 : reportDataIPv4;
 	var isp = (offCampus['iplocation'] && offCampus['iplocation']['isp']) || '';
+	var org = (offCampus['iplocation'] && offCampus['iplocation']['org']) || '';
 	var note;
 
-	if (/icloud|private relay/i.test(isp)) {
+	if (/icloud|private relay/i.test(isp) || /icloud|private relay/i.test(org)) {
 		note = 'iCloud Private Relay is routing one of your addresses off-campus.';
-	} else if (offCampus['iplocation'] && offCampus['iplocation']['proxy']) {
+	} else if (offCampus['iplocation'] && (offCampus['iplocation']['proxy'] || /cloudflare warp/i.test(org))) {
 		note = 'A VPN or proxy service is routing one of your addresses off-campus.';
 	} else {
 		note = 'Your two addresses are on different networks — one campus, one off-campus.';
 	}
 
-	$('#intro_text .intro-status').append(
-		`<div class="mt-1 small text-muted"><i class="fa-solid fa-circle-info text-info me-1" aria-hidden="true"></i>${note}</div>`
-	);
+	$('#intro-sub-mismatch').html(
+		`<i class="fa-solid fa-circle-info text-info me-1" aria-hidden="true"></i>${note}`
+	).removeClass('d-none');
+}
+
+function checkProxyNotice() {
+	if (proxyNoticeShown) return;
+	if (!ipv4Resolved || !ipv6Resolved) return;
+	// If a mismatch note was already shown, don't add a second sub-line.
+	if (reportDataIPv4 && reportDataIPv6 &&
+		reportDataIPv4['is_campus'] !== reportDataIPv6['is_campus']) return;
+
+	// Need at least one off-campus result — nothing to warn about if on-campus.
+	var offCampusExists = (reportDataIPv4 && !reportDataIPv4['is_campus']) ||
+		(reportDataIPv6 && !reportDataIPv6['is_campus']);
+	if (!offCampusExists) return;
+
+	// Check proxy/iCloud flags from any available result.
+	var isp1 = (reportDataIPv4 && reportDataIPv4['iplocation'] && reportDataIPv4['iplocation']['isp']) || '';
+	var isp2 = (reportDataIPv6 && reportDataIPv6['iplocation'] && reportDataIPv6['iplocation']['isp']) || '';
+	var org1 = (reportDataIPv4 && reportDataIPv4['iplocation'] && reportDataIPv4['iplocation']['org']) || '';
+	var org2 = (reportDataIPv6 && reportDataIPv6['iplocation'] && reportDataIPv6['iplocation']['org']) || '';
+	var proxy1 = reportDataIPv4 && reportDataIPv4['iplocation'] && reportDataIPv4['iplocation']['proxy'];
+	var proxy2 = reportDataIPv6 && reportDataIPv6['iplocation'] && reportDataIPv6['iplocation']['proxy'];
+
+	var isICloud = /icloud|private relay/i.test(isp1) || /icloud|private relay/i.test(isp2) ||
+		/icloud|private relay/i.test(org1) || /icloud|private relay/i.test(org2);
+	var isWarp = /cloudflare warp/i.test(org1) || /cloudflare warp/i.test(org2);
+	var note;
+	if (isICloud) {
+		note = 'iCloud Private Relay is active — your actual network location may differ from what is shown.';
+	} else if (isWarp || proxy1 || proxy2) {
+		note = 'A VPN or proxy service is active — your actual network location may differ from what is shown.';
+	} else {
+		return;
+	}
+
+	proxyNoticeShown = true;
+	$('#intro-sub-proxy').html(
+		`<i class="fa-solid fa-circle-info text-info me-1" aria-hidden="true"></i>${note}`
+	).removeClass('d-none');
 }
 
 function showPrimaryLoadError() {
@@ -166,7 +232,7 @@ function showPrimaryLoadError() {
 }
 
 function set_intro_text(is_campus, network_purpose) {
-	var icon, msg, cls;
+	var icon, msg;
 	if (is_campus) {
 		if (network_purpose == 'VPN') {
 			icon = 'fa-shield text-success';
@@ -181,12 +247,29 @@ function set_intro_text(is_campus, network_purpose) {
 	} else {
 		icon = 'fa-earth-americas text-secondary';
 		msg  = 'You are connected from off campus over the Internet.';
+		var vpnCfgEl = document.getElementById('vpn_config');
+		if (vpnCfgEl) {
+			var vpnCfg = JSON.parse(vpnCfgEl.textContent);
+			if (vpnCfg && vpnCfg.install_url) {
+				$('#vpn-install-link').attr('href', vpnCfg.install_url);
+				$('#vpn-provider-name').text(vpnCfg.provider_name || 'VPN Client');
+				$('#vpn-card').show();
+			}
+		}
 	}
-	$('#intro_text').html(`<div class="intro-status"><i class="fa-solid ${icon} me-2" aria-hidden="true"></i>${msg}</div>`);
+	// Only update if this call has a specific purpose — prevents the non-default protocol
+	// overwriting a VPN/Wireless message with a generic "campus network" when it has no
+	// matching IPAM network (and therefore a null purpose).
+	if (network_purpose || !$('#intro-main-status').data('resolved')) {
+		$('#intro-main-status')
+			.html(`<i class="fa-solid ${icon} me-2" aria-hidden="true"></i>${msg}`)
+			.removeClass('text-muted')
+			.data('resolved', true);
+	}
 }
 
 function downloadReport() {
-	if (!reportDataPrimary) {
+	if (!reportDataIPv4) {
 		alert('Connection data is still loading — please try again in a moment.');
 		return;
 	}
@@ -212,14 +295,17 @@ function downloadReport() {
 		return `<h2>${e(title)}</h2><table><tbody>${content}</tbody></table>`;
 	}
 
-	var r = reportDataPrimary;
-	var primaryIsV6 = r.client_address && r.client_address.includes(':');
-	var primaryLabel = primaryIsV6 ? 'IPv6' : 'IPv4';
-	var secondaryLabel = primaryIsV6 ? 'IPv4' : 'IPv6';
+	var r4 = reportDataIPv4;
+	var r6 = reportDataIPv6;
+	// Primary = the protocol that loaded the page; secondary = the other one.
+	var rPrimary   = (default_version == 6 && r6) ? r6 : r4;
+	var rSecondary = (default_version == 6) ? r4 : r6;
+	var primaryLabel   = (default_version == 6) ? 'IPv6' : 'IPv4';
+	var secondaryLabel = (default_version == 6) ? 'IPv4' : 'IPv6';
 
 	var statusMsg;
-	if (r.is_campus) {
-		var purpose = r.network && r.network.purpose;
+	if (rPrimary.is_campus) {
+		var purpose = rPrimary.network && rPrimary.network.purpose;
 		if (purpose === 'VPN') statusMsg = 'Connected through the campus VPN';
 		else if (purpose === 'Wireless') statusMsg = 'Connected to the campus wireless network';
 		else statusMsg = 'Connected to the campus network';
@@ -227,17 +313,17 @@ function downloadReport() {
 		statusMsg = 'Connected from off campus over the Internet';
 	}
 
-	var ad = r.address_details || {};
-	var net = r.network || {};
-	var loc = r.iplocation || {};
+	var ad = rPrimary.address_details || {};
+	var net = rPrimary.network || {};
+	var loc = rPrimary.iplocation || {};
 
 	var primaryNames = (ad.names && ad.names.length)
 		? [...new Set(ad.names.map(n => n.toLowerCase()))].join(', ')
-		: (r.ptr || '');
+		: (rPrimary.ptr || '');
 	var primaryFlags = [loc.mobile ? 'Mobile' : null, loc.proxy ? 'Proxy/VPN' : null, loc.hosting ? 'Hosting' : null].filter(Boolean).join(', ');
 
 	var primarySection = section('Primary Address (' + primaryLabel + ')', [
-		rpt('IP Address', r.client_address),
+		rpt('IP Address', rPrimary.client_address),
 		rpt('PTR / Host Names', primaryNames),
 		rpt('Network', net.cidr ? (net.comment ? net.cidr + ' (' + net.comment + ')' : net.cidr) : null),
 		rpt('VLAN', net.vlan_id ? net.vlan_id + ' (' + net.vlan_name + ')' : null),
@@ -254,16 +340,15 @@ function downloadReport() {
 	]);
 
 	var secondarySection = '';
-	if (reportDataSecondary) {
-		var r2 = reportDataSecondary;
-		var ad2 = r2.address_details || {};
-		var net2 = r2.network || {};
-		var loc2 = r2.iplocation || {};
+	if (rSecondary) {
+		var ad2 = rSecondary.address_details || {};
+		var net2 = rSecondary.network || {};
+		var loc2 = rSecondary.iplocation || {};
 		var s2Names = (ad2.names && ad2.names.length)
 			? [...new Set(ad2.names.map(n => n.toLowerCase()))].join(', ')
-			: (r2.ptr || '');
+			: (rSecondary.ptr || '');
 		secondarySection = section('Secondary Address (' + secondaryLabel + ')', [
-			rpt('IP Address', r2.client_address),
+			rpt('IP Address', rSecondary.client_address),
 			rpt('PTR / Host Names', s2Names),
 			rpt('Network', net2.cidr ? (net2.comment ? net2.cidr + ' (' + net2.comment + ')' : net2.cidr) : null),
 			rpt('VLAN', net2.vlan_id ? net2.vlan_id + ' (' + net2.vlan_name + ')' : null),
@@ -292,45 +377,66 @@ function downloadReport() {
 	]);
 
 	var nacRows = [];
-	if (r.nac) {
-		if (r.nac.endSystem) Object.entries(r.nac.endSystem).forEach(([k, v]) => { if (v) nacRows.push(rpt(k, v)); });
-		if (r.nac.endSystemInfo) Object.entries(r.nac.endSystemInfo).forEach(([k, v]) => { if (v) nacRows.push(rpt(k, v)); });
+	if (r4.nac) {
+		if (r4.nac.endSystem) Object.entries(r4.nac.endSystem).forEach(([k, v]) => { if (v) nacRows.push(rpt(k, v)); });
+		if (r4.nac.endSystemInfo) Object.entries(r4.nac.endSystemInfo).forEach(([k, v]) => { if (v) nacRows.push(rpt(k, v)); });
 	}
 	var nacSection = nacRows.length ? section('Campus NAC Details', nacRows) : '';
 
-	var merakiSection = '';
-	if (r.nac && (r.nac.meraki_client || r.nac.meraki_ap || r.nac.meraki_signal)) {
-		var mc = r.nac.meraki_client || {};
-		var ma = r.nac.meraki_ap || {};
-		var ms = r.nac.meraki_signal || {};
+	var wirelessSection = '';
+	var wirelessEndSystem = r4.nac ? (r4.nac.endSystem || {}) : {};
+	if (r4.nac && (wirelessEndSystem.connection_type === 'wireless' || r4.nac.aruba_client || r4.nac.aruba_mobility || r4.nac.meraki_client || r4.nac.meraki_ap || r4.nac.meraki_signal)) {
+		var mc = r4.nac.meraki_client || {};
+		var ma = r4.nac.meraki_ap || {};
+		var ms = r4.nac.wireless_signal || r4.nac.meraki_signal || {};
+		var am = r4.nac.aruba_mobility || {};
+		var ac = r4.nac.aruba_client || {};
 		var rssiText = ms.rssi !== undefined && ms.rssi !== null
 			? ms.rssi + ' dBm (' + (ms.rssi >= -65 ? 'Good' : ms.rssi >= -70 ? 'Fair' : 'Poor') + ')'
 			: null;
-		var snrText = ms.snr !== undefined && ms.snr !== null
-			? ms.snr + ' dB (' + (ms.snr >= 25 ? 'Good' : ms.snr >= 15 ? 'Fair' : 'Poor') + ')'
+		var reportSnr = ms.snr !== undefined && ms.snr !== null ? ms.snr : ac.snr;
+		var snrText = reportSnr !== undefined && reportSnr !== null
+			? reportSnr + ' dB (' + (reportSnr >= 25 ? 'Good' : reportSnr >= 15 ? 'Fair' : 'Poor') + ')'
 			: null;
-		var lastSeenText = mc.last_seen ? new Date(mc.last_seen * 1000).toLocaleString() : null;
-		merakiSection = section('Wireless Connection', [
+		var lastSeenText = mc.last_seen ? formatWirelessTimestamp(mc.last_seen) : null;
+		var roamPath = [am.source_ap, am.destination_ap].filter(Boolean).join(' → ');
+		var channel = ac.channel || (am.from_channel && am.channel && am.from_channel !== am.channel
+			? am.from_channel + ' → ' + am.channel
+			: am.channel);
+		wirelessSection = section('Wireless Connection', [
+			rpt('Data Source', wirelessEndSystem.wireless_provider || (r4.nac.aruba_client || r4.nac.aruba_mobility ? 'Aruba Central' : null)),
 			rpt('Manufacturer', mc.manufacturer),
 			rpt('Device', mc.description),
 			rpt('OS', mc.os),
 			rpt('User', mc.user),
 			rpt('Status', mc.status),
-			rpt('SSID', mc.ssid),
+			rpt('Name', ac.name),
+			rpt('Encryption Method', ac.encryption_method),
+			rpt('Site', ac.site),
+			rpt('SSID', wirelessEndSystem.wireless_ssid || mc.ssid || ac.ssid || am.ssid),
 			rpt('VLAN', mc.vlan),
 			rpt('Last Seen', lastSeenText),
-			rpt('Client MAC', mc.mac),
+			rpt('Latest Mobility Event', formatWirelessTimestamp(am.occurred_at)),
+			rpt('Client MAC', mc.mac || ac.client_mac || am.client_mac || wirelessEndSystem.macAddress),
 			rpt('Signal (RSSI)', rssiText),
+			rpt('Mobility Event RSSI', am.rssi !== null && am.rssi !== undefined ? am.rssi + ' dBm' : null),
 			rpt('Signal/Noise (SNR)', snrText),
 			rpt('Capabilities', mc.wireless_capabilities),
-			rpt('AP Name', ma.name),
+			rpt('AP Name', wirelessEndSystem.wireless_ap_name || ma.name || ac.access_point || am.destination_ap),
+			rpt('AP MAC', wirelessEndSystem.wireless_ap_mac),
 			rpt('AP Model', ma.model),
+			rpt('Radio Band', ac.radio_band || am.radio_band),
+			rpt('Channel', channel),
+			rpt('Latest Roam', roamPath),
+			rpt('Roam Protocol', am.roam_protocol),
+			rpt('Roam Time', am.roam_time_ms !== null && am.roam_time_ms !== undefined ? am.roam_time_ms + ' ms' : null),
+			rpt('Controller', wirelessEndSystem.wireless_controller),
 		]);
 	}
 
 	var bldgSection = '';
-	if (r.nac && r.nac.nit_building && Object.keys(r.nac.nit_building).length) {
-		var bldg = r.nac.nit_building;
+	if (r4.nac && r4.nac.nit_building && Object.keys(r4.nac.nit_building).length) {
+		var bldg = r4.nac.nit_building;
 		bldgSection = section('Building', [
 			rpt('Name', bldg.official_name || bldg.full_name),
 			rpt('Address', bldg.address),
@@ -339,24 +445,29 @@ function downloadReport() {
 	}
 
 	var cfgRows = [];
-	var hasV4cfg = net.netmask || net.dhcp_routers || (net.dhcp_dns_servers && net.dhcp_dns_servers.length) || net.dhcp_domain_name || net.router_device;
+	var net4 = r4.network || {};
+	var hasV4cfg = net4.netmask || net4.dhcp_routers || (net4.dhcp_dns_servers && net4.dhcp_dns_servers.length) || net4.dhcp_domain_name || net4.purpose || net4.vpn_group || net4.router_device;
 	if (hasV4cfg) {
 		cfgRows.push('<tr><td colspan="2" style="font-weight:700;background:#edf5fb;padding:4px 8px;">IPv4</td></tr>');
-		if (net.netmask) cfgRows.push(rpt('Subnet Mask', net.netmask));
-		if (net.dhcp_routers) cfgRows.push(rpt('Default Gateway', net.dhcp_routers));
-		if (net.dhcp_dns_servers && net.dhcp_dns_servers.length) cfgRows.push(rpt('DNS Servers', net.dhcp_dns_servers.join(', ')));
-		if (net.dhcp_domain_name) cfgRows.push(rpt('Search Domain', net.dhcp_domain_name));
-		if (net.router_device) cfgRows.push(rpt('Router Device', net.router_device));
+		if (net4.netmask) cfgRows.push(rpt('Subnet Mask', net4.netmask));
+		if (net4.dhcp_routers) cfgRows.push(rpt('Default Gateway', net4.dhcp_routers));
+		if (net4.dhcp_dns_servers && net4.dhcp_dns_servers.length) cfgRows.push(rpt('DNS Servers', net4.dhcp_dns_servers.join(', ')));
+		if (net4.dhcp_domain_name) cfgRows.push(rpt('Search Domain', net4.dhcp_domain_name));
+		if (net4.purpose) cfgRows.push(rpt('Purpose', net4.purpose));
+		if (net4.vpn_group) cfgRows.push(rpt('VPN Group', net4.vpn_group));
+		if (net4.router_device) cfgRows.push(rpt('Router Device', net4.router_device));
 	}
-	if (reportDataSecondary) {
-		var net2b = reportDataSecondary.network || {};
-		var hasV6cfg = net2b.prefixlen || net2b.dhcp_routers || (net2b.dhcp_dns_servers && net2b.dhcp_dns_servers.length) || net2b.dhcp_domain_name || net2b.router_device;
+	if (r6) {
+		var net2b = r6.network || {};
+		var hasV6cfg = net2b.prefixlen || net2b.dhcp_routers || (net2b.dhcp_dns_servers && net2b.dhcp_dns_servers.length) || net2b.dhcp_domain_name || net2b.purpose || net2b.vpn_group || net2b.router_device;
 		if (hasV6cfg) {
 			cfgRows.push('<tr><td colspan="2" style="font-weight:700;background:#edf5fb;padding:4px 8px;">IPv6</td></tr>');
 			if (net2b.prefixlen) cfgRows.push(rpt('Prefix Length', '/' + net2b.prefixlen));
 			if (net2b.dhcp_routers) cfgRows.push(rpt('Default Gateway', net2b.dhcp_routers));
 			if (net2b.dhcp_dns_servers && net2b.dhcp_dns_servers.length) cfgRows.push(rpt('DNS Servers', net2b.dhcp_dns_servers.join(', ')));
 			if (net2b.dhcp_domain_name) cfgRows.push(rpt('Search Domain', net2b.dhcp_domain_name));
+			if (net2b.purpose) cfgRows.push(rpt('Purpose', net2b.purpose));
+			if (net2b.vpn_group) cfgRows.push(rpt('VPN Group', net2b.vpn_group));
 			if (net2b.router_device) cfgRows.push(rpt('Router Device', net2b.router_device));
 		}
 	}
@@ -364,7 +475,7 @@ function downloadReport() {
 		? `<h2>Network Configuration</h2><table><tbody>${cfgRows.filter(Boolean).join('')}</tbody></table>`
 		: '';
 
-	var ud = r.user_device || {};
+	var ud = rPrimary.user_device || {};
 	var browser = (ud.browser && ud.browser !== 'Other') ? (ud.browser + (ud.browser_version ? ' ' + ud.browser_version : '')) : null;
 	var os = (ud.os && ud.os !== 'Other') ? (ud.os + (ud.os_version ? ' ' + ud.os_version : '')) : null;
 	var deviceType = ud.is_bot ? 'Bot / Crawler' : ud.is_mobile ? 'Mobile' : ud.is_tablet ? 'Tablet' : ud.is_pc ? 'PC / Desktop' : null;
@@ -386,18 +497,18 @@ function downloadReport() {
 <title>Network Diagnostic Report</title>
 <style>
   body{font-family:Arial,Helvetica,sans-serif;font-size:11pt;color:#222;margin:15mm 20mm}
-  h1{font-size:16pt;color:#13294B;margin:0 0 2px}
-  h2{font-size:10.5pt;font-weight:700;color:#13294B;background:#EDF5FB;border-left:4px solid #4B9CD3;padding:5px 10px;margin:14px 0 0}
+  h1{font-size:16pt;color:#002F56;margin:0 0 2px}
+  h2{font-size:10.5pt;font-weight:700;color:#002F56;background:#E7F3FF;border-left:4px solid #005BBB;padding:5px 10px;margin:14px 0 0}
   table{width:100%;border-collapse:collapse;font-size:10pt}
   th{text-align:left;font-weight:600;width:38%;padding:3px 8px;vertical-align:top;background:#fafafa}
   td{padding:3px 8px;vertical-align:top;word-break:break-all}
   tr{border-bottom:1px solid #e8e8e8}
-  .hdr{border-bottom:3px solid #4B9CD3;padding-bottom:10px;margin-bottom:12px}
+  .hdr{border-bottom:3px solid #005BBB;padding-bottom:10px;margin-bottom:12px}
   .sub{color:#5B6670;font-size:10pt;margin:2px 0 0}
   .ts{color:#888;font-size:9.5pt;margin:4px 0 0}
-  .status{background:#EDF5FB;border-left:4px solid #4B9CD3;padding:7px 12px;margin:12px 0 14px;font-size:11pt;font-weight:600;color:#13294B}
+  .status{background:#E7F3FF;border-left:4px solid #005BBB;padding:7px 12px;margin:12px 0 14px;font-size:11pt;font-weight:600;color:#002F56}
   .ftr{margin-top:20px;border-top:1px solid #ddd;padding-top:8px;color:#aaa;font-size:9pt}
-  a{color:#4B9CD3}
+  a{color:#005BBB}
   @media print{body{margin:8mm 12mm}}
 </style>
 </head>
@@ -413,7 +524,7 @@ ${secondarySection}
 ${connectSection}
 ${dnsSection}
 ${nacSection}
-${merakiSection}
+${wirelessSection}
 ${bldgSection}
 ${netConfigSection}
 ${deviceSection}
@@ -429,9 +540,10 @@ ${deviceSection}
 	}
 }
 
-function test_primary_url(default_version) {
+function test_ipv4_url(default_version) {
 	// call the test url and display address information
-	var simulate = !!$('#connect-test').data('simulate');
+	var simulate_mode = $('#connect-test').data('simulate') || '';
+	var simulate = !!simulate_mode;
 
 	// handle starting state
 	if ( default_version == 4 ) {
@@ -444,18 +556,19 @@ function test_primary_url(default_version) {
 	var test_url = $('#connect-test').data('ipv4_url')
 	$.ajax({
 		type: "GET",
-		url: test_url + "/hostinfo" + (simulate ? '?simulate=4' : ''),
+		url: test_url + "/hostinfo" + (simulate ? '?simulate=' + (simulate_mode === 'offcampus' ? 'offcampus' : 'oncampus') : ''),
 		dataType: "json",
 		success: function (result, status, xhr) {
 			// $('#connect-ipv4').text("Supported");
 			$('#connect-ipv4').html('<i class="fa-solid fa-circle-check text-success" aria-hidden="true"></i> Supported');
 			//console.log("Host check from " + result["address"]);
 
+			set_intro_text(result['is_campus'], result['network']['purpose']);
+
 			if ( default_version == 4 ) {
 				$('#first_address_section').show();
 				$('#address1').html(formatIPAddress(result["client_address"]));
 				$('#address_box .ip-bar-label').text('IPv4');
-				set_intro_text(result['is_campus'], result['network']['purpose']);
 			} else {
 				$('#second_address_section').show();
 				$('#address2').html(formatIPAddress(result["client_address"]));
@@ -554,26 +667,44 @@ function test_primary_url(default_version) {
 			}
 
 			// Do the Map work
-			if (result['nac']['nit_building'] && result['nac']['nit_building']['address']) {
+			if (result['nac']['aruba_site_location']) {
+				// Aruba's current site is the best location signal for a campus wireless client.
+				var arubaSite = result['nac']['aruba_site_location'];
+				var siteLat = parseFloat(arubaSite['latitude']);
+				var siteLon = parseFloat(arubaSite['longitude']);
+				var siteZoom = parseInt(arubaSite['zoom'], 10) || 19;
+				var siteLabel = arubaSite['name'];
+				loadCampusMap(arubaSite['address'], siteLabel, siteLat, siteLon, siteZoom);
+				$('#map').attr('aria-label', 'Map showing detected Aruba site ' + siteLabel);
+				$('#map_label').text('Detected building: ' + siteLabel).show();
+			} else if (result['nac']['nit_building'] && result['nac']['nit_building']['address']) {
 				// Building lat/lon preferred; address passed as fallback for Google Maps geocoder
 				var bldgMapLat = parseFloat(result['nac']['nit_building']['latitude']);
 				var bldgMapLon = parseFloat(result['nac']['nit_building']['longitude']);
-				loadCampusMap(result['nac']['nit_building']['address'], result['nac']['nit_building']['full_name'], bldgMapLat, bldgMapLon);
+				var bldgMapName = result['nac']['nit_building']['full_name'] || result['nac']['nit_building']['address'];
+				loadCampusMap(result['nac']['nit_building']['address'], bldgMapName, bldgMapLat, bldgMapLon);
+				$('#map').attr('aria-label', 'Map showing location of ' + bldgMapName);
+				$('#map_label').text(bldgMapName).show();
 			} else if (result['nac']['meraki_ap'] && result['nac']['meraki_ap']['lat'] && result['nac']['meraki_ap']['lon']) {
 				// Meraki AP coordinates — more precise than IP geolocation when building lookup isn't available
 				var apLat = parseFloat(result['nac']['meraki_ap']['lat']);
 				var apLon = parseFloat(result['nac']['meraki_ap']['lon']);
 				var apLabel = result['nac']['meraki_ap']['name'] || 'Access Point';
 				loadCampusMap(apLabel, apLabel, apLat, apLon);
-				$('#map_label').text(apLabel).show();
+				$('#map').attr('aria-label', 'Map showing location of wireless access point ' + apLabel);
+				$('#map_label').text('Wireless access point: ' + apLabel).show();
 			} else {
 				// Approximate IP geolocation (city-level) for everyone else
 				var mapLat = parseFloat(result['iplocation']['lat']);
 				var mapLon = parseFloat(result['iplocation']['lon']);
 				// Skip if geolocation failed (null, NaN, or the 0,0 fallback ip-api.com returns on lookup failure)
 				if (!isNaN(mapLat) && !isNaN(mapLon) && !(mapLat === 0 && mapLon === 0)) {
-					var mapLabel = result['iplocation']['city'] || 'IP location';
-					loadLatLonMap(mapLat, mapLon, mapLabel);
+					var mapCity = result['iplocation']['city'] || '';
+					var mapCountry = result['iplocation']['country'] || '';
+					var mapDesc = [mapCity, mapCountry].filter(Boolean).join(', ') || 'IP location';
+					$('#map_label').text('Approximate IP location: ' + mapDesc);
+					$('#map').attr('aria-label', 'Approximate IP location map — ' + mapDesc + ' (city-level accuracy only)');
+					loadLatLonMap(mapLat, mapLon, mapCity || mapDesc);
 				}
 			}
 
@@ -597,16 +728,20 @@ function test_primary_url(default_version) {
 			function escHtml(s) { return $('<span>').text(String(s)).html(); }
 			function nacRow(label, html) { nacTbody.append(`<tr><th>${label}</th><td>${html}</td></tr>`); }
 
-			if (result['nac']['endSystem']) {
+			var hasConnectionPath = result['nac']['endSystem'] || result['nac']['aruba_client'] || result['nac']['aruba_mobility'];
+			if (hasConnectionPath) {
 				$('#nac-diagram-row').show();
-				$('#nac-card').show();
 
-				// Build connection diagram
+				// Build the connection diagram from NAC, Aruba, or both.
 				var diagHtml = buildNacDiagram(result['nac'], result['user_device']);
 				if (diagHtml) {
 					$('#nac-diagram').html(diagHtml);
 					$('#nac-diagram-card').show();
 				}
+			}
+
+			if (result['nac']['endSystem']) {
+				$('#nac-card').show();
 
 				var es = result['nac']['endSystem'];
 				var ei = result['nac']['endSystemInfo'] || {};
@@ -656,7 +791,7 @@ function test_primary_url(default_version) {
 			// Wireless connection card — common fields from endSystem (Aruba + Meraki)
 			var showMerakiCard = false;
 			function merakiRow(rowId, val) {
-				if (val) {
+				if (val !== null && val !== undefined && val !== '') {
 					$('#' + rowId).text(val);
 					$('#' + rowId + '-row').show();
 					showMerakiCard = true;
@@ -664,10 +799,61 @@ function test_primary_url(default_version) {
 			}
 			var es = result['nac']['endSystem'];
 			if (es && es['connection_type'] === 'wireless') {
+				merakiRow('wireless-provider', es['wireless_provider']);
+				merakiRow('meraki-mac', es['macAddress']);
 				merakiRow('wireless-ssid', es['wireless_ssid']);
+				var ssidInfoEl = document.getElementById('ssid_info');
+				if (ssidInfoEl && es['wireless_ssid']) {
+					var ssidMap = JSON.parse(ssidInfoEl.textContent);
+					var ssidEntry = ssidMap[es['wireless_ssid']];
+					if (ssidEntry) {
+						var parts = [];
+						if (ssidEntry.description) parts.push(ssidEntry.description);
+						if (ssidEntry.usage) parts.push(ssidEntry.usage);
+						if (parts.length) {
+							var descEl = $('#wireless-ssid-desc');
+							descEl.text(parts.join(' — '));
+							if (ssidEntry.expected === false) {
+								descEl.addClass('text-warning').removeClass('text-muted');
+							} else {
+								descEl.addClass('text-muted').removeClass('text-warning');
+							}
+							descEl.show();
+						}
+					}
+				}
 				merakiRow('wireless-ap-name', es['wireless_ap_name']);
 				merakiRow('wireless-ap-mac', es['wireless_ap_mac']);
 				merakiRow('wireless-controller', es['wireless_controller']);
+			}
+			if (result['nac']['aruba_mobility']) {
+				var am = result['nac']['aruba_mobility'];
+				merakiRow('wireless-provider', 'Aruba Central');
+				merakiRow('meraki-mac', am.client_mac);
+				merakiRow('wireless-ssid', am.ssid);
+				merakiRow('wireless-ap-name', am.destination_ap);
+				merakiRow('aruba-occurred-at', formatWirelessTimestamp(am.occurred_at));
+				merakiRow('aruba-rssi', am.rssi !== null && am.rssi !== undefined ? am.rssi + ' dBm' : null);
+				merakiRow('aruba-radio-band', am.radio_band);
+				var arubaChannel = am.from_channel && am.channel && am.from_channel !== am.channel
+					? am.from_channel + ' → ' + am.channel
+					: am.channel;
+				merakiRow('aruba-channel', arubaChannel);
+				merakiRow('aruba-roam-path', [am.source_ap, am.destination_ap].filter(Boolean).join(' → '));
+				merakiRow('aruba-roam-protocol', am.roam_protocol);
+				merakiRow('aruba-roam-time', am.roam_time_ms !== null && am.roam_time_ms !== undefined ? am.roam_time_ms + ' ms' : null);
+			}
+			var arubaClient = result['nac']['aruba_client'];
+			if (arubaClient) {
+				merakiRow('wireless-provider', 'Aruba Central');
+				merakiRow('meraki-mac', arubaClient.client_mac);
+				merakiRow('aruba-name', arubaClient.name);
+				merakiRow('aruba-encryption-method', arubaClient.encryption_method);
+				merakiRow('aruba-site', arubaClient.site);
+				merakiRow('wireless-ssid', arubaClient.ssid);
+				merakiRow('wireless-ap-name', arubaClient.access_point);
+				merakiRow('aruba-radio-band', arubaClient.radio_band);
+				merakiRow('aruba-channel', arubaClient.channel);
 			}
 			if (result['nac']['meraki_client']) {
 				var mc = result['nac']['meraki_client'];
@@ -698,8 +884,10 @@ function test_primary_url(default_version) {
 			if (result['nac']['meraki_ap']) {
 				merakiRow('meraki-ap-model', result['nac']['meraki_ap'].model);
 			}
-			if (result['nac']['meraki_signal']) {
-				var ms = result['nac']['meraki_signal'];
+			var wirelessSignal = result['nac']['wireless_signal'] || result['nac']['meraki_signal'] || {};
+			var arubaSnr = arubaClient && arubaClient.snr;
+			if (Object.keys(wirelessSignal).length || arubaSnr !== null && arubaSnr !== undefined) {
+				var ms = wirelessSignal;
 				if (ms.rssi !== null && ms.rssi !== undefined) {
 					var rssiIcon = ms.rssi >= -65 ? 'fa-circle-check text-success' : ms.rssi >= -70 ? 'fa-triangle-exclamation text-warning' : 'fa-circle-xmark text-danger';
 					var rssiCls  = ms.rssi >= -65 ? '' : ms.rssi >= -70 ? 'text-warning' : 'text-danger';
@@ -708,11 +896,12 @@ function test_primary_url(default_version) {
 					$('#meraki-rssi-row').show();
 					showMerakiCard = true;
 				}
-				if (ms.snr !== null && ms.snr !== undefined) {
-					var snrIcon = ms.snr >= 25 ? 'fa-circle-check text-success' : ms.snr >= 15 ? 'fa-triangle-exclamation text-warning' : 'fa-circle-xmark text-danger';
-					var snrCls  = ms.snr >= 25 ? '' : ms.snr >= 15 ? 'text-warning' : 'text-danger';
-					var snrLabel = ms.snr >= 25 ? 'Good' : ms.snr >= 15 ? 'Fair' : 'Poor';
-					$('#meraki-snr').html(`${ms.snr} dB &mdash; <i class="fa-solid ${snrIcon} me-1" aria-hidden="true"></i><span class="${snrCls}">${snrLabel}</span>`);
+				var snr = ms.snr !== null && ms.snr !== undefined ? ms.snr : arubaSnr;
+				if (snr !== null && snr !== undefined) {
+					var snrIcon = snr >= 25 ? 'fa-circle-check text-success' : snr >= 15 ? 'fa-triangle-exclamation text-warning' : 'fa-circle-xmark text-danger';
+					var snrCls  = snr >= 25 ? '' : snr >= 15 ? 'text-warning' : 'text-danger';
+					var snrLabel = snr >= 25 ? 'Good' : snr >= 15 ? 'Fair' : 'Poor';
+					$('#meraki-snr').html(`${snr} dB &mdash; <i class="fa-solid ${snrIcon} me-1" aria-hidden="true"></i><span class="${snrCls}">${snrLabel}</span>`);
 					$('#meraki-snr-row').show();
 					showMerakiCard = true;
 				}
@@ -762,9 +951,24 @@ function test_primary_url(default_version) {
 				$('#net-config-v4-domain').text(result['network']['dhcp_domain_name']);
 				hasV4Config = true;
 			}
+			if (result['network']['purpose']) {
+				$('#net-config-v4-purpose-row').show();
+				$('#net-config-v4-purpose').text(result['network']['purpose']);
+				hasV4Config = true;
+			}
+			if (result['network']['vpn_group']) {
+				$('#net-config-v4-vpn-group-row').show();
+				$('#net-config-v4-vpn-group').text(result['network']['vpn_group']);
+				hasV4Config = true;
+			}
 			if (result['network']['router_device']) {
 				$('#net-config-v4-router-row').show();
 				$('#net-config-v4-router').text(result['network']['router_device']);
+				hasV4Config = true;
+			}
+			if (result['network']['contact_name']) {
+				$('#net-config-v4-contact-row').show();
+				$('#net-config-v4-contact').text(result['network']['contact_name']);
 				hasV4Config = true;
 			}
 			if (hasV4Config) {
@@ -779,9 +983,11 @@ function test_primary_url(default_version) {
 			}
 
 			if (result['network']['purpose']) reportNetworkPurpose = result['network']['purpose'];
-			reportDataPrimary = result;
+			reportDataIPv4 = result;
+			ipv4Resolved = true;
 			checkAddressMismatch();
-			checkNATType(result['client_address']);
+			checkProxyNotice();
+			if (!simulate) checkNATType(result['client_address']);
 			if (default_version == 4) reportConnectV4 = 'Supported';
 			else reportConnectV6 = 'Supported';
 			$('#report-btn').prop('disabled', false);
@@ -794,6 +1000,8 @@ function test_primary_url(default_version) {
 			} else {
 				reportConnectV6 = 'Not detected';
 			}
+			ipv4Resolved = true;
+			checkProxyNotice();
 		}
 	});
 
@@ -823,21 +1031,32 @@ function renderNATResult(serverIp, externalIp, networkPurpose) {
 	var pathsDiffer = !isV6 && externalIp && externalIp !== serverIp;
 	if (!pathsDiffer) return;
 
+	// Suppress if a relay/proxy is detected in either protocol result, or if checkProxyNotice already
+	// fired — relay services rotate exit IPs between requests so address differences are not meaningful.
+	if (proxyNoticeShown) return;
+	var ipLoc4 = reportDataIPv4 && reportDataIPv4['iplocation'];
+	var ipLoc6 = reportDataIPv6 && reportDataIPv6['iplocation'];
+	var isp4 = (ipLoc4 && ipLoc4['isp']) || '';
+	var org4 = (ipLoc4 && ipLoc4['org']) || '';
+	var isp6 = (ipLoc6 && ipLoc6['isp']) || '';
+	var org6 = (ipLoc6 && ipLoc6['org']) || '';
+	var relayRe = /icloud|private relay|cloudflare warp/i;
+	if (relayRe.test(isp4) || relayRe.test(org4) || relayRe.test(isp6) || relayRe.test(org6) ||
+	    (ipLoc4 && ipLoc4['proxy']) || (ipLoc6 && ipLoc6['proxy'])) return;
+
 	reportInternetIp = externalIp;
 
+	var natNote;
 	if (networkPurpose === 'VPN') {
-		$('#intro_text .intro-status').append(
-			`<div class="mt-1 small text-muted"><i class="fa-solid fa-circle-info text-info me-1" aria-hidden="true"></i>Internet traffic bypasses the VPN tunnel and exits via ${externalIp}.</div>`
-		);
+		natNote = `Internet traffic bypasses the VPN tunnel and exits via ${externalIp}.`;
 	} else if (networkPurpose) {
-		$('#intro_text .intro-status').append(
-			`<div class="mt-1 small text-muted"><i class="fa-solid fa-circle-info text-info me-1" aria-hidden="true"></i>Your internet traffic exits the campus network as ${externalIp}.</div>`
-		);
+		natNote = `Your internet traffic exits the campus network as ${externalIp}.`;
 	} else {
-		$('#intro_text .intro-status').append(
-			`<div class="mt-1 small text-muted"><i class="fa-solid fa-circle-info text-info me-1" aria-hidden="true"></i>Your internet traffic appears to use a different address (${externalIp}) than your campus connection.</div>`
-		);
+		natNote = `Your internet traffic appears to use a different address (${externalIp}) than your campus connection.`;
 	}
+	$('#intro-sub-nat').html(
+		`<i class="fa-solid fa-circle-info text-info me-1" aria-hidden="true"></i>${natNote}`
+	).removeClass('d-none');
 }
 
 function checkClockSync(serverTime) {
@@ -975,8 +1194,40 @@ function get_dns_info() {
 	// testing DNS identification
 	// https://ip-api.com/docs/dns
 
+	const simulate_mode = $('#connect-test').data('simulate') || '';
 	const dns_test_url = $('#dns-test').data('dns_test_url') || '';
-	const simulate = !!$('#connect-test').data('simulate');
+	const simulate = !!simulate_mode && simulate_mode !== 'offcampus';
+
+	if (simulate) {
+		// Inject static campus-realistic DNS data so simulate is fully self-contained.
+		if (dns_test_url) {
+			append_dns_table_row(
+				'Campus DNS Security',
+				'<i class="fa-solid fa-circle-check text-success" aria-hidden="true"></i> Active',
+				'security-filtering-row',
+				true
+			);
+		}
+		append_dns_table_row('Internet DNS Provider', 'Akamai Technologies\nUnited States\n192.0.2.53');
+		append_dns_table_row('EDNS Client Subnet', 'University at Buffalo\nUnited States\n192.0.2.0');
+		$('#dns-test').show();
+		return;
+	}
+
+	if (simulate_mode === 'offcampus') {
+		// Inject static off-campus DNS data — ISP resolver, no EDNS subnet, filtering inactive.
+		if (dns_test_url) {
+			append_dns_table_row(
+				'Campus DNS Security',
+				'<i class="fa-solid fa-circle-xmark text-secondary" aria-hidden="true"></i> Inactive',
+				'security-filtering-row',
+				true
+			);
+		}
+		append_dns_table_row('Internet DNS Provider', 'Charter Communications\nUnited States\n96.120.1.8');
+		$('#dns-test').show();
+		return;
+	}
 
 	// Add Security Filtering row only if a test URL is configured
 	if (dns_test_url) {
@@ -989,7 +1240,7 @@ function get_dns_info() {
 	}
 	$('#dns-test').show();
 
-	tmp_name = createRandomString(32);
+	const tmp_name = createRandomString(32);
 	const test_url = `https://${tmp_name}.edns.ip-api.com/json`;
 
 	$.ajax({
@@ -1023,9 +1274,11 @@ function get_dns_info() {
 				let ip = result['edns']['ip']
 
 				if (geo || ip) {
-					let clientSubnetDetails = geo || '';
-					if (geo && ip) {
-						clientSubnetDetails = `${geo}\n${ip}`;
+					let geoParts = geo ? geo.split(' - ') : [];
+					let geoFormatted = geoParts.length === 2 ? `${geoParts[1]}\n${geoParts[0]}` : (geo || '');
+					let clientSubnetDetails = geoFormatted || '';
+					if (geoFormatted && ip) {
+						clientSubnetDetails = `${geoFormatted}\n${ip}`;
 					} else if (ip) {
 						clientSubnetDetails = ip;
 					}
@@ -1092,9 +1345,10 @@ function get_dns_info() {
 	}
 }
 
-function test_secondary_url(default_version) {
+function test_ipv6_url(default_version) {
 	// test secondary url
-	var simulate = !!$('#connect-test').data('simulate');
+	var simulate_mode = $('#connect-test').data('simulate') || '';
+	var simulate = !!simulate_mode;
 
 	var test_url = $('#connect-test').data('ipv6_url');
 	if (!test_url) {
@@ -1115,7 +1369,7 @@ function test_secondary_url(default_version) {
 	// Make AJAX call to the API to get the ipv6 address
 	$.ajax({
 		type: "GET",
-		url: test_url + "/hostinfo" + (simulate ? '?simulate=6' : ''),
+		url: test_url + "/hostinfo" + (simulate ? '?simulate=' + (simulate_mode === 'offcampus' ? 'offcampus6' : 'oncampus6') : ''),
 		dataType: "json",
 		success: function (result, status, xhr) {
 			// $('#connect-ipv6').text("Supported");
@@ -1248,9 +1502,24 @@ function test_secondary_url(default_version) {
 				$('#net-config-v6-domain').text(result['network']['dhcp_domain_name']);
 				hasV6Config = true;
 			}
+			if (result['network']['purpose']) {
+				$('#net-config-v6-purpose-row').show();
+				$('#net-config-v6-purpose').text(result['network']['purpose']);
+				hasV6Config = true;
+			}
+			if (result['network']['vpn_group']) {
+				$('#net-config-v6-vpn-group-row').show();
+				$('#net-config-v6-vpn-group').text(result['network']['vpn_group']);
+				hasV6Config = true;
+			}
 			if (result['network']['router_device']) {
 				$('#net-config-v6-router-row').show();
 				$('#net-config-v6-router').text(result['network']['router_device']);
+				hasV6Config = true;
+			}
+			if (result['network']['contact_name']) {
+				$('#net-config-v6-contact-row').show();
+				$('#net-config-v6-contact').text(result['network']['contact_name']);
 				hasV6Config = true;
 			}
 			if (hasV6Config) {
@@ -1265,8 +1534,10 @@ function test_secondary_url(default_version) {
 			}
 
 			if (result['network']['purpose']) reportNetworkPurpose = result['network']['purpose'];
-			reportDataSecondary = result;
+			reportDataIPv6 = result;
+			ipv6Resolved = true;
 			checkAddressMismatch();
+			checkProxyNotice();
 			if (default_version == 4) reportConnectV6 = 'Supported';
 			else reportConnectV4 = 'Supported';
 		},
@@ -1278,6 +1549,8 @@ function test_secondary_url(default_version) {
 			} else {
 				reportConnectV4 = 'Not detected';
 			}
+			ipv6Resolved = true;
+			checkProxyNotice();
 		}
 	});
 
@@ -1305,8 +1578,8 @@ $(document).ready(function () {
 		default_version = 4;
 	}
 
-	test_primary_url(default_version);
-	test_secondary_url(default_version);
+	test_ipv4_url(default_version);
+	test_ipv6_url(default_version);
 
 	// if (isLocalhost || is_campus) {
 		// console.log(`Doing extended testing for campus`);

@@ -1,11 +1,17 @@
 """Tests for whatismyip.db — metrics storage and dashboard aggregation."""
 
 import sqlite3
+from datetime import datetime, time, timedelta, timezone
 
 import pytest
 
 from whatismyip import create_app
-from whatismyip.db import ensure_metrics_store, get_metrics_dashboard, log_metrics_event
+from whatismyip.db import (
+    METRICS_TIMEZONE,
+    ensure_metrics_store,
+    get_metrics_dashboard,
+    log_metrics_event,
+)
 
 
 @pytest.fixture
@@ -36,6 +42,41 @@ def test_ensure_metrics_store_is_idempotent(app):
     with app.app_context():
         ensure_metrics_store()
         ensure_metrics_store()  # second call must not raise
+
+
+def test_ensure_metrics_store_prunes_expired_rows(app, monkeypatch):
+    import whatismyip.db as db_module
+
+    monkeypatch.setitem(app.config, "METRICS_RETENTION_DAYS", 30)
+    with app.app_context():
+        ensure_metrics_store()
+        db_path = app.config["METRICS_DB_PATH"]
+        old = (datetime.now(timezone.utc) - timedelta(days=31)).isoformat()
+        recent = (datetime.now(timezone.utc) - timedelta(days=1)).isoformat()
+        with sqlite3.connect(db_path) as conn:
+            conn.execute(
+                "INSERT INTO metrics_events (created_at, event_type) VALUES (?, ?)",
+                (old, "hostinfo"),
+            )
+            conn.execute(
+                "INSERT INTO metrics_events (created_at, event_type) VALUES (?, ?)",
+                (recent, "hostinfo"),
+            )
+            conn.execute(
+                "INSERT INTO page_views (created_at, page) VALUES (?, ?)",
+                (old, "Home"),
+            )
+            conn.execute(
+                "INSERT INTO page_views (created_at, page) VALUES (?, ?)",
+                (recent, "Home"),
+            )
+
+        db_module._schema_initialized_for = None
+        ensure_metrics_store()
+
+    with sqlite3.connect(db_path) as conn:
+        assert conn.execute("SELECT COUNT(*) FROM metrics_events").fetchone()[0] == 1
+        assert conn.execute("SELECT COUNT(*) FROM page_views").fetchone()[0] == 1
 
 
 # --- log_metrics_event ---
@@ -145,3 +186,51 @@ def test_get_metrics_dashboard_uses_cache(app):
         second = get_metrics_dashboard()
 
     assert first is second
+
+
+def test_get_metrics_dashboard_splits_daily_ipv4_and_ipv6(app):
+    with app.app_context():
+        ensure_metrics_store()
+        yesterday = datetime.now(METRICS_TIMEZONE).date() - timedelta(days=1)
+        created_at = (
+            datetime.combine(yesterday, time(hour=12), tzinfo=METRICS_TIMEZONE)
+            .astimezone(timezone.utc)
+            .isoformat()
+        )
+        with sqlite3.connect(app.config["METRICS_DB_PATH"]) as conn:
+            conn.executemany(
+                """
+                INSERT INTO metrics_events (created_at, event_type, ip_version)
+                VALUES (?, 'hostinfo', ?)
+                """,
+                [(created_at, 4), (created_at, 4), (created_at, 6)],
+            )
+
+        import whatismyip.db as db_module
+
+        db_module._metrics_cache["data"] = None
+        data = get_metrics_dashboard(days=2)
+
+    row = next(item for item in data["daily_series"] if item["day"] == str(yesterday))
+    assert row == {"day": str(yesterday), "count": 3, "v4": 2, "v6": 1}
+
+
+def test_metrics_cache_is_scoped_to_database(app, tmp_path):
+    with app.app_context():
+        import whatismyip.db as db_module
+
+        db_module._metrics_cache["data"] = None
+        log_metrics_event("hostinfo", is_campus=True)
+        first = get_metrics_dashboard()
+
+    second_app = create_app(
+        {
+            "TESTING": True,
+            "METRICS_DB_PATH": str(tmp_path / "other-metrics.sqlite3"),
+        }
+    )
+    with second_app.app_context():
+        second = get_metrics_dashboard()
+
+    assert first["total_hostinfo"] == 1
+    assert second["total_hostinfo"] == 0

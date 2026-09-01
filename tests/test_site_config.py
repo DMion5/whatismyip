@@ -71,6 +71,51 @@ def test_load_site_config_validates_map_provider(tmp_path):
     assert app.config["MAP_PROVIDER"] == "leaflet"
 
 
+def test_load_site_config_applies_qol_sections(tmp_path):
+    cfg = tmp_path / "config.toml"
+    cfg.write_text(
+        """
+[campus]
+networks = []
+[status_page]
+url = "https://status.example.edu/"
+[metrics]
+window_days = 14
+retention_days = 45
+[vpn]
+provider_name = "Secure VPN"
+install_url = "https://vpn.example.edu/install"
+networks = ["198.51.100.0/24"]
+[wireless]
+[[wireless.ssids]]
+name = "eduroam"
+description = "Primary wireless"
+usage = "Campus affiliates"
+expected = true
+"""
+    )
+    from whatismyip.site_config import load_site_config
+
+    app = create_app({"TESTING": True, "METRICS_DB_PATH": str(tmp_path / "m.sqlite3")})
+    with app.app_context():
+        import whatismyip.site_config as sc
+
+        original = sc.SITE_CONFIG_PATH
+        sc.SITE_CONFIG_PATH = str(cfg)
+        try:
+            load_site_config(app)
+        finally:
+            sc.SITE_CONFIG_PATH = original
+
+    assert app.config["STATUS_PAGE_URL"] == "https://status.example.edu"
+    assert app.config["METRICS_TIME_WINDOW_DAYS"] == 14
+    assert app.config["METRICS_RETENTION_DAYS"] == 45
+    assert app.config["VPN_PROVIDER_NAME"] == "Secure VPN"
+    assert app.config["VPN_INSTALL_URL"] == "https://vpn.example.edu/install"
+    assert str(app.config["VPN_NETWORKS"][0]) == "198.51.100.0/24"
+    assert app.config["SSID_INFO"]["eduroam"]["description"] == "Primary wireless"
+
+
 # --- Missing config file ---
 
 

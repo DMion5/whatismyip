@@ -42,6 +42,15 @@ class Config:  # pylint: disable=too-few-public-methods
     MERAKI_API_KEY = ""
     MERAKI_ORG_ID = ""
 
+    # HPE Aruba Networking Central API
+    ARUBA_CENTRAL_BASE_URL = "https://us5.api.central.arubanetworks.com"
+    ARUBA_CENTRAL_TOKEN_URL = "https://sso.common.cloud.hpe.com/as/token.oauth2"
+    ARUBA_CENTRAL_CLIENT_ID = ""
+    ARUBA_CENTRAL_CLIENT_SECRET = ""
+    ARUBA_CENTRAL_ACCESS_TOKEN = ""
+    ARUBA_CENTRAL_SITE_ID = ""
+    ARUBA_CENTRAL_SITE_NAME = ""
+
     # Google Maps API Key
     GOOGLE_MAPS_API_KEY = ""
 
@@ -49,9 +58,10 @@ class Config:  # pylint: disable=too-few-public-methods
     METRICS_USERNAME = ""
     METRICS_PASSWORD = ""
     METRICS_TIME_WINDOW_DAYS = 30
+    METRICS_RETENTION_DAYS = 90  # rows older than this are pruned on startup
 
-    # Browser cache lifetime for static assets (CSS, JS, images) in seconds
-    SEND_FILE_MAX_AGE_DEFAULT = 86400  # 1 day
+    # Disable browser caching so every deployment is visible immediately.
+    SEND_FILE_MAX_AGE_DEFAULT = 0
 
 
 class ProductionConfig(Config):  # pylint: disable=too-few-public-methods

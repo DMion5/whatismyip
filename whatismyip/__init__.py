@@ -1,4 +1,4 @@
-"""What Is My IP — Flask application factory."""
+"""My IP — Flask application factory."""
 
 import os
 
@@ -10,7 +10,7 @@ from flask_cors import CORS
 from whatismyip.db import _DEFAULT_METRICS_DB_PATH
 from whatismyip.site_config import load_site_config
 
-__version__ = "1.9.1"
+__version__ = "1.11.5"
 
 _APP_ROOT = os.path.join(os.path.dirname(__file__), "..")
 load_dotenv(os.path.join(_APP_ROOT, ".env"))
@@ -22,9 +22,6 @@ def create_app(test_config: dict | None = None) -> Flask:
     app.config.from_object("config.Config")
     app.config.from_prefixed_env()
     app.logger.propagate = False
-    app.config["METRICS_TIME_WINDOW_DAYS"] = int(
-        app.config.get("METRICS_TIME_WINDOW_DAYS", 30)
-    )
     app.config.setdefault("METRICS_DB_PATH", _DEFAULT_METRICS_DB_PATH)
 
     if test_config:
@@ -46,6 +43,16 @@ def create_app(test_config: dict | None = None) -> Flask:
     )
 
     load_site_config(app)
+
+    @app.after_request
+    def disable_browser_cache(response):
+        """Prevent browsers and intermediary caches from retaining responses."""
+        response.headers["Cache-Control"] = (
+            "no-store, no-cache, must-revalidate, max-age=0"
+        )
+        response.headers["Pragma"] = "no-cache"
+        response.headers["Expires"] = "0"
+        return response
 
     @app.context_processor
     def inject_globals():

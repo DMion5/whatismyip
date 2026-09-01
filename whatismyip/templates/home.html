@@ -11,13 +11,20 @@
 <div class="row mt-3 mb-2">
   <div class="col">
     <div class="d-flex align-items-center justify-content-between gap-2">
-      <div id="intro_text" aria-live="polite" aria-atomic="true" data-nosnippet><div class="intro-status text-muted"><i class="fa-solid fa-spinner fa-spin me-2" aria-hidden="true"></i>Testing connection&hellip;</div></div>
-      <button id="report-btn" class="nav-report-btn flex-shrink-0" type="button"
+      <div id="intro_text" aria-live="polite" aria-atomic="true" data-nosnippet>
+        <div class="intro-status">
+          <div id="intro-main-status" class="text-muted"><i class="fa-solid fa-spinner fa-spin me-2" aria-hidden="true"></i>Testing connection&hellip;</div>
+          <div id="intro-sub-nat" class="mt-1 small text-muted d-none"></div>
+          <div id="intro-sub-mismatch" class="mt-1 small text-muted d-none"></div>
+          <div id="intro-sub-proxy" class="mt-1 small text-muted d-none"></div>
+        </div>
+      </div>
+      <button id="report-btn" class="btn btn-primary nav-report-btn flex-shrink-0" type="button"
               onclick="downloadReport()"
-              aria-label="Download support report"
+              aria-label="Print connection report (saves as PDF)"
               disabled
-              title="Download a PDF support report of your connection details">
-        <i class="fa-solid fa-file-arrow-down me-1" aria-hidden="true"></i>Report
+              title="Opens the print dialog — save as PDF to keep a copy">
+        <i class="fa-solid fa-print me-1" aria-hidden="true"></i>Print Report <span class="fw-normal">(PDF)</span>
       </button>
     </div>
   </div>
@@ -31,7 +38,7 @@
         <div class="card shadow ip-copy-card"
              onclick="copyAddress('#address1')"
              onkeydown="if(event.key==='Enter'||event.key===' ')copyAddress('#address1')"
-             role="button" tabindex="0" aria-label="Copy IPv4 address to clipboard">
+             role="button" tabindex="0" aria-labelledby="address1" aria-describedby="address1-copy-hint">
           <div class="card-body">
             <div id="address_box" class="d-flex align-items-center ip-address">
               <span class="flex-shrink-0 ip-bar-label"></span>
@@ -40,6 +47,7 @@
               </div>
               <i class="fa fa-copy text-white opacity-50 ms-3 flex-shrink-0" aria-hidden="true"></i>
             </div>
+            <span id="address1-copy-hint" class="visually-hidden">Click or press Enter to copy to clipboard</span>
           </div>
         </div>
       </div>
@@ -49,7 +57,7 @@
         <div class="card shadow ip-copy-card ip-loading"
              onclick="copyAddress('#address2')"
              onkeydown="if(event.key==='Enter'||event.key===' ')copyAddress('#address2')"
-             role="button" tabindex="0" aria-label="Copy IPv6 address to clipboard">
+             role="button" tabindex="0" aria-labelledby="address2" aria-describedby="address2-copy-hint">
           <div class="card-body">
             <div id="additional_ip" class="d-flex align-items-center ip-address">
               <span class="flex-shrink-0 ip-bar-label"></span>
@@ -58,6 +66,7 @@
               </div>
               <i class="fa fa-copy text-white opacity-50 ms-3 flex-shrink-0" aria-hidden="true"></i>
             </div>
+            <span id="address2-copy-hint" class="visually-hidden">Click or press Enter to copy to clipboard</span>
           </div>
         </div>
       </div>
@@ -78,9 +87,7 @@
       <div class="card-body p-0 m-0">
         <div id="map" style="height: 250px;" role="img" aria-label="Campus location map" class="map-loading"></div>
       </div>
-      <div id="map_label" class="card-footer text-muted small text-center py-1" style="display:none;">
-        Approximate IP location
-      </div>
+      <div id="map_label" class="card-footer text-muted small text-center py-1" style="display:none;" aria-live="polite"></div>
     </div>
   </div>
 
@@ -94,7 +101,7 @@
 
     <div class="card shadow my-3">
       <div class="card-body">
-        <div id="connect-test" data-ipv4_url="{{ context.ipv4_url }}" data-ipv6_url="{{ context.ipv6_url }}" data-simulate="{{ '1' if context.simulate else '' }}">
+        <div id="connect-test" data-ipv4_url="{{ context.ipv4_url }}" data-ipv6_url="{{ context.ipv6_url }}" data-simulate="{{ context.simulate_mode }}">
           <h3 class="card-title h5"><i class="fa-solid fa-tower-broadcast text-primary me-2" aria-hidden="true"></i>Campus Connectivity</h3>
           <div class="table-responsive">
           <table class="table table-sm mb-0">
@@ -308,15 +315,15 @@
 </div> <!-- end of row -->
 
 <div id="nac-diagram-row" class="mt-3" style="display:none;" data-nosnippet>
-  <div class="d-flex flex-column flex-md-row align-items-stretch gap-3">
-    <div id="nac-diagram-card" class="card shadow flex-grow-1" style="display:none;">
+  <div class="d-flex flex-column gap-3">
+    <div id="nac-diagram-card" class="card shadow w-100" style="display:none;">
       <div class="card-body py-2">
         <h3 class="card-title h5"><i class="fa-solid fa-network-wired text-primary me-2" aria-hidden="true"></i>Connection Path</h3>
         <div id="nac-diagram"></div>
       </div>
     </div>
-    <div class="nac-btn-col d-flex flex-column justify-content-end">
-      <button id="toggle-button" class="btn btn-primary w-100 mb-3" type="button" data-mdb-toggle="collapse" data-mdb-target="#additionalDetails" aria-expanded="false" aria-controls="additionalDetails">
+    <div class="d-flex justify-content-end">
+      <button id="toggle-button" class="btn btn-primary details-toggle" type="button" data-mdb-toggle="collapse" data-mdb-target="#additionalDetails" aria-expanded="false" aria-controls="additionalDetails">
         <i class="fa-solid fa-chevron-down me-2 toggle-chevron" aria-hidden="true"></i>More Details
       </button>
     </div>
@@ -340,7 +347,18 @@
               </tr>
               <tr id="device-os-row" style="display:none;">
                 <th scope="row">Operating System</th>
-                <td id="device-os"></td>
+                <td>
+                  <span id="device-os"></span>
+                  <span
+                    class="text-muted ms-1"
+                    role="img"
+                    tabindex="0"
+                    data-mdb-toggle="tooltip"
+                    data-mdb-placement="top"
+                    title="Operating system information is inferred from your browser and may be inaccurate or intentionally obscured."
+                    aria-label="Operating system information is inferred from your browser and may be inaccurate or intentionally obscured."
+                  ><i class="fa-solid fa-circle-info" aria-hidden="true"></i></span>
+                </td>
               </tr>
               <tr id="device-type-row" style="display:none;">
                 <th scope="row">Device Type</th>
@@ -424,9 +442,21 @@
                   <th scope="row">Domain Name</th>
                   <td id="net-config-v4-domain"></td>
                 </tr>
+                <tr id="net-config-v4-purpose-row" style="display:none;">
+                  <th scope="row">Purpose</th>
+                  <td id="net-config-v4-purpose"></td>
+                </tr>
+                <tr id="net-config-v4-vpn-group-row" style="display:none;">
+                  <th scope="row">VPN Group</th>
+                  <td id="net-config-v4-vpn-group"></td>
+                </tr>
                 <tr id="net-config-v4-router-row" style="display:none;">
                   <th scope="row">Router Device</th>
                   <td id="net-config-v4-router"></td>
+                </tr>
+                <tr id="net-config-v4-contact-row" style="display:none;">
+                  <th scope="row">Network Contact</th>
+                  <td id="net-config-v4-contact"></td>
                 </tr>
               </tbody>
             </table>
@@ -459,9 +489,21 @@
                   <th scope="row">Domain Name</th>
                   <td id="net-config-v6-domain"></td>
                 </tr>
+                <tr id="net-config-v6-purpose-row" style="display:none;">
+                  <th scope="row">Purpose</th>
+                  <td id="net-config-v6-purpose"></td>
+                </tr>
+                <tr id="net-config-v6-vpn-group-row" style="display:none;">
+                  <th scope="row">VPN Group</th>
+                  <td id="net-config-v6-vpn-group"></td>
+                </tr>
                 <tr id="net-config-v6-router-row" style="display:none;">
                   <th scope="row">Router Device</th>
                   <td id="net-config-v6-router"></td>
+                </tr>
+                <tr id="net-config-v6-contact-row" style="display:none;">
+                  <th scope="row">Network Contact</th>
+                  <td id="net-config-v6-contact"></td>
                 </tr>
               </tbody>
             </table>
@@ -477,21 +519,65 @@
           <table class="table table-sm">
             <caption class="visually-hidden">Wireless Connection</caption>
             <tbody>
+              <tr id="wireless-provider-row" style="display:none;">
+                <th style="width:40%;" scope="row">Data Source</th>
+                <td id="wireless-provider"></td>
+              </tr>
+              <tr id="meraki-last-seen-row" style="display:none;">
+                <th scope="row">Last Seen</th>
+                <td id="meraki-last-seen"></td>
+              </tr>
+              <tr id="aruba-occurred-at-row" style="display:none;">
+                <th scope="row">Latest Mobility Event</th>
+                <td id="aruba-occurred-at"></td>
+              </tr>
+              <tr id="meraki-mac-row" style="display:none;">
+                <th scope="row">Client MAC</th>
+                <td id="meraki-mac"></td>
+              </tr>
+              <tr id="meraki-status-row" style="display:none;">
+                <th scope="row">Status</th>
+                <td id="meraki-status"></td>
+              </tr>
+              <tr id="aruba-name-row" style="display:none;">
+                <th scope="row">Name</th>
+                <td id="aruba-name"></td>
+              </tr>
+              <tr id="aruba-encryption-method-row" style="display:none;">
+                <th scope="row">Encryption Method</th>
+                <td id="aruba-encryption-method"></td>
+              </tr>
+              <tr id="aruba-site-row" style="display:none;">
+                <th scope="row">Site</th>
+                <td id="aruba-site"></td>
+              </tr>
+              <tr id="meraki-rssi-row" style="display:none;">
+                <th scope="row">Signal (RSSI)</th>
+                <td id="meraki-rssi"></td>
+              </tr>
+              <tr id="aruba-rssi-row" style="display:none;">
+                <th scope="row">Mobility Event RSSI</th>
+                <td id="aruba-rssi"></td>
+              </tr>
+              <tr id="meraki-snr-row" style="display:none;">
+                <th scope="row">Signal/Noise</th>
+                <td id="meraki-snr"></td>
+              </tr>
+              <tr id="meraki-user-row" style="display:none;">
+                <th scope="row">User</th>
+                <td id="meraki-user"></td>
+              </tr>
               <tr id="wireless-ssid-row" style="display:none;">
-                <th style="width:40%;" scope="row">SSID</th>
-                <td id="wireless-ssid"></td>
+                <th scope="row">SSID</th>
+                <td><span id="wireless-ssid"></span><small id="wireless-ssid-desc" class="d-block text-muted mt-1" style="display:none;"></small></td>
               </tr>
-              <tr id="wireless-ap-name-row" style="display:none;">
-                <th scope="row">Access Point</th>
-                <td id="wireless-ap-name"></td>
+              <tr id="meraki-vlan-row" style="display:none;">
+                <th scope="row">VLAN</th>
+                <td id="meraki-vlan"></td>
               </tr>
-              <tr id="wireless-ap-mac-row" style="display:none;">
-                <th scope="row">AP MAC</th>
-                <td id="wireless-ap-mac"></td>
-              </tr>
-              <tr id="wireless-controller-row" style="display:none;">
-                <th scope="row">Controller</th>
-                <td id="wireless-controller"></td>
+              <tr id="meraki-capabilities-row" style="display:none;">
+                <th scope="row">Capabilities</th>
+                <td id="meraki-capabilities"></td>
               </tr>
               <tr id="meraki-manufacturer-row" style="display:none;">
                 <th scope="row">Manufacturer</th>
@@ -505,47 +591,58 @@
                 <th scope="row">OS</th>
                 <td id="meraki-os"></td>
               </tr>
-              <tr id="meraki-user-row" style="display:none;">
-                <th scope="row">User</th>
-                <td id="meraki-user"></td>
+              <tr id="wireless-ap-name-row" style="display:none;">
+                <th scope="row">Access Point</th>
+                <td id="wireless-ap-name"></td>
               </tr>
-              <tr id="meraki-status-row" style="display:none;">
-                <th scope="row">Status</th>
-                <td id="meraki-status"></td>
+              <tr id="wireless-ap-mac-row" style="display:none;">
+                <th scope="row">AP MAC</th>
+                <td id="wireless-ap-mac"></td>
               </tr>
-              <tr id="meraki-vlan-row" style="display:none;">
-                <th scope="row">VLAN</th>
-                <td id="meraki-vlan"></td>
+              <tr id="aruba-radio-band-row" style="display:none;">
+                <th scope="row">Radio Band</th>
+                <td id="aruba-radio-band"></td>
               </tr>
-              <tr id="meraki-last-seen-row" style="display:none;">
-                <th scope="row">Last Seen</th>
-                <td id="meraki-last-seen"></td>
+              <tr id="aruba-channel-row" style="display:none;">
+                <th scope="row">Channel</th>
+                <td id="aruba-channel"></td>
               </tr>
-              <tr id="meraki-mac-row" style="display:none;">
-                <th scope="row">Client MAC</th>
-                <td id="meraki-mac"></td>
+              <tr id="aruba-roam-path-row" style="display:none;">
+                <th scope="row">Latest Roam</th>
+                <td id="aruba-roam-path"></td>
               </tr>
-              <tr id="meraki-rssi-row" style="display:none;">
-                <th scope="row">Signal (RSSI)</th>
-                <td id="meraki-rssi"></td>
+              <tr id="aruba-roam-protocol-row" style="display:none;">
+                <th scope="row">Roam Protocol</th>
+                <td id="aruba-roam-protocol"></td>
               </tr>
-              <tr id="meraki-snr-row" style="display:none;">
-                <th scope="row">Signal/Noise</th>
-                <td id="meraki-snr"></td>
-              </tr>
-              <tr id="meraki-capabilities-row" style="display:none;">
-                <th scope="row">Capabilities</th>
-                <td id="meraki-capabilities"></td>
+              <tr id="aruba-roam-time-row" style="display:none;">
+                <th scope="row">Roam Time</th>
+                <td id="aruba-roam-time"></td>
               </tr>
               <tr id="meraki-ap-model-row" style="display:none;">
                 <th scope="row">AP Model</th>
                 <td id="meraki-ap-model"></td>
+              </tr>
+              <tr id="wireless-controller-row" style="display:none;">
+                <th scope="row">Controller</th>
+                <td id="wireless-controller"></td>
               </tr>
             </tbody>
           </table>
         </div>
       </div>
     </div>
+    {% if context.vpn_install_url %}
+    <div id="vpn-card" class="card shadow my-3" style="display:none;">
+      <div class="card-body">
+        <h3 class="card-title h5"><i class="fa-solid fa-shield-halved text-primary me-2" aria-hidden="true"></i>Campus VPN</h3>
+        <p class="card-text small mb-3">Connect to the campus VPN to access restricted campus resources from off campus.</p>
+        <a id="vpn-install-link" href="{{ context.vpn_install_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-primary w-100">
+          <i class="fa-solid fa-download me-1" aria-hidden="true"></i>Install <span id="vpn-provider-name">{{ context.vpn_provider_name or 'VPN Client' }}</span>
+        </a>
+      </div>
+    </div>
+    {% endif %}
   </div><!-- end right-col -->
 
 </div><!-- end additional-info -->
@@ -558,29 +655,32 @@
       <h2 class="card-title h5"><i class="fa-solid fa-circle-question text-primary me-2" aria-hidden="true"></i>What does this tool show?</h2>
       <div class="row mt-2">
         <div class="col-md-6">
-          <p class="mb-1">All visitors see:</p>
+          <p class="mb-1">All visitors can see:</p>
           <ul class="mb-0">
-            <li>IPv4 and IPv6 address detection</li>
-            <li>Internet Service Provider (ISP) and geolocation</li>
-            <li>Internet DNS provider and security filtering status</li>
-            <li>IP geolocation map (city-level accuracy)</li>
+            <li>The public IP address detected for this visit</li>
+            <li>Internet Service Provider (ISP) and approximate geolocation, when available</li>
+            <li>Internet DNS provider and configured security filtering status, when available</li>
+            <li>An IP geolocation map based on approximate city-level data</li>
+            <li>IPv6 results when available; IPv6 support is currently under construction</li>
           </ul>
         </div>
         <div class="col-md-6 mt-3 mt-md-0">
-          <p class="mb-1">Campus and VPN visitors also see:</p>
+          <p class="mb-1">Recognized campus and VPN visitors may also see:</p>
           <ul class="mb-0">
-            <li>Campus network and VLAN assignment</li>
-            <li>Network Access Control (NAC) details</li>
-            <li>Wi-Fi connection details — SSID, access point, and signal quality</li>
+            <li>Campus network and Virtual Local Area Network (VLAN) assignment</li>
+            <li>Network Access Control (NAC) details, when provided by UB network systems</li>
+            <li>Wi-Fi connection details — SSID, access point, and signal quality — when available</li>
             <li>Building location map (street-level, where available)</li>
           </ul>
         </div>
       </div>
-      <p class="mt-3 mb-0">Knowing your network details helps diagnose connectivity problems before calling the help desk.
-        VPN users can confirm their traffic is routing through campus before accessing IP-restricted resources such as
-        licensed databases or administrative systems. Wireless users can verify they are on the correct network segment.
+      <p class="mt-3 mb-0">Knowing your network details can help diagnose connectivity problems, either on your own or
+        with assistance from the UBIT Help Center. Help Center staff may ask you to visit this page so they can use the
+        information shown here to help identify the problem. Anyone using VPN can confirm whether traffic is routing
+        through campus before accessing IP-restricted resources such as licensed databases or administrative systems.
+        Anyone using Wi-Fi can verify that the detected network information is what they expect.
         If something looks wrong — an unexpected ISP, an off-campus address while on-site, or a missing VPN address —
-        this page gives you the specific details to share with UBIT support.
+        this page gives you specific details to share with the UBIT Help Center.
       </p>
     </div>
   </div>
@@ -597,7 +697,7 @@
   "name": "My IP — UB Information Technology",
   "alternateName": "UBIT My IP",
   "url": "{{ site_url }}",
-  "description": "Find your IP address and test your connection to the University at Buffalo campus network. Designed for on-campus, UB VPN and Wi-Fi users, the tool provides IPv4 and IPv6 detection, DNS provider information, DNS security filtering status, and detailed UB network diagnostics.",
+  "description": "Find your IP address and test your connection to the University at Buffalo campus network. The tool provides public IP detection, DNS information, VPN checks, and additional UB network diagnostics when supported by campus systems.",
   "applicationCategory": "NetworkingApplication",
   "operatingSystem": "Any",
   "isAccessibleForFree": true,
@@ -620,7 +720,7 @@
   },
   "featureList": [
     "IP address lookup",
-    "IPv4 and IPv6 detection",
+    "Public IP address detection",
     "UB VPN detection",
     "UB campus network detection",
     "Wi-Fi connection details",
@@ -679,7 +779,15 @@
 {% elif context['map_provider'] == 'google' %}
 <script src="{{ url_for('static', filename='js/map-google.js') }}?v={{ app_version }}"></script>
 {% endif %}
-<script type="application/json" id="is_campus">{{ (true if context.simulate else context['is_campus']) | tojson }}</script>
-<script type="application/json" id="default_address">{{ ("2001:db8::50" if context.simulate else context['client_address']) | tojson }}</script>
+<script type="application/json" id="is_campus">{{ context['is_campus'] | tojson }}</script>
+<script type="application/json" id="default_address">{{ (
+  "2001:db8::50" if context.simulate_mode in ("6", "oncampus6") else
+  "2001:db8:cafe::75" if context.simulate_mode == "offcampus6" else
+  "203.0.113.75" if context.simulate_mode == "offcampus" else
+  "192.0.2.50" if context.simulate else
+  context['client_address']
+) | tojson }}</script>
+{% if context.vpn_install_url %}<script type="application/json" id="vpn_config">{{ {'provider_name': context.vpn_provider_name, 'install_url': context.vpn_install_url} | tojson }}</script>{% endif %}
+{% if context.ssid_info %}<script type="application/json" id="ssid_info">{{ context.ssid_info | tojson }}</script>{% endif %}
 <script src="{{ url_for('static', filename='js/whatismyip.js') }}?v={{ app_version }}"></script>
 {% endblock %}

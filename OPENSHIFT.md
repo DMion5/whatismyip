@@ -155,6 +155,20 @@ oc logs -l app=whatismyip
 
 A healthy pod shows `Running` with `1/1` ready. Open your route URL to confirm.
 
+### Manually list Aruba Central sites
+
+The image includes a manual inventory utility that uses the pod's configured
+`FLASK_ARUBA_CENTRAL_CLIENT_ID` and `FLASK_ARUBA_CENTRAL_CLIENT_SECRET`. It is
+not run by the web application or during pod startup.
+
+```bash
+oc rsh <pod-name> python scripts/list_aruba_sites.py
+```
+
+The command prints site ID, site name, address, and a total. Its short-lived
+access token remains only in the utility process and is discarded when the
+command exits.
+
 ---
 
 ## Configuration

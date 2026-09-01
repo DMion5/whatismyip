@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block title %}Frequently Asked Questions | My IP{% endblock %}
-{% block meta_description %}Common questions about My IP, including campus connectivity, UB VPN, IPv4, IPv6, privacy, reports and API usage.{% endblock %}
+{% block meta_description %}Common questions about My IP, including campus connectivity, UB VPN, IPv4, IPv6, privacy and support reports.{% endblock %}
 {% block og_title %}Frequently Asked Questions | My IP{% endblock %}
 {% block og_description %}Common questions about University at Buffalo network diagnostics, UB VPN, IPv4, IPv6, privacy and support reports.{% endblock %}
 {% block og_url %}{{ site_url }}/faq{% endblock %}
@@ -21,52 +21,52 @@
   <div class="col">
       <div class="accordion my-3" id="faqAccordion">
 
-        <p class="faq-section-label text-primary">What you see</p>
+        <h2 class="faq-section-label text-primary">What you see</h2>
 
         <div class="accordion-item faq-accent-primary">
-          <h2 class="accordion-header" id="faq-on-campus-heading">
+          <h3 class="accordion-header" id="faq-on-campus-heading">
             <button class="accordion-button collapsed" type="button" data-mdb-toggle="collapse" data-mdb-target="#faq-on-campus" aria-expanded="false" aria-controls="faq-on-campus">
               <i class="fa-solid fa-building text-primary me-2" aria-hidden="true"></i>
               If I am on campus, what can this tool tell me?
             </button>
-          </h2>
+          </h3>
           <div id="faq-on-campus" class="accordion-collapse collapse" aria-labelledby="faq-on-campus-heading">
             <div class="accordion-body">
-              <p>Every visitor sees your IP address, internet provider, approximate geolocation, and DNS security filtering status. On-campus and VPN users additionally see:</p>
+              <p>Every visitor sees the public IP address detected for the visit and may also see an internet provider, approximate geolocation, DNS provider, and configured security filtering status. If the address is recognized as campus or VPN traffic and UB network systems have matching data, the site may additionally show:</p>
               <ul class="mb-3">
-                <li>Campus network and VLAN assignment</li>
-                <li>DHCP and network configuration details</li>
-                <li>Network Access Control (NAC) details, including switch port and connection policy</li>
+                <li>Campus network and Virtual Local Area Network (VLAN) assignment</li>
+                <li>DHCP and network configuration details, when available</li>
+                <li>Network Access Control (NAC) details, such as switch port and connection policy, when available</li>
                 <li>Wi-Fi connection details - SSID, access point name, and signal quality (when available)</li>
-                <li>Building location map for wired and wireless connections</li>
+                <li>A building location map when a wired or Wi-Fi connection has mapped location data</li>
               </ul>
-              <p class="mb-0">Knowing these details helps diagnose connectivity problems and troubleshoot access to UB network resources.</p>
+              <p class="mb-0">These details can help you investigate a problem yourself or help UBIT Help Center staff troubleshoot access to UB network resources.</p>
             </div>
           </div>
         </div>
 
         <div class="accordion-item faq-accent-primary">
-          <h2 class="accordion-header" id="faq-off-campus-heading">
+          <h3 class="accordion-header" id="faq-off-campus-heading">
             <button class="accordion-button collapsed" type="button" data-mdb-toggle="collapse" data-mdb-target="#faq-off-campus" aria-expanded="false" aria-controls="faq-off-campus">
               <i class="fa-solid fa-house text-primary me-2" aria-hidden="true"></i>
               If I am off campus, what can this tool tell me?
             </button>
-          </h2>
+          </h3>
           <div id="faq-off-campus" class="accordion-collapse collapse" aria-labelledby="faq-off-campus-heading">
             <div class="accordion-body">
-              <p>Off-campus visitors see their IP address, internet provider, approximate location, and DNS security filtering status. Campus network details - VLAN assignment, NAC information, and building location - are not available from off-campus addresses.</p>
+              <p>Off-campus visitors see the public IP address detected for the visit and may also see an internet provider, approximate location, DNS provider, and configured security filtering status. Internal campus details such as VLAN assignment, NAC information, and building location are not normally available for off-campus addresses.</p>
               <p class="mb-0">If your UB VPN connection uses an address recognized by this deployment, the tool may show additional campus network details.</p>
             </div>
           </div>
         </div>
 
         <div class="accordion-item faq-accent-primary">
-          <h2 class="accordion-header" id="faq-off-campus-result-heading">
+          <h3 class="accordion-header" id="faq-off-campus-result-heading">
             <button class="accordion-button collapsed" type="button" data-mdb-toggle="collapse" data-mdb-target="#faq-off-campus-result" aria-expanded="false" aria-controls="faq-off-campus-result">
               <i class="fa-solid fa-circle-question text-primary me-2" aria-hidden="true"></i>
               Why am I seeing an off-campus result when I am physically on campus?
             </button>
-          </h2>
+          </h3>
           <div id="faq-off-campus-result" class="accordion-collapse collapse" aria-labelledby="faq-off-campus-result-heading">
             <div class="accordion-body">
               <p>Several things can cause this:</p>
@@ -76,38 +76,39 @@
                 <li>Your device is on a specialized network segment not recognized as a standard campus address range</li>
                 <li>A VPN from another organization is active, routing your traffic through a different IP</li>
               </ul>
-              <p class="mb-0">Try connecting to the main campus Wi-Fi (eduroam) or a wired network port and reloading the page.</p>
+              <p class="mb-0">Try connecting to UB's campus Wi-Fi (eduroam) or a wired network port and reloading the page.</p>
             </div>
           </div>
         </div>
 
         <div class="accordion-item faq-accent-primary">
-          <h2 class="accordion-header" id="faq-different-ip-heading">
+          <h3 class="accordion-header" id="faq-different-ip-heading">
             <button class="accordion-button collapsed" type="button" data-mdb-toggle="collapse" data-mdb-target="#faq-different-ip" aria-expanded="false" aria-controls="faq-different-ip">
               <i class="fa-solid fa-arrow-right-arrow-left text-primary me-2" aria-hidden="true"></i>
               Why does this site show a different IP address than other lookup sites?
             </button>
-          </h2>
+          </h3>
           <div id="faq-different-ip" class="accordion-collapse collapse" aria-labelledby="faq-different-ip-heading">
             <div class="accordion-body">
-              <p>Most general IP lookup tools show the address your device presents to their internet service. This tool also tests IPv4 and IPv6 connectivity to the configured UB service endpoints. A VPN, proxy, cellular relay, or different network route can cause two sites to see different addresses.</p>
-              <p class="mb-0">Additionally, most lookup sites force a connection over IPv4. This tool tests both IPv4 and IPv6 separately and shows whichever your device uses by default when reaching campus - which may be IPv6. Both addresses are correct; your device can use different protocols to reach different destinations simultaneously.</p>
+              <p>Most general IP lookup tools show the address your device presents to their internet service. A VPN, proxy, cellular relay, or different network route can cause two sites to see different addresses.</p>
+              <p>My IP attempts separate IPv4 and IPv6 checks against configured UB service endpoints. IPv6 support is currently under construction, so IPv6 results may be missing or incomplete.</p>
+              <p class="mb-0">When both protocols are available, a device can use IPv4 for one destination and IPv6 for another. That can make two correct lookup results appear different.</p>
             </div>
           </div>
         </div>
 
-        <p class="faq-section-label text-success">Campus network</p>
+        <h2 class="faq-section-label text-success">Campus network</h2>
 
         <div class="accordion-item faq-accent-success">
-          <h2 class="accordion-header" id="faq-campus-heading">
+          <h3 class="accordion-header" id="faq-campus-heading">
             <button class="accordion-button collapsed" type="button" data-mdb-toggle="collapse" data-mdb-target="#faq-campus" aria-expanded="false" aria-controls="faq-campus">
               <i class="fa-solid fa-network-wired text-success me-2" aria-hidden="true"></i>
               What is campus?
             </button>
-          </h2>
+          </h3>
           <div id="faq-campus" class="accordion-collapse collapse" aria-labelledby="faq-campus-heading">
             <div class="accordion-body">
-              <p class="mb-0">Campus refers to University at Buffalo network service at North Campus, South Campus, Downtown Campus, and other recognized UB locations.
+              <p class="mb-0">Campus refers to the University at Buffalo's network service at North Campus, South Campus, Downtown Campus, and other recognized UB locations.
                 See the <a href="https://www.buffalo.edu/home/visiting-ub/map.html">official UB campus maps</a> for location information.
               </p>
             </div>
@@ -115,30 +116,57 @@
         </div>
 
         <div class="accordion-item faq-accent-success">
-          <h2 class="accordion-header" id="faq-nac-heading">
+          <h3 class="accordion-header" id="faq-vlan-heading">
+            <button class="accordion-button collapsed" type="button" data-mdb-toggle="collapse" data-mdb-target="#faq-vlan" aria-expanded="false" aria-controls="faq-vlan">
+              <i class="fa-solid fa-diagram-project text-success me-2" aria-hidden="true"></i>
+              What is a VLAN?
+            </button>
+          </h3>
+          <div id="faq-vlan" class="accordion-collapse collapse" aria-labelledby="faq-vlan-heading">
+            <div class="accordion-body">
+              <p class="mb-0">A Virtual Local Area Network (VLAN) is the virtual network segment your device is using. UB can use VLANs to separate devices or services that have different access and security requirements.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item faq-accent-success">
+          <h3 class="accordion-header" id="faq-nac-heading">
             <button class="accordion-button collapsed" type="button" data-mdb-toggle="collapse" data-mdb-target="#faq-nac" aria-expanded="false" aria-controls="faq-nac">
               <i class="fa-solid fa-lock text-success me-2" aria-hidden="true"></i>
               What is Network Access Control (NAC)?
             </button>
-          </h2>
+          </h3>
           <div id="faq-nac" class="accordion-collapse collapse" aria-labelledby="faq-nac-heading">
             <div class="accordion-body">
               <p class="mb-0">Network Access Control is a system that manages which devices are allowed to connect to the campus network and under what conditions.
-                When you connect, NAC checks whether your device meets security requirements - such as being registered or having current software.
-                The connection policy shown in this tool reflects the access level your device has been granted.
+                When you connect, NAC may check requirements such as device registration or software status.
+                When UB network systems provide the information, My IP may show the connection policy or other NAC details associated with the device.
               </p>
             </div>
           </div>
         </div>
 
+        <div class="accordion-item faq-accent-success">
+          <h3 class="accordion-header" id="faq-dns-heading">
+            <button class="accordion-button collapsed" type="button" data-mdb-toggle="collapse" data-mdb-target="#faq-dns" aria-expanded="false" aria-controls="faq-dns">
+              <i class="fa-solid fa-shield-halved text-success me-2" aria-hidden="true"></i>
+              What is Campus DNS Security?
+            </button>
+          </h3>
+          <div id="faq-dns" class="accordion-collapse collapse" aria-labelledby="faq-dns-heading">
+            <div class="accordion-body">
+              <p class="mb-0">UBIT can protect devices that use campus DNS resolvers by blocking known malicious domains. The result shown by My IP indicates whether the configured campus DNS security test appears active; encrypted or private DNS settings can affect the result.</p>
+            </div>
+          </div>
+        </div>
 
         <div class="accordion-item faq-accent-success">
-          <h2 class="accordion-header" id="faq-dns-provider-heading">
+          <h3 class="accordion-header" id="faq-dns-provider-heading">
             <button class="accordion-button collapsed" type="button" data-mdb-toggle="collapse" data-mdb-target="#faq-dns-provider" aria-expanded="false" aria-controls="faq-dns-provider">
               <i class="fa-solid fa-magnifying-glass text-success me-2" aria-hidden="true"></i>
               What does the DNS provider check show?
             </button>
-          </h2>
+          </h3>
           <div id="faq-dns-provider" class="accordion-collapse collapse" aria-labelledby="faq-dns-provider-heading">
             <div class="accordion-body">
               <p>Every time your device connects to a website, it uses a DNS resolver to translate the domain name into an IP address. This check estimates which provider answered the browser's test query.</p>
@@ -148,15 +176,15 @@
           </div>
         </div>
 
-        <p class="faq-section-label text-warning">Privacy &amp; location</p>
+        <h2 class="faq-section-label text-warning">Privacy &amp; location</h2>
 
         <div class="accordion-item faq-accent-warning">
-          <h2 class="accordion-header" id="faq-privacy-heading">
+          <h3 class="accordion-header" id="faq-privacy-heading">
             <button class="accordion-button collapsed" type="button" data-mdb-toggle="collapse" data-mdb-target="#faq-privacy" aria-expanded="false" aria-controls="faq-privacy">
               <i class="fa-solid fa-eye-slash text-warning me-2" aria-hidden="true"></i>
               Is my IP address being stored or tracked?
             </button>
-          </h2>
+          </h3>
           <div id="faq-privacy" class="accordion-collapse collapse" aria-labelledby="faq-privacy-heading">
             <div class="accordion-body">
               <p class="mb-0">The application metrics feature stores aggregate counts and classifications rather than raw client IP addresses. Separate web server, reverse proxy, security, and operational logs may retain network information according to the production configuration and applicable UB policy.</p>
@@ -165,32 +193,33 @@
         </div>
 
         <div class="accordion-item faq-accent-warning">
-          <h2 class="accordion-header" id="faq-external-service-heading">
+          <h3 class="accordion-header" id="faq-external-service-heading">
             <button class="accordion-button collapsed" type="button" data-mdb-toggle="collapse" data-mdb-target="#faq-external-service" aria-expanded="false" aria-controls="faq-external-service">
               <i class="fa-solid fa-arrow-up-right-from-square text-warning me-2" aria-hidden="true"></i>
               Does this site contact any external services?
             </button>
-          </h2>
+          </h3>
           <div id="faq-external-service" class="accordion-collapse collapse" aria-labelledby="faq-external-service-heading">
             <div class="accordion-body">
-              <p>Yes. Your browser contacts up to three external services as part of the diagnostic checks:</p>
+              <p>Yes. The service and your browser may contact external providers while producing diagnostic results:</p>
               <ul class="mb-3">
-                <li><a href="https://ip-api.com/">ip-api.com</a> - identifies your internet DNS provider and EDNS client subnet as part of the DNS information test.</li>
-                <li><a href="https://www.ipify.org/">ipify.org</a> - checks what IPv4 address internet servers see for your connection. This is compared against the campus-detected address to identify split-tunnel VPN or campus NAT scenarios.</li>
-                <li>A configured test domain - if DNS security filtering is enabled, your browser attempts to reach a known test domain to determine whether filtering is active.</li>
+                <li><a href="https://ip-api.com/">ip-api.com</a> - provides approximate public IP geolocation and helps identify the internet DNS provider and EDNS client subnet.</li>
+                <li><a href="https://www.ipify.org/">ipify.org</a> - checks the IPv4 address seen by an internet service. This can help identify split-tunnel VPN or campus NAT scenarios.</li>
+                <li>OpenStreetMap or Google Maps - supplies map data when a location map is displayed, depending on the configured map provider.</li>
+                <li>A configured test domain - if DNS security filtering is enabled, the browser attempts to reach a known test domain to determine whether filtering appears active.</li>
               </ul>
-              <p class="mb-0">In all cases your IP address is visible to any internet service you contact, so these checks do not expose anything beyond what is inherent to browsing the web. The application receives only the diagnostic results needed to display the page, subject to the production configuration.</p>
+              <p class="mb-0">An internet service can see the IP address used to contact it. My IP uses the returned diagnostic information to display results, subject to the production configuration and applicable UB policy.</p>
             </div>
           </div>
         </div>
 
         <div class="accordion-item faq-accent-warning">
-          <h2 class="accordion-header" id="faq-location-accuracy-heading">
+          <h3 class="accordion-header" id="faq-location-accuracy-heading">
             <button class="accordion-button collapsed" type="button" data-mdb-toggle="collapse" data-mdb-target="#faq-location-accuracy" aria-expanded="false" aria-controls="faq-location-accuracy">
               <i class="fa-solid fa-location-dot text-warning me-2" aria-hidden="true"></i>
               Why does my IP location look inaccurate?
             </button>
-          </h2>
+          </h3>
           <div id="faq-location-accuracy" class="accordion-collapse collapse" aria-labelledby="faq-location-accuracy-heading">
             <div class="accordion-body">
               <p class="mb-0">IP geolocation is a city-level estimate based on where an internet provider registered its address block - not your physical location or GPS position.
@@ -202,12 +231,12 @@
         </div>
 
         <div class="accordion-item faq-accent-warning">
-          <h2 class="accordion-header" id="faq-location-update-heading">
+          <h3 class="accordion-header" id="faq-location-update-heading">
             <button class="accordion-button collapsed" type="button" data-mdb-toggle="collapse" data-mdb-target="#faq-location-update" aria-expanded="false" aria-controls="faq-location-update">
               <i class="fa-solid fa-pen-to-square text-warning me-2" aria-hidden="true"></i>
               The location data for my IP address doesn't look right. Can it be updated?
             </button>
-          </h2>
+          </h3>
           <div id="faq-location-update" class="accordion-collapse collapse" aria-labelledby="faq-location-update-heading">
             <div class="accordion-body">
               <p class="mb-0">Yes, the service <a href="https://ip-api.com/">IP-API.com</a> being used offers a <a href="https://ip-api.com/docs/correction">data correction</a> page for submitting requests.</p>
@@ -215,31 +244,31 @@
           </div>
         </div>
 
-        <p class="faq-section-label text-info">Technical</p>
+        <h2 class="faq-section-label text-info">Technical</h2>
 
         <div class="accordion-item faq-accent-info">
-          <h2 class="accordion-header" id="faq-report-heading">
+          <h3 class="accordion-header" id="faq-report-heading">
             <button class="accordion-button collapsed" type="button" data-mdb-toggle="collapse" data-mdb-target="#faq-report" aria-expanded="false" aria-controls="faq-report">
               <i class="fa-solid fa-file-arrow-down text-info me-2" aria-hidden="true"></i>
               How do I download a support report?
             </button>
-          </h2>
+          </h3>
           <div id="faq-report" class="accordion-collapse collapse" aria-labelledby="faq-report-heading">
             <div class="accordion-body">
-              <p>The <b>Report</b> button in the navigation bar generates a print-ready summary of everything shown on the home page - your IP address, connection type, campus network details, device information, and IPv4/IPv6 connectivity test results. The button activates automatically once your connection details have finished loading.</p>
-              <p>Clicking <b>Report</b> opens a formatted page in a new browser window. From there, use your browser's Print function (<kbd>Ctrl+P</kbd> on Windows / <kbd>Cmd+P</kbd> on Mac) and choose <b>Save as PDF</b> as the destination. The resulting file can be attached to a request at <a href="https://support.buffalo.edu/">support.buffalo.edu</a>.</p>
+              <p>The <b>Print Report (PDF)</b> button near the top of the home page generates a print-ready summary of the results available for your visit, including your IP address, connection classification, device information, and any campus network or connectivity details that finished loading. IPv6 information may be unavailable or incomplete while IPv6 support is under construction.</p>
+              <p>Clicking <b>Print Report (PDF)</b> opens a formatted page in a new browser window. From there, use your browser's Print function (<kbd>Ctrl+P</kbd> on Windows / <kbd>Cmd+P</kbd> on Mac) and choose <b>Save as PDF</b> as the destination. The resulting file can be attached to a request at <a href="https://support.buffalo.edu/">support.buffalo.edu</a>.</p>
               <p class="mb-0">If a popup blocker prevents the window from opening, allow popups for this site and try again.</p>
             </div>
           </div>
         </div>
 
         <div class="accordion-item faq-accent-info">
-          <h2 class="accordion-header" id="faq-speedtest-heading">
+          <h3 class="accordion-header" id="faq-speedtest-heading">
             <button class="accordion-button collapsed" type="button" data-mdb-toggle="collapse" data-mdb-target="#faq-speedtest" aria-expanded="false" aria-controls="faq-speedtest">
               <i class="fa-solid fa-gauge-high text-info me-2" aria-hidden="true"></i>
               How does the speed test on this site work?
             </button>
-          </h2>
+          </h3>
           <div id="faq-speedtest" class="accordion-collapse collapse" aria-labelledby="faq-speedtest-heading">
             <div class="accordion-body">
               <p>The Speed Test page opens <a href="https://fast.com/">Fast.com</a>, a third-party internet performance test.</p>
@@ -249,18 +278,18 @@
         </div>
 
         <div class="accordion-item faq-accent-info">
-          <h2 class="accordion-header" id="faq-isp-org-heading">
+          <h3 class="accordion-header" id="faq-isp-org-heading">
             <button class="accordion-button collapsed" type="button" data-mdb-toggle="collapse" data-mdb-target="#faq-isp-org" aria-expanded="false" aria-controls="faq-isp-org">
               <i class="fa-solid fa-sitemap text-info me-2" aria-hidden="true"></i>
               What is the difference between Internet provider and Organization in the site statistics?
             </button>
-          </h2>
+          </h3>
           <div id="faq-isp-org" class="accordion-collapse collapse" aria-labelledby="faq-isp-org-heading">
             <div class="accordion-body">
               <p>Both come from geolocation data associated with your IP address, but they describe different things:</p>
               <ul class="mb-3">
-                <li><b>Internet provider</b> is the company that sells you internet access - the legal business name registered as the owner of your IP address range. Examples: "Charter Communications", "Comcast Cable Communications LLC", "AT&T Enterprises LLC".</li>
-                <li><b>Organization</b> is the entity registered as the operator of your specific IP address block with the regional internet registry. For home users this is often a brand or subsidiary name (e.g., "Spectrum" is Charter's consumer brand). For universities, businesses, and enterprises that manage their own IP allocations, it is typically the institution itself - for example, a UB campus address may show "University at Buffalo" or another related registry name as the organization.</li>
+                <li><b>Internet provider</b> is the company that sells you internet access - the legal business name registered as the owner of your IP address range. Examples include "Charter Communications," "Comcast Cable Communications LLC," and "AT&amp;T Enterprises LLC."</li>
+                <li><b>Organization</b> is the entity registered as the operator of your specific IP address block with the regional internet registry. For home connections this is often a brand or subsidiary name (for example, Spectrum is Charter's consumer brand). For universities, businesses, and enterprises that manage their own IP allocations, it is typically the institution itself - for example, a UB campus address may show "University at Buffalo" or another related registry name as the organization.</li>
               </ul>
               <p class="mb-0">The two fields are often the same or closely related for residential connections, but can differ significantly for business and campus users.</p>
             </div>
@@ -268,36 +297,15 @@
         </div>
 
         <div class="accordion-item faq-accent-info">
-          <h2 class="accordion-header" id="faq-query-heading">
+          <h3 class="accordion-header" id="faq-query-heading">
             <button class="accordion-button collapsed" type="button" data-mdb-toggle="collapse" data-mdb-target="#faq-query" aria-expanded="false" aria-controls="faq-query">
               <i class="fa-solid fa-ban text-info me-2" aria-hidden="true"></i>
               Can I query information about different IP addresses?
             </button>
-          </h2>
+          </h3>
           <div id="faq-query" class="accordion-collapse collapse" aria-labelledby="faq-query-heading">
             <div class="accordion-body">
               <p class="mb-0">No. For security reasons, this tool only displays information about the client device communicating with it.</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="accordion-item faq-accent-info">
-          <h2 class="accordion-header" id="faq-api-heading">
-            <button class="accordion-button collapsed" type="button" data-mdb-toggle="collapse" data-mdb-target="#faq-api" aria-expanded="false" aria-controls="faq-api">
-              <i class="fa-solid fa-code text-info me-2" aria-hidden="true"></i>
-              Is an API available?
-            </button>
-          </h2>
-          <div id="faq-api" class="accordion-collapse collapse" aria-labelledby="faq-api-heading">
-            <div class="accordion-body">
-              <p>This application is intended for browser-based use, but it is powered by an API that can be accessed directly.
-                API responses and data structures may change over time without notice.
-              </p>
-              <ul class="mb-0">
-                <li><a href="{{ site_url }}/hostinfo">Dual stack hostinfo</a> for dual stack detection</li>
-                <li><a href="{{ ipv4_url }}/hostinfo">IPv4 hostinfo</a> for IPv4 only testing</li>
-                {% if ipv6_url %}<li><a href="{{ ipv6_url }}/hostinfo">IPv6 hostinfo</a> for IPv6 only testing</li>{% endif %}
-              </ul>
             </div>
           </div>
         </div>

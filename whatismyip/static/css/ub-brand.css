@@ -21,8 +21,8 @@
 	--site-bg: var(--ub-white);
 	--site-surface: var(--ub-white);
 	--site-subtle-bg: var(--ub-baird-point);
-	--site-text: var(--ub-harriman-blue);
-	--site-muted-text: var(--ub-townsend-gray);
+	--site-text: #000000;
+	--site-muted-text: #262626;
 	--site-link: var(--ub-blue);
 	--site-link-hover: var(--ub-harriman-blue);
 	--site-border: var(--ub-baird-point);
@@ -158,7 +158,7 @@ h6,
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	gap: 0.65rem;
+	gap: 0.28em;
 	color: var(--ub-blue);
 	text-decoration: none;
 }
@@ -169,27 +169,29 @@ h6,
 	text-decoration: none;
 }
 
-.ub-app-logo {
-	display: block;
-	width: auto;
-	height: 3.5rem;
-	object-fit: contain;
+main a.ub-app-title,
+main a.ub-app-title:hover,
+main a.ub-app-title:focus {
+	text-decoration: none;
 }
 
-@media (max-width: 576px) {
-	.ub-app-logo {
-		height: 2.75rem;
-	}
+.ub-app-symbol {
+	display: inline-flex;
+	align-items: center;
+	color: var(--ub-blue);
+	font-size: 1em;
+	line-height: 1;
 }
 
 .site-title {
-	font-size: clamp(1.8rem, 4vw, 2.45rem);
+	font-size: clamp(2.4rem, 5vw, 3.25rem);
 	font-weight: 700;
 	letter-spacing: -0.02em;
+	line-height: 1;
 }
 
 .site-header-tagline {
-	color: var(--ub-townsend-gray);
+	color: var(--site-muted-text);
 	font-size: 0.84rem;
 	font-weight: 700;
 	letter-spacing: 0.03em;
@@ -216,34 +218,35 @@ html[data-theme="dark"] .site-header-tagline {
 
 /* Site navigation */
 .site-navbar {
-	background: var(--ub-harriman-blue);
-	border-top: 4px solid var(--ub-blue);
+	background: var(--ub-white);
+	border-top: 1px solid var(--ub-baird-point);
+	border-bottom: 1px solid #c8c8c8;
 }
 
 .site-navbar .nav-link {
-	color: var(--ub-white);
+	color: var(--ub-blue);
 	opacity: 1;
 }
 
 .site-navbar .nav-link:hover,
 .site-navbar .nav-link:focus {
-	color: var(--ub-white);
+	color: var(--ub-harriman-blue);
 	text-decoration: underline;
 	text-decoration-thickness: 2px;
 	text-underline-offset: 4px;
 }
 
 .site-navbar .nav-link.active {
-	color: var(--ub-white) !important;
-	border-bottom-color: var(--ub-solar-strand);
+	color: var(--ub-blue) !important;
+	border-bottom-color: var(--ub-blue);
 }
 
 .site-navbar-toggler {
-	color: var(--ub-white);
+	color: var(--ub-blue);
 }
 
 .site-navbar-toggler:focus-visible {
-	outline-color: var(--ub-solar-strand);
+	outline-color: var(--ub-blue);
 }
 
 /* Core controls */
@@ -267,6 +270,11 @@ html[data-theme="dark"] .site-header-tagline {
 
 .text-primary {
 	color: var(--ub-blue) !important;
+}
+
+/* Keep body and secondary copy crisp against the white light-theme surface. */
+html:not([data-theme="dark"]) .text-muted {
+	color: var(--site-muted-text) !important;
 }
 
 /* The main IP address card */
@@ -405,7 +413,7 @@ html[data-theme="dark"] .text-danger {
 	}
 
 	.site-navbar .nav-link.active {
-		border-left-color: var(--ub-solar-strand);
+		border-left-color: var(--ub-blue);
 	}
 }
 
@@ -427,7 +435,7 @@ html[data-theme="dark"] .text-danger {
 
 .ub-university-logo {
 	display: block;
-	width: 350px;
+	width: 265px;
 	max-width: 100%;
 	height: auto;
 	object-fit: contain;

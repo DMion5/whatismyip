@@ -39,7 +39,7 @@ async function placeLatLonMarker(lat, lon, title) {
 	addAdvancedMarker(position, title);
 }
 
-function loadCampusMap(address, title, lat, lon) {
+function loadCampusMap(address, title, lat, lon, zoom) {
 	$('#map_card').show();
 	$('#map_label').hide();
 
@@ -52,7 +52,7 @@ function loadCampusMap(address, title, lat, lon) {
 		return;
 	}
 	mapInitialized = true;
-	initMap(startLat, startLon, 17)
+	initMap(startLat, startLon, zoom || 17)
 		.then(() => useCampusLatLon ? placeLatLonMarker(lat, lon, title) : codeAddress(address, title))
 		.catch((error) => {
 			console.error('Failed to load campus map', error);

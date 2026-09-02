@@ -1,6 +1,6 @@
 # Deploying on OpenShift
 
-This guide walks through deploying **My IP** on OpenShift using Source-to-Image (S2I) — the same approach used for the University at Buffalo deployment. It is written for teams who manage OpenShift projects but are not necessarily Python developers.
+This guide walks through deploying **Check Your Internet Connection** on OpenShift using Source-to-Image (S2I) — the same approach used for the University at Buffalo deployment. It is written for teams who manage OpenShift projects but are not necessarily Python developers.
 
 The application runs as a single pod backed by a PersistentVolumeClaim for configuration and metrics storage.
 

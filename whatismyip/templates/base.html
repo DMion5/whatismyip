@@ -12,24 +12,24 @@
 
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-	<title>{% block title %}My IP | UB Information Technology{% endblock %}</title>
+	<title>{% block title %}Check Your Internet Connection | UB Information Technology{% endblock %}</title>
 	<meta name="description" content="{% block meta_description %}View your public IP address and test University at Buffalo network connectivity, VPN, DNS and available campus network information.{% endblock %}">
 	<meta name="keywords" content="{% block meta_keywords %}UB network diagnostics, University at Buffalo, UBIT, IP address, IPv4, IPv6, VPN, DNS, campus network{% endblock %}">
 	<meta name="author" content="UB Information Technology">
 	<meta name="robots" content="index, follow">
 
-	<meta property="og:title" content="{% block og_title %}My IP | UB Information Technology{% endblock %}">
-	<meta property="og:site_name" content="My IP">
+	<meta property="og:title" content="{% block og_title %}Check Your Internet Connection | UB Information Technology{% endblock %}">
+	<meta property="og:site_name" content="Check Your Internet Connection">
 	<meta property="og:url" content="{% block og_url %}{{ site_url }}{% endblock %}">
 	<meta property="og:description" content="{% block og_description %}Check your IP address and University at Buffalo network connection, including VPN, DNS and available campus network details.{% endblock %}">
 	<meta property="og:type" content="website">
 	<meta property="og:image" content="{{ site_url }}{{ url_for('static', filename='logo/placeholder-logo.svg') }}">
 	<meta property="og:image:width" content="512">
 	<meta property="og:image:height" content="512">
-	<meta property="og:image:alt" content="Placeholder logo for My IP">
+	<meta property="og:image:alt" content="Placeholder logo for Check Your Internet Connection">
 
 	<meta name="twitter:card" content="summary">
-	<meta name="twitter:title" content="{% block twitter_title %}My IP | UB Information Technology{% endblock %}">
+	<meta name="twitter:title" content="{% block twitter_title %}Check Your Internet Connection | UB Information Technology{% endblock %}">
 	<meta name="twitter:description" content="{% block twitter_description %}Check your IP address and University at Buffalo network connection.{% endblock %}">
 	<meta name="twitter:image" content="{{ site_url }}{{ url_for('static', filename='logo/placeholder-logo.svg') }}">
 
@@ -95,7 +95,7 @@
 							<span class="ub-app-symbol" aria-hidden="true">
 								<i class="fa-solid fa-location-dot"></i>
 							</span>
-							<span>My IP</span>
+							<span>Check Your Internet Connection</span>
 						</a>
 						{% block site_heading_close %}</p>{% endblock %}
 
@@ -214,7 +214,7 @@
 				<div class="col">
 					<p class="ub-footer-meta text-center mb-1">
 						<small>
-							My IP
+							Check Your Internet Connection
 							&nbsp;&middot;&nbsp;
 							<a href="https://github.com/DMion5/whatismyip/blob/master/CHANGELOG.md">
 								v{{ app_version }}
@@ -231,9 +231,9 @@
 					</p>
 					<p class="ub-footer-credit text-center mb-0">
 						<small>
-							My IP is operated and maintained for University at Buffalo by UB Information Technology.
+							Check Your Internet Connection is operated and maintained for University at Buffalo by UB Information Technology.
 							Based on the
-							<a href="https://github.com/unc-network/whatismyip">open-source What Is My IP project</a>
+							<a href="https://github.com/unc-network/whatismyip">upstream open-source project</a>
 							originally developed by William E. Whitaker, Jr. and UNC Information Technology Services.
 						</small>
 					</p>

@@ -1,24 +1,24 @@
 {% extends "base.html" %}
 
-{% block title %}About | My IP{% endblock %}
-{% block meta_description %}Learn about My IP, a University at Buffalo service that displays the IP address seen by campus applications and helps troubleshoot network connectivity.{% endblock %}
-{% block og_title %}About | My IP{% endblock %}
-{% block og_description %}Learn how My IP helps the University at Buffalo community identify IP, VPN, DNS and campus network information.{% endblock %}
+{% block title %}About | Check Your Internet Connection{% endblock %}
+{% block meta_description %}Learn about Check Your Internet Connection, a University at Buffalo service that displays the IP address seen by campus applications and helps troubleshoot network connectivity.{% endblock %}
+{% block og_title %}About | Check Your Internet Connection{% endblock %}
+{% block og_description %}Learn how Check Your Internet Connection helps the University at Buffalo community identify IP, VPN, DNS and campus network information.{% endblock %}
 {% block og_url %}{{ site_url }}/about{% endblock %}
-{% block twitter_title %}About | My IP{% endblock %}
-{% block twitter_description %}Learn how My IP helps troubleshoot University at Buffalo network connectivity.{% endblock %}
+{% block twitter_title %}About | Check Your Internet Connection{% endblock %}
+{% block twitter_description %}Learn how Check Your Internet Connection helps troubleshoot University at Buffalo network connectivity.{% endblock %}
 
 {% block structured_data %}
 <script type="application/ld+json">
 {
 	"@context": "https://schema.org",
 	"@type": "WebPage",
-	"name": "About My IP",
+	"name": "About Check Your Internet Connection",
 	"url": "{{ site_url }}/about",
 	"description": "Information about the University at Buffalo network diagnostic service operated by UB Information Technology.",
 	"isPartOf": {
 		"@type": "WebSite",
-		"name": "My IP",
+		"name": "Check Your Internet Connection",
 		"url": "{{ site_url }}"
 	},
 	"publisher": {
@@ -33,7 +33,7 @@
 {% block content %}
 <div class="row mt-3 mb-1">
 	<div class="col">
-		<h1 class="site-page-heading">About My IP</h1>
+		<h1 class="site-page-heading">About Check Your Internet Connection</h1>
 		<p class="site-page-subheading">
 			A network troubleshooting service for the University at Buffalo community,
 			operated by
@@ -141,14 +141,14 @@
 			</h2>
 
 			<p>
-				The <a href="https://github.com/DMion5/whatismyip">My IP</a>
+				The <a href="https://github.com/DMion5/whatismyip">Check Your Internet Connection</a>
 				project is maintained for University at Buffalo and released under the
 				<a href="https://github.com/DMion5/whatismyip/blob/de380dc8cf75e2db30f81100f53c7307121cd25f/LICENSE.md">MIT License</a>.
 			</p>
 
 			<p>
-				My IP is a modified derivative of
-				<a href="https://github.com/unc-network/whatismyip">What Is My IP</a>,
+				Check Your Internet Connection is a modified derivative of
+				<a href="https://github.com/unc-network/whatismyip">the upstream whatismyip project</a>,
 				originally developed by William E. Whitaker, Jr. and
 				<a href="https://its.unc.edu/">UNC Information Technology Services</a>
 				at the University of North Carolina at Chapel Hill.

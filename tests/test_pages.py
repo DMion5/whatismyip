@@ -38,12 +38,12 @@ def test_trailing_slash_redirects(client, path, location):
 # --- Page content ---
 
 
-def test_home_uses_my_ip_brand_without_application_logo(client):
+def test_home_uses_rebranded_name_without_application_logo(client):
     response = client.get("/")
 
     assert response.status_code == 200
-    assert b"<title>My IP | UB Information Technology</title>" in response.data
-    assert b"<span>My IP</span>" in response.data
+    assert b"<title>Check Your Internet Connection | UB Information Technology</title>" in response.data
+    assert b"<span>Check Your Internet Connection</span>" in response.data
     assert b"logo/placeholder-logo.svg" in response.data
     assert b'class="ub-app-logo"' not in response.data
     app_symbol = response.data.split(b'class="ub-app-symbol"', 1)[1].split(

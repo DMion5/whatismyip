@@ -1,7 +1,7 @@
 # Attribution notice
 
-My IP is a modified derivative of
-[What Is My IP](https://github.com/unc-network/whatismyip), originally developed
+Check Your Internet Connection is a modified derivative of
+[the upstream whatismyip project](https://github.com/unc-network/whatismyip), originally developed
 by William E. Whitaker, Jr. and UNC Information Technology Services at the
 University of North Carolina at Chapel Hill.
 

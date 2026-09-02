@@ -10,7 +10,7 @@ Compared:
 
 The upstream branch had 66 commits after the shared base: 55 content commits and
 11 merge commits. Every content commit was reviewed. Runtime improvements were
-adapted to the fork's My IP and University at Buffalo configuration; upstream
+adapted to the fork's Check Your Internet Connection and University at Buffalo configuration; upstream
 release notes, repository naming, licensing, and institution-specific
 documentation were not copied.
 
@@ -85,7 +85,7 @@ commits above and were therefore reviewed through their merged diffs:
 
 - No original-institution names, domains, CSS variables, or simulated campus
   data were introduced.
-- My IP naming, the neutral placeholder logo/favicon, UB links, and the IPv6
+- Check Your Internet Connection naming, the neutral placeholder logo/favicon, UB links, and the IPv6
   under-construction notice remain in place.
 - VPN detection works without an IPAM result and reports network purpose `VPN`.
 - Metrics cache entries cannot leak between application instances that use

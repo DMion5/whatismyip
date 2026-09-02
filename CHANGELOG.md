@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented here. This project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) conventions.
 
+## [Unreleased]
+
+### Changed
+
+- Rebranded the site, metadata, documentation, reports, and installable app identity as Check Your Internet Connection.
+
 ## [1.11.5] - 2026-08-27
 
 ### Added
@@ -60,8 +66,8 @@ All notable changes to this project will be documented here. This project follow
 
 - Introductory connection text can no longer be overwritten by later asynchronous checks.
 - Configured VPN ranges are treated as campus connections even when IPAM has no matching network.
-- Simulation fixtures and colors retain University at Buffalo and My IP branding.
-- The custom My IP logo and generated favicon set were replaced with a neutral placeholder asset.
+- Simulation fixtures and colors retain University at Buffalo and Check Your Internet Connection branding.
+- The custom Check Your Internet Connection logo and generated favicon set were replaced with a neutral placeholder asset.
 
 ## [1.9.1] - 2026-07-13
 

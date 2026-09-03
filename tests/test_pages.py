@@ -46,11 +46,7 @@ def test_home_uses_rebranded_name_without_application_logo(client):
     assert b"<span>Check Your Internet Connection</span>" in response.data
     assert b"logo/placeholder-logo.svg" in response.data
     assert b'class="ub-app-logo"' not in response.data
-    app_symbol = response.data.split(b'class="ub-app-symbol"', 1)[1].split(
-        b"</span>", 1
-    )[0]
-    assert b"fa-network-wired" not in app_symbol
-    assert b"fa-location-dot" in app_symbol
+    assert b'class="ub-app-symbol"' not in response.data
     assert b'class="ub-university-logo"' in response.data
     assert b"logo/my%20ip%20logo.png" not in response.data
     assert b"IPv6 support is under construction." in response.data
@@ -61,7 +57,7 @@ def test_home_uses_rebranded_name_without_application_logo(client):
         b'image/x-icon" sizes="32x32" href="/static/logo/favicon.ico' in response.data
     )
     assert b'rel="shortcut icon" href="/static/logo/favicon.ico' in response.data
-    assert b"Check your network connection and identify problems" in response.data
+    assert b"Check your network connection and identify problems" not in response.data
     assert b"Help Center staff may ask you to visit this page" in response.data
     assert b">Auth Type<" not in response.data
     assert b"Operating system information is inferred from your browser" in response.data

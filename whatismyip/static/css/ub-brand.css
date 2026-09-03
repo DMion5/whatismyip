@@ -158,7 +158,6 @@ h6,
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	gap: 0.28em;
 	color: var(--ub-blue);
 	text-decoration: none;
 }
@@ -175,30 +174,11 @@ main a.ub-app-title:focus {
 	text-decoration: none;
 }
 
-.ub-app-symbol {
-	display: inline-flex;
-	align-items: center;
-	color: var(--ub-blue);
-	font-size: 1em;
-	line-height: 1;
-}
-
 .site-title {
-	font-size: clamp(2.4rem, 5vw, 3.25rem);
+	font-size: clamp(2rem, 4vw, 2.75rem);
 	font-weight: 700;
 	letter-spacing: -0.02em;
 	line-height: 1;
-}
-
-.site-header-tagline {
-	color: var(--site-muted-text);
-	font-size: 0.84rem;
-	font-weight: 700;
-	letter-spacing: 0.03em;
-}
-
-html[data-theme="dark"] .site-header-tagline {
-	color: var(--ub-baird-point);
 }
 
 .site-page-heading,

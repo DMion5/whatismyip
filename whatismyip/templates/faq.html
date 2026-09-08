@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 
-{% block title %}Frequently Asked Questions | My IP{% endblock %}
-{% block meta_description %}Common questions about My IP, including campus connectivity, UB VPN, IPv4, IPv6, privacy and support reports.{% endblock %}
-{% block og_title %}Frequently Asked Questions | My IP{% endblock %}
+{% block title %}Frequently Asked Questions | Check Your Internet Connection{% endblock %}
+{% block meta_description %}Common questions about Check Your Internet Connection, including campus connectivity, UB VPN, IPv4, IPv6, privacy and support reports.{% endblock %}
+{% block og_title %}Frequently Asked Questions | Check Your Internet Connection{% endblock %}
 {% block og_description %}Common questions about University at Buffalo network diagnostics, UB VPN, IPv4, IPv6, privacy and support reports.{% endblock %}
 {% block og_url %}{{ site_url }}/faq{% endblock %}
-{% block twitter_title %}Frequently Asked Questions | My IP{% endblock %}
+{% block twitter_title %}Frequently Asked Questions | Check Your Internet Connection{% endblock %}
 {% block twitter_description %}Common questions about UB network diagnostics, UB VPN, IPv4, IPv6 and privacy.{% endblock %}
 
 
@@ -91,7 +91,7 @@
           <div id="faq-different-ip" class="accordion-collapse collapse" aria-labelledby="faq-different-ip-heading">
             <div class="accordion-body">
               <p>Most general IP lookup tools show the address your device presents to their internet service. A VPN, proxy, cellular relay, or different network route can cause two sites to see different addresses.</p>
-              <p>My IP attempts separate IPv4 and IPv6 checks against configured UB service endpoints. IPv6 support is currently under construction, so IPv6 results may be missing or incomplete.</p>
+              <p>Check Your Internet Connection attempts separate IPv4 and IPv6 checks against configured UB service endpoints. IPv6 support is currently under construction, so IPv6 results may be missing or incomplete.</p>
               <p class="mb-0">When both protocols are available, a device can use IPv4 for one destination and IPv6 for another. That can make two correct lookup results appear different.</p>
             </div>
           </div>
@@ -140,7 +140,7 @@
             <div class="accordion-body">
               <p class="mb-0">Network Access Control is a system that manages which devices are allowed to connect to the campus network and under what conditions.
                 When you connect, NAC may check requirements such as device registration or software status.
-                When UB network systems provide the information, My IP may show the connection policy or other NAC details associated with the device.
+                When UB network systems provide the information, Check Your Internet Connection may show the connection policy or other NAC details associated with the device.
               </p>
             </div>
           </div>
@@ -155,7 +155,7 @@
           </h3>
           <div id="faq-dns" class="accordion-collapse collapse" aria-labelledby="faq-dns-heading">
             <div class="accordion-body">
-              <p class="mb-0">UBIT can protect devices that use campus DNS resolvers by blocking known malicious domains. The result shown by My IP indicates whether the configured campus DNS security test appears active; encrypted or private DNS settings can affect the result.</p>
+              <p class="mb-0">UBIT can protect devices that use campus DNS resolvers by blocking known malicious domains. The result shown by Check Your Internet Connection indicates whether the configured campus DNS security test appears active; encrypted or private DNS settings can affect the result.</p>
             </div>
           </div>
         </div>
@@ -208,7 +208,7 @@
                 <li>OpenStreetMap or Google Maps - supplies map data when a location map is displayed, depending on the configured map provider.</li>
                 <li>A configured test domain - if DNS security filtering is enabled, the browser attempts to reach a known test domain to determine whether filtering appears active.</li>
               </ul>
-              <p class="mb-0">An internet service can see the IP address used to contact it. My IP uses the returned diagnostic information to display results, subject to the production configuration and applicable UB policy.</p>
+              <p class="mb-0">An internet service can see the IP address used to contact it. Check Your Internet Connection uses the returned diagnostic information to display results, subject to the production configuration and applicable UB policy.</p>
             </div>
           </div>
         </div>

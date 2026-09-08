@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 
-{% block title %}Site Statistics — My IP | UB Information Technology{% endblock %}
+{% block title %}Site Statistics — Check Your Internet Connection | UB Information Technology{% endblock %}
 {% block meta_description %}Usage statistics for the University at Buffalo IP address tool: daily visit counts, campus vs. off-campus ratio, IPv4/IPv6 mix, and ISP and country breakdown.{% endblock %}
-{% block og_title %}Site Statistics — My IP | UB Information Technology{% endblock %}
+{% block og_title %}Site Statistics — Check Your Internet Connection | UB Information Technology{% endblock %}
 {% block og_description %}Usage statistics for the University at Buffalo IP address tool: daily visit counts, campus vs. off-campus ratio, IPv4/IPv6 mix, and ISP and country breakdown.{% endblock %}
 {% block og_url %}{{ site_url }}/metrics{% endblock %}
-{% block twitter_title %}Site Statistics — My IP | UB Information Technology{% endblock %}
+{% block twitter_title %}Site Statistics — Check Your Internet Connection | UB Information Technology{% endblock %}
 {% block twitter_description %}Aggregated usage statistics for the University at Buffalo IP address diagnostic tool: visit counts, campus split, IPv4/IPv6 mix, and ISP breakdown.{% endblock %}
 
 {% block structured_data %}
@@ -13,12 +13,12 @@
 {
   "@context": "https://schema.org",
   "@type": "WebPage",
-  "name": "Site Statistics — My IP",
+  "name": "Site Statistics — Check Your Internet Connection",
   "url": "{{ site_url }}/metrics",
   "description": "Aggregated usage statistics for the University at Buffalo IP address diagnostic tool. Shows daily lookup counts, campus vs. off-campus split, IPv4/IPv6 mix, ISP breakdown, and country distribution.",
   "isPartOf": {
     "@type": "WebSite",
-    "name": "My IP — University at Buffalo",
+    "name": "Check Your Internet Connection — University at Buffalo",
     "url": "{{ site_url }}"
   },
   "publisher": {

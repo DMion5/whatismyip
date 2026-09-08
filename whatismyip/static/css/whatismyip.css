@@ -557,14 +557,6 @@ html[data-theme="dark"] .ip-copy-card:focus-visible {
   animation: ip-pulse 1.4s ease-in-out infinite;
 }
 
-.site-header-tagline {
-  font-size: 0.8rem;
-  letter-spacing: 0.04em;
-  color: var(--site-muted-text);
-  margin-top: 0.25rem;
-  margin-bottom: 0;
-}
-
 .toggle-chevron {
   transition: transform 0.2s ease;
 }

@@ -1,6 +1,6 @@
 # Deploying with Docker
 
-This guide walks through standing up **My IP** on any server with Docker and Docker Compose. It is written for network teams who are comfortable with Docker but are not Python developers.
+This guide walks through standing up **Check Your Internet Connection** on any server with Docker and Docker Compose. It is written for network teams who are comfortable with Docker but are not Python developers.
 
 The tool works in two tiers:
 
@@ -190,7 +190,7 @@ The `/connectivity` page tests reachability to a list of URLs from the visitor's
 
 ```toml
 [[connectivity.targets]]
-name = "My IP"
+name = "Check Your Internet Connection"
 url = "https://whatismyip.yourinstitution.edu/"
 description = "This tool"
 type = "self"

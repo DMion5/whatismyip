@@ -1,4 +1,4 @@
-"""My IP — Flask application factory."""
+"""Check Your Internet Connection — Flask application factory."""
 
 import os
 

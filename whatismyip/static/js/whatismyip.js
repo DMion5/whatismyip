@@ -1,6 +1,6 @@
 /*!
   * whatismyip.js
-  * Helper library for My IP at University at Buffalo.
+  * Helper library for Check Your Internet Connection at University at Buffalo.
   */
 
 function formatIPAddress(ip) {
@@ -515,7 +515,7 @@ function downloadReport() {
 <body>
 <div class="hdr">
   <h1>Network Diagnostic Report</h1>
-  <p class="sub">UBIT &mdash; My IP</p>
+  <p class="sub">UBIT &mdash; Check Your Internet Connection</p>
   <p class="ts">${e(ts)}</p>
 </div>
 <div class="status">${e(statusMsg)}</div>

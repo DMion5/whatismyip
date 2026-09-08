@@ -1,6 +1,6 @@
 {
-  "name": "My IP",
-  "short_name": "My IP",
+  "name": "Check Your Internet Connection",
+  "short_name": "Check Your Internet Connection",
   "description": "View your IP address and test University at Buffalo network connectivity.",
   "start_url": "/",
   "scope": "/",

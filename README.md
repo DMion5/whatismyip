@@ -1,11 +1,11 @@
-# My IP
+# Check Your Internet Connection
 
 A Flask web application that tells users their IP address and provides detailed network diagnostics — especially useful for campus networks where users need to know whether they appear on-campus, what VLAN they're on, or whether a VPN is active.
 
 Built and operated for the University at Buffalo by [UB Information Technology](https://www.buffalo.edu/ubit.html). Designed to be adapted for other higher-education institutions.
 
-My IP is a modified derivative of
-[UNC ITS's What Is My IP project](https://github.com/unc-network/whatismyip),
+Check Your Internet Connection is a modified derivative of
+[UNC ITS's upstream whatismyip project](https://github.com/unc-network/whatismyip),
 originally developed by William E. Whitaker, Jr. and UNC Information Technology
 Services. The original MIT license and copyright notice are preserved in
 [LICENSE.md](LICENSE.md); additional attribution is documented in
@@ -13,7 +13,7 @@ Services. The original MIT license and copyright notice are preserved in
 
 > **Note:** This repository contains the University at Buffalo deployment. Please open issues in this GitHub repository for review.
 
-![My IP screenshot](docs/whatismyip.png)
+![Check Your Internet Connection screenshot](docs/whatismyip.png)
 
 ---
 

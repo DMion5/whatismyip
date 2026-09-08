@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title description">
-  <title id="title">My IP placeholder logo</title>
+  <title id="title">Check Your Internet Connection placeholder logo</title>
   <desc id="description">A neutral placeholder containing a network symbol and the letters IP.</desc>
   <rect width="512" height="512" rx="88" fill="#f3f4f6"/>
   <rect x="44" y="44" width="424" height="424" rx="64" fill="#ffffff" stroke="#6b7280" stroke-width="14" stroke-dasharray="24 18"/>

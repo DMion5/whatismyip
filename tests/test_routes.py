@@ -322,6 +322,86 @@ def test_hostinfo_vpn_ip_uses_vpn_purpose_without_ipam_network(client, monkeypat
     assert response.get_json()["network"]["purpose"] == "VPN"
 
 
+def _campus_hostinfo_with_network(client, monkeypatch, network, is_vpn=False):
+    """Request /hostinfo as a campus IP and return (json, logged metrics kwargs)."""
+    for var in ("CLIENT_ADDRESS", "CLIENT_ADDRESS_V4", "CLIENT_ADDRESS_V6"):
+        monkeypatch.delenv(var, raising=False)
+    monkeypatch.delenv("FORWARDED_FOR", raising=False)
+    logged = {}
+    monkeypatch.setattr("whatismyip.routes.api.is_campus_ip", lambda ip: True)
+    monkeypatch.setattr("whatismyip.routes.api.is_vpn_ip", lambda ip: is_vpn)
+    monkeypatch.setattr("whatismyip.routes.api.get_network", lambda ip: network)
+    monkeypatch.setattr("whatismyip.routes.api.get_address_objects", lambda ip: None)
+    monkeypatch.setattr("whatismyip.routes.api.get_nac_info", lambda ip, mac=None: None)
+    monkeypatch.setattr(
+        "whatismyip.routes.api.log_metrics_event",
+        lambda event, **kw: logged.update(kw),
+    )
+    monkeypatch.setattr("whatismyip.routes.api.resolver.query", _no_ptr)
+
+    response = client.get("/hostinfo", environ_base={"REMOTE_ADDR": "10.0.0.1"})
+    assert response.status_code == 200
+    return response.get_json(), logged
+
+
+@pytest.mark.parametrize(
+    ("description", "comment", "expected"),
+    [
+        ("Wireless Student Cluster", "", "Wireless"),
+        ("Staff Cluster", "Staff Wi-Fi", "Wireless"),
+        ("Building A VLAN 100", "Building A Wireless Vlan", "Wireless"),
+        ("Corporate VPN - client ip ranges", "", "VPN"),
+        ("Library", "", "Wired"),
+        (None, "", "Wired"),
+    ],
+)
+def test_hostinfo_infers_purpose_from_ipam_description(
+    client, monkeypatch, description, comment, expected
+):
+    extattrs = {"Type": {"value": "Switched Physical"}}
+    if description is not None:
+        extattrs["Description"] = {"value": description}
+    network = {"network": "192.0.2.0/24", "comment": comment, "extattrs": extattrs}
+
+    data, logged = _campus_hostinfo_with_network(client, monkeypatch, network)
+
+    assert data["network"]["purpose"] == expected
+    assert logged["network_purpose"] == expected
+
+
+def test_hostinfo_purpose_extattr_takes_precedence_over_description(
+    client, monkeypatch
+):
+    network = {
+        "network": "192.0.2.0/24",
+        "extattrs": {
+            "Purpose": {"value": "Lab"},
+            "Description": {"value": "Wireless Student Cluster"},
+        },
+    }
+
+    data, logged = _campus_hostinfo_with_network(client, monkeypatch, network)
+
+    assert data["network"]["purpose"] == "Lab"
+    assert logged["network_purpose"] == "Lab"
+
+
+def test_hostinfo_configured_vpn_range_takes_precedence_over_description(
+    client, monkeypatch
+):
+    network = {
+        "network": "192.0.2.0/24",
+        "extattrs": {"Description": {"value": "Core"}},
+    }
+
+    data, logged = _campus_hostinfo_with_network(
+        client, monkeypatch, network, is_vpn=True
+    )
+
+    assert data["network"]["purpose"] == "VPN"
+    assert logged["network_purpose"] == "VPN"
+
+
 def test_hostinfo_external_failures_degrade_gracefully(client, monkeypatch):
     def _ipam_down(*a, **kw):
         raise Exception("IPAM down")

@@ -109,6 +109,7 @@ Both NIT calls return a building record with `official_name`, `full_name`, `addr
 | DHCP lease state, server, router | Infoblox IPAM | Campus only; DHCP leases only |
 | MAC address | Infoblox IPAM (DHCP lease) | May be absent |
 | Admin contact info | Infoblox extattrs | Campus only |
+| Network type (Wired/Wireless/VPN) | Infoblox `Purpose` extattr; else `[vpn] networks`; else inferred from the network's `Description` extattr/comment ("wireless"/"wi-fi" → Wireless, "vpn" → VPN, otherwise Wired) | Campus only; recorded in metrics |
 | Switch port / AP / policy | Extreme XMC (by IP, then MAC) | Campus IPv4 only |
 | Device vendor / type profile | Extreme XMC `getMacAddress` | Requires a MAC from Step 2 or 3 |
 | Building name, address, map | NIT building API | Derived from switch IP or AP name |

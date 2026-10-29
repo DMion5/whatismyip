@@ -8,6 +8,10 @@ All notable changes to this project will be documented here. This project follow
 
 - Rebranded the site, metadata, documentation, reports, and installable app identity as Check Your Internet Connection.
 
+### Fixed
+
+- The metrics "Network type" chart no longer reports every campus connection as Unknown. When an IPAM network has no `Purpose` extattr, the network type is now inferred from its `Description` extattr or comment (Wireless, VPN, otherwise Wired).
+
 ## [1.11.5] - 2026-08-27
 
 ### Added

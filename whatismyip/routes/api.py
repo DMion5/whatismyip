@@ -2,7 +2,9 @@
 
 import ipaddress
 import os
+import re
 import time
+from typing import Any
 
 import dns.exception
 from dns import resolver, reversename
@@ -30,6 +32,25 @@ from whatismyip.utils import (
 )
 
 bp = Blueprint("api", __name__)
+
+_WIRELESS_PATTERN = re.compile(r"wireless|\bwi-?fi\b", re.IGNORECASE)
+_VPN_PATTERN = re.compile(r"\bvpn\b", re.IGNORECASE)
+
+
+def _infer_network_purpose(network: dict[str, Any]) -> str:
+    """Infer Wired/Wireless/VPN from an IPAM network's Description extattr and comment.
+
+    Used when the network has no Purpose extattr (e.g. UB's IPAM, which records
+    the network's role in free-text descriptions like "Wireless North Cluster").
+    """
+    description = network.get("extattrs", {}).get("Description", {}).get("value") or ""
+    text = f"{description} {network.get('comment') or ''}"
+    if _WIRELESS_PATTERN.search(text):
+        return "Wireless"
+    if _VPN_PATTERN.search(text):
+        return "VPN"
+    return "Wired"
+
 
 _SIMULATE_HOSTINFO = {
     4: {
@@ -639,18 +660,19 @@ def hostinfo() -> Response:
     if is_vpn and not net_details["purpose"]:
         net_details["purpose"] = "VPN"
 
+    if network and not net_details["purpose"]:
+        net_details["purpose"] = _infer_network_purpose(network)
+        current_app.logger.debug(
+            f"Network {net_details['cidr']} has no Purpose extattr; "
+            f"inferred {net_details['purpose']} from its description"
+        )
+
     data["network"] = net_details
 
-    if data["is_campus"]:
-        if network is None and not is_vpn:
-            current_app.logger.error(
-                f"On-campus IP {data['client_address']} has no matching network in IPAM"
-            )
-        elif not net_details["purpose"]:
-            current_app.logger.warning(
-                f"On-campus IP {data['client_address']} matched network "
-                f"{net_details['cidr']} with no Purpose defined"
-            )
+    if data["is_campus"] and network is None and not is_vpn:
+        current_app.logger.error(
+            f"On-campus IP {data['client_address']} has no matching network in IPAM"
+        )
 
     addr_details = {
         "comment": "",

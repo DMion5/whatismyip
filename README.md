@@ -264,6 +264,23 @@ Networks are parsed into `ipaddress.ip_network` objects at startup — changes r
 
 The optional `[status_page]`, `[vpn]`, `[wireless]`, and `[metrics]` sections configure live service status, VPN guidance and address classification, SSID descriptions, and the metrics display/retention windows. See `data/config.toml.example` for the full schema.
 
+On `/metrics`, the **Statistics range** dropdown at the bottom of the dashboard
+controls every card, chart, and breakdown. `window_days` sets the default and
+`retention_days` sets the maximum.
+With the example settings above, the options are Today, Last 30 days (default),
+Last 60 days, and Last 90 days — Max. Options use 30-day increments and always
+include the configured default and exact retention limit, without duplicates.
+Both values must be positive; a default exceeding retention is limited to the
+retention window with a startup warning.
+
+Ranges include today so far, using calendar dates in `America/New_York`.
+The page shows the selected dates and the snapshot's update time. Data is cached
+separately by range for up to 60 seconds; reload to see a newer snapshot.
+Selections are shareable, for example `/metrics?days=60`. Only offered ranges
+are accepted; invalid selections return HTTP 400. Increasing retention cannot
+recover deleted data, and dates before collection began have no recorded events.
+Restart the app after changing `config.toml` to refresh these settings.
+
 ### DNS security filtering test
 
 The `[dns] security_filter_test_url` setting enables the **Campus DNS Security** row in the connectivity card. Leave it empty to hide the row entirely.

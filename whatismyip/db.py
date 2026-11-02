@@ -5,6 +5,7 @@ import sqlite3
 import time
 from datetime import datetime, timedelta, timezone
 from datetime import time as dt_time
+from threading import Lock
 from typing import Any
 from zoneinfo import ZoneInfo
 
@@ -15,8 +16,10 @@ _DEFAULT_METRICS_DB_PATH = os.path.join(
 )
 METRICS_TIMEZONE = ZoneInfo("America/New_York")
 
-_metrics_cache: dict = {"data": None, "ts": 0.0, "key": None}
-_METRICS_CACHE_TTL = 1800  # seconds — complete-day data is stable until midnight
+_metrics_cache: dict[tuple[str, int, str], tuple[float, dict[str, Any]]] = {}
+_metrics_cache_lock = Lock()
+_METRICS_CACHE_TTL = 60
+_METRICS_CACHE_MAX_ENTRIES = 16
 _schema_initialized_for: str | None = None  # db path last initialized; None = never
 
 
@@ -240,24 +243,29 @@ def get_metrics_dashboard(days: int | None = None) -> dict[str, Any]:
     """Build the metrics summary data for the admin dashboard."""
     if days is None:
         days = current_app.config["METRICS_TIME_WINDOW_DAYS"]
-    cache_key = (_db_path(), days)
-    if (
-        _metrics_cache["key"] == cache_key
-        and _metrics_cache["data"] is not None
-        and time.monotonic() - _metrics_cache["ts"] < _METRICS_CACHE_TTL
-    ):
-        return _metrics_cache["data"]
-    ensure_metrics_store()
+    if not 1 <= days <= current_app.config["METRICS_RETENTION_DAYS"]:
+        raise ValueError("Metrics range must be between 1 day and the retention limit.")
 
     now_local = datetime.now(METRICS_TIMEZONE)
     today = now_local.date()
-    last_full_day = today - timedelta(days=1)
-    first_day = last_full_day - timedelta(days=days - 1)
+    cache_key = (_db_path(), days, today.isoformat())
+    cache_time = time.monotonic()
+    with _metrics_cache_lock:
+        for key, (cached_at, _) in list(_metrics_cache.items()):
+            if cache_time - cached_at >= _METRICS_CACHE_TTL:
+                _metrics_cache.pop(key)
+        cached = _metrics_cache.get(cache_key)
+        if cached is not None:
+            return cached[1]
+    ensure_metrics_store()
+
+    first_day = today - timedelta(days=days - 1)
     cutoff = (
         datetime.combine(first_day, dt_time.min, tzinfo=METRICS_TIMEZONE)
         .astimezone(timezone.utc)
         .isoformat()
     )
+    end = now_local.astimezone(timezone.utc).isoformat()
 
     # Read the entire DB file into memory in one sequential pass before querying.
     # On NFS-backed storage (OpenShift PVC) this trades ~11 separate lock/read
@@ -276,9 +284,9 @@ def get_metrics_dashboard(days: int | None = None) -> dict[str, Any]:
                 COALESCE(SUM(CASE WHEN is_campus = 1 THEN 1 ELSE 0 END), 0) AS campus,
                 COALESCE(SUM(CASE WHEN is_campus = 0 THEN 1 ELSE 0 END), 0) AS remote
             FROM metrics_events
-            WHERE event_type = ? AND created_at >= ?
+            WHERE event_type = ? AND created_at >= ? AND created_at < ?
             """,
-            ("hostinfo", cutoff),
+            ("hostinfo", cutoff, end),
         ).fetchone()
         total_hostinfo = totals_row["total"]
         total_campus = totals_row["campus"]
@@ -290,10 +298,10 @@ def get_metrics_dashboard(days: int | None = None) -> dict[str, Any]:
             """
             SELECT created_at, ip_version
             FROM metrics_events
-            WHERE event_type = ? AND created_at >= ?
+            WHERE event_type = ? AND created_at >= ? AND created_at < ?
             ORDER BY created_at
             """,
-            ("hostinfo", cutoff),
+            ("hostinfo", cutoff, end),
         ).fetchall():
             day = (
                 datetime.fromisoformat(row["created_at"])
@@ -308,7 +316,7 @@ def get_metrics_dashboard(days: int | None = None) -> dict[str, Any]:
 
         daily_series = []
         for offset in range(days):
-            day = (last_full_day - timedelta(days=days - 1 - offset)).isoformat()
+            day = (first_day + timedelta(days=offset)).isoformat()
             v4 = daily_lookup_v4.get(day, 0)
             v6 = daily_lookup_v6.get(day, 0)
             daily_series.append({"day": day, "count": v4 + v6, "v4": v4, "v6": v6})
@@ -319,10 +327,10 @@ def get_metrics_dashboard(days: int | None = None) -> dict[str, Any]:
             """
             SELECT created_at
             FROM page_views
-            WHERE created_at >= ?
+            WHERE created_at >= ? AND created_at < ?
             ORDER BY created_at
             """,
-            (cutoff,),
+            (cutoff, end),
         ).fetchall():
             day = (
                 datetime.fromisoformat(row["created_at"])
@@ -334,9 +342,9 @@ def get_metrics_dashboard(days: int | None = None) -> dict[str, Any]:
 
         daily_page_views_series = [
             {
-                "day": (last_full_day - timedelta(days=days - 1 - offset)).isoformat(),
+                "day": (first_day + timedelta(days=offset)).isoformat(),
                 "count": daily_page_view_lookup.get(
-                    (last_full_day - timedelta(days=days - 1 - offset)).isoformat(), 0
+                    (first_day + timedelta(days=offset)).isoformat(), 0
                 ),
             }
             for offset in range(days)
@@ -348,11 +356,11 @@ def get_metrics_dashboard(days: int | None = None) -> dict[str, Any]:
                 """
                 SELECT COALESCE(CAST(ip_version AS TEXT), 'Unknown') AS label, COUNT(*) AS count
                 FROM metrics_events
-                WHERE event_type = ? AND created_at >= ?
+                WHERE event_type = ? AND created_at >= ? AND created_at < ?
                 GROUP BY label
                 ORDER BY count DESC
                 """,
-                ("hostinfo", cutoff),
+                ("hostinfo", cutoff, end),
             )
         )
         for row in ip_versions:
@@ -367,12 +375,12 @@ def get_metrics_dashboard(days: int | None = None) -> dict[str, Any]:
                 """
                 SELECT COALESCE(NULLIF(TRIM(isp), ''), 'Unknown') AS label, COUNT(*) AS count
                 FROM metrics_events
-                WHERE event_type = ? AND created_at >= ?
+                WHERE event_type = ? AND created_at >= ? AND created_at < ?
                 GROUP BY label
                 ORDER BY count DESC
                 LIMIT 10
                 """,
-                ("hostinfo", cutoff),
+                ("hostinfo", cutoff, end),
             )
         )
 
@@ -382,12 +390,12 @@ def get_metrics_dashboard(days: int | None = None) -> dict[str, Any]:
                 """
                 SELECT COALESCE(NULLIF(TRIM(org), ''), 'Unknown') AS label, COUNT(*) AS count
                 FROM metrics_events
-                WHERE event_type = ? AND created_at >= ?
+                WHERE event_type = ? AND created_at >= ? AND created_at < ?
                 GROUP BY label
                 ORDER BY count DESC
                 LIMIT 10
                 """,
-                ("hostinfo", cutoff),
+                ("hostinfo", cutoff, end),
             )
         )
 
@@ -397,12 +405,12 @@ def get_metrics_dashboard(days: int | None = None) -> dict[str, Any]:
                 """
                 SELECT COALESCE(NULLIF(TRIM(country), ''), 'Unknown') AS label, COUNT(*) AS count
                 FROM metrics_events
-                WHERE event_type = ? AND created_at >= ?
+                WHERE event_type = ? AND created_at >= ? AND created_at < ?
                 GROUP BY label
                 ORDER BY count DESC
                 LIMIT 10
                 """,
-                ("hostinfo", cutoff),
+                ("hostinfo", cutoff, end),
             )
         )
 
@@ -413,11 +421,11 @@ def get_metrics_dashboard(days: int | None = None) -> dict[str, Any]:
                 SELECT CASE WHEN is_campus = 1 THEN 'Campus' ELSE 'Off campus' END AS label,
                        COUNT(*) AS count
                 FROM metrics_events
-                WHERE event_type = ? AND created_at >= ?
+                WHERE event_type = ? AND created_at >= ? AND created_at < ?
                 GROUP BY label
                 ORDER BY count DESC
                 """,
-                ("hostinfo", cutoff),
+                ("hostinfo", cutoff, end),
             )
         )
 
@@ -427,12 +435,12 @@ def get_metrics_dashboard(days: int | None = None) -> dict[str, Any]:
                 """
                 SELECT COALESCE(NULLIF(TRIM(network_purpose), ''), 'Unknown') AS label, COUNT(*) AS count
                 FROM metrics_events
-                WHERE event_type = ? AND is_campus = 1 AND created_at >= ?
+                WHERE event_type = ? AND is_campus = 1 AND created_at >= ? AND created_at < ?
                 GROUP BY label
                 ORDER BY count DESC
                 LIMIT 10
                 """,
-                ("hostinfo", cutoff),
+                ("hostinfo", cutoff, end),
             )
         )
 
@@ -448,11 +456,11 @@ def get_metrics_dashboard(days: int | None = None) -> dict[str, Any]:
                        END AS label,
                        COUNT(*) AS count
                 FROM metrics_events
-                WHERE event_type = ? AND dns_filtering IS NOT NULL AND created_at >= ?
+                WHERE event_type = ? AND dns_filtering IS NOT NULL AND created_at >= ? AND created_at < ?
                 GROUP BY dns_filtering
                 ORDER BY count DESC
                 """,
-                ("dns_result", cutoff),
+                ("dns_result", cutoff, end),
             )
         )
 
@@ -462,12 +470,12 @@ def get_metrics_dashboard(days: int | None = None) -> dict[str, Any]:
                 """
                 SELECT COALESCE(NULLIF(TRIM(dns_geo), ''), 'Unknown') AS label, COUNT(*) AS count
                 FROM metrics_events
-                WHERE event_type = ? AND dns_geo IS NOT NULL AND created_at >= ?
+                WHERE event_type = ? AND dns_geo IS NOT NULL AND created_at >= ? AND created_at < ?
                 GROUP BY label
                 ORDER BY count DESC
                 LIMIT 8
                 """,
-                ("dns_result", cutoff),
+                ("dns_result", cutoff, end),
             )
         )
 
@@ -477,11 +485,11 @@ def get_metrics_dashboard(days: int | None = None) -> dict[str, Any]:
                 """
                 SELECT page AS label, COUNT(*) AS count
                 FROM page_views
-                WHERE created_at >= ?
+                WHERE created_at >= ? AND created_at < ?
                 GROUP BY page
                 ORDER BY count DESC
                 """,
-                (cutoff,),
+                (cutoff, end),
             )
         )
 
@@ -489,6 +497,10 @@ def get_metrics_dashboard(days: int | None = None) -> dict[str, Any]:
 
     result = {
         "window_days": days,
+        "range_label": "Today" if days == 1 else f"Last {days} days",
+        "start_date": first_day.isoformat(),
+        "end_date": today.isoformat(),
+        "updated_at": now_local.strftime("%I:%M %p %Z"),
         "total_hostinfo": total_hostinfo,
         "total_campus": total_campus,
         "total_remote": total_remote,
@@ -505,7 +517,11 @@ def get_metrics_dashboard(days: int | None = None) -> dict[str, Any]:
         "page_view_breakdown": page_view_breakdown,
         "daily_page_views_series": daily_page_views_series,
     }
-    _metrics_cache["data"] = result
-    _metrics_cache["ts"] = time.monotonic()
-    _metrics_cache["key"] = cache_key
+    with _metrics_cache_lock:
+        if (
+            cache_key not in _metrics_cache
+            and len(_metrics_cache) >= _METRICS_CACHE_MAX_ENTRIES
+        ):
+            _metrics_cache.pop(next(iter(_metrics_cache)))
+        _metrics_cache[cache_key] = (cache_time, result)
     return result

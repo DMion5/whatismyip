@@ -95,6 +95,21 @@ def load_site_config(app: Flask) -> None:
         app.config["METRICS_RETENTION_DAYS"] = int(
             metrics_section.get("retention_days", 90)
         )
+        if (
+            app.config["METRICS_TIME_WINDOW_DAYS"] < 1
+            or app.config["METRICS_RETENTION_DAYS"] < 1
+        ):
+            raise ValueError("Metrics window_days and retention_days must be positive.")
+        if (
+            app.config["METRICS_TIME_WINDOW_DAYS"]
+            > app.config["METRICS_RETENTION_DAYS"]
+        ):
+            app.logger.warning(
+                "Metrics window_days exceeds retention_days — limiting the default to retained history."
+            )
+            app.config["METRICS_TIME_WINDOW_DAYS"] = app.config[
+                "METRICS_RETENTION_DAYS"
+            ]
 
         vpn_section = site_cfg.get("vpn", {})
         app.config["VPN_PROVIDER_NAME"] = vpn_section.get("provider_name", "")

@@ -39,7 +39,7 @@
 <div class="row mt-3 mb-1">
   <div class="col">
     <h1 class="site-page-heading">Site Statistics</h1>
-    <p class="site-page-subheading">Aggregated IP lookups and page views for the last {{ metrics.window_days }} days. The database stores counts and classifications only — no raw client IP addresses are retained.</p>
+    <p class="site-page-subheading">Aggregated IP lookups and page views {% if metrics.window_days == 1 %}for today{% else %}for the last {{ metrics.window_days }} days{% endif %}. The database stores counts and classifications only — no raw client IP addresses are retained.</p>
   </div>
 </div>
 
@@ -49,7 +49,7 @@
       <div class="card-body">
         <div class="metrics-stat-label"><i class="fa-solid fa-users me-1" aria-hidden="true"></i>Total lookups</div>
         <div class="metrics-stat-number">{{ '{:,}'.format(total) }}</div>
-        <div class="metrics-stat-secondary">last {{ metrics.window_days }} days</div>
+        <div class="metrics-stat-secondary">{{ metrics.range_label | lower }}</div>
       </div>
     </div>
   </div>
@@ -76,7 +76,7 @@
       <div class="card-body">
         <div class="metrics-stat-label"><i class="fa-solid fa-chart-simple me-1" aria-hidden="true"></i>Daily average</div>
         <div class="metrics-stat-number">{{ '{:,}'.format(daily_avg) }}</div>
-        <div class="metrics-stat-secondary">lookups per day</div>
+        <div class="metrics-stat-secondary">{% if metrics.window_days == 1 %}today so far{% else %}lookups per day{% endif %}</div>
       </div>
     </div>
   </div>
@@ -97,7 +97,7 @@
         {% if metrics.daily_series %}
           <div style="position:relative;height:200px;">
             <canvas id="chartLookupsOverTime"
-                    aria-label="Daily IP lookups over the past {{ metrics.window_days }} days"
+                    aria-label="Daily IP lookups — {{ metrics.range_label }}"
                     role="img"></canvas>
           </div>
           <script type="application/json" id="dataLookupsOverTime">
@@ -109,7 +109,7 @@
             }
           </script>
           <table class="visually-hidden">
-            <caption>Daily IP lookups over the past {{ metrics.window_days }} days</caption>
+            <caption>Daily IP lookups — {{ metrics.range_label }}</caption>
             <thead><tr><th scope="col">Date</th><th scope="col">IPv4</th><th scope="col">IPv6</th><th scope="col">Total</th></tr></thead>
             <tbody>
               {% for row in metrics.daily_series %}
@@ -141,7 +141,7 @@
             }
           </script>
           <table class="visually-hidden">
-            <caption>IP version distribution over the past {{ metrics.window_days }} days</caption>
+            <caption>IP version distribution — {{ metrics.range_label }}</caption>
             <thead><tr><th scope="col">Protocol</th><th scope="col">Count</th></tr></thead>
             <tbody>
               {% for row in metrics.ip_versions %}
@@ -163,7 +163,7 @@
         {% if metrics.daily_page_views_series %}
           <div style="position:relative;flex:1;min-height:150px;">
             <canvas id="chartPageViewsOverTime"
-                    aria-label="Daily page views over the past {{ metrics.window_days }} days"
+                    aria-label="Daily page views — {{ metrics.range_label }}"
                     role="img"></canvas>
           </div>
           <script type="application/json" id="dataPageViewsOverTime">
@@ -173,7 +173,7 @@
             }
           </script>
           <table class="visually-hidden">
-            <caption>Daily page views over the past {{ metrics.window_days }} days</caption>
+            <caption>Daily page views — {{ metrics.range_label }}</caption>
             <thead><tr><th scope="col">Date</th><th scope="col">Views</th></tr></thead>
             <tbody>
               {% for row in metrics.daily_page_views_series %}
@@ -191,7 +191,7 @@
   <div class="col-md-5">
     <div class="card shadow h-100">
       <div class="card-body">
-        <h3 class="h5 card-title"><i class="fa-solid fa-file-lines text-primary me-2" aria-hidden="true"></i>Page views <small class="text-muted fw-normal" style="font-size:0.75em;">last {{ metrics.window_days }} days</small></h3>
+        <h3 class="h5 card-title"><i class="fa-solid fa-file-lines text-primary me-2" aria-hidden="true"></i>Page views <small class="text-muted fw-normal" style="font-size:0.75em;">{{ metrics.range_label | lower }}</small></h3>
         {% if metrics.page_view_breakdown %}
           <div class="table-responsive">
             <table class="table table-sm align-middle mb-0">
@@ -491,12 +491,31 @@
     </div>
   </div>
 </div>
+<form method="get" action="{{ url_for('metrics.metrics') }}" class="metrics-range-picker mb-4">
+  <div class="d-flex align-items-center flex-wrap gap-2">
+    <label for="metricsRange" class="metrics-stat-secondary mb-0">Statistics range</label>
+    <select id="metricsRange" name="days" class="form-select form-select-sm" aria-describedby="metricsRangeHelp metricsPeriodSummary">
+      {% for days in available_days %}
+      <option value="{{ days }}"{% if days == metrics.window_days %} selected{% endif %}>{% if days == 1 %}Today{% else %}Last {{ days }} days{% endif %}{% if days == default_days %} (default){% endif %}{% if days == retention_days %} — Max{% endif %}</option>
+      {% endfor %}
+    </select>
+    <noscript><button type="submit" class="btn btn-primary btn-sm">Apply range</button></noscript>
+  </div>
+  <div class="ms-md-auto">
+    <div id="metricsRangeHelp" class="metrics-stat-secondary">Up to {{ retention_days }} days retained. Today is still in progress.</div>
+    <div id="metricsPeriodSummary" class="metrics-period-summary">{{ metrics.start_date }}{% if metrics.start_date != metrics.end_date %} – {{ metrics.end_date }}{% endif %} · Updated {{ metrics.updated_at }}.</div>
+  </div>
+</form>
 {% endblock %}
 
 {% block javascript %}
 <script src="{{ url_for('static', filename='js/chart.umd.min.js') }}?v={{ app_version }}"></script>
 <script>
 (function () {
+  document.getElementById('metricsRange').addEventListener('change', function () {
+    this.form.requestSubmit();
+  });
+
   var chartInstances = [];
 
   function destroyAll() {

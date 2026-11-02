@@ -145,6 +145,34 @@ main[role="main"] {
   margin-bottom: 0.4rem;
 }
 
+.metrics-range-picker {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--site-border);
+}
+
+.metrics-range-picker .form-select {
+  width: auto;
+  max-width: 100%;
+  font-size: 0.8rem;
+  background-color: var(--site-surface);
+  color: var(--site-text);
+  border-color: var(--site-border);
+}
+
+.metrics-range-picker .form-select:focus {
+  border-color: var(--site-link);
+  box-shadow: 0 0 0 0.2rem rgba(0, 91, 187, 0.2);
+}
+
+.metrics-period-summary {
+  font-size: 0.75rem;
+  color: var(--site-muted-text);
+}
+
 .site-header-logo {
   width: auto;
   height: 72px;

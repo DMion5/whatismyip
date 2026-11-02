@@ -1,3 +1,5 @@
+import re
+
 import dns.exception
 import pytest
 
@@ -17,9 +19,13 @@ def client(app):
         yield c
 
 
-def _metrics_stub():
+def _metrics_stub(days=30):
     return {
-        "window_days": 30,
+        "window_days": days,
+        "range_label": "Today" if days == 1 else f"Last {days} days",
+        "start_date": "2026-10-04",
+        "end_date": "2026-11-02",
+        "updated_at": "03:00 PM EST",
         "total_hostinfo": 0,
         "total_campus": 0,
         "total_remote": 0,
@@ -60,6 +66,81 @@ def test_metrics_route_requires_auth_when_configured(app, client, monkeypatch):
 
     authed = client.get("/metrics", headers={"Authorization": "Basic YWRtaW46c2VjcmV0"})
     assert authed.status_code == 200
+
+
+@pytest.mark.parametrize(
+    "retention, default, expected",
+    [
+        (90, 30, [1, 30, 60, 90]),
+        (75, 30, [1, 30, 60, 75]),
+        (90, 14, [1, 14, 30, 60, 90]),
+        (14, 30, [1, 14]),
+        (1, 30, [1]),
+        (120, 60, [1, 30, 60, 90, 120]),
+    ],
+)
+def test_metrics_dropdown_uses_configured_default_and_retention(
+    app, client, monkeypatch, retention, default, expected
+):
+    monkeypatch.setitem(app.config, "METRICS_RETENTION_DAYS", retention)
+    monkeypatch.setitem(app.config, "METRICS_TIME_WINDOW_DAYS", default)
+    monkeypatch.setattr(
+        "whatismyip.routes.metrics.get_metrics_dashboard", _metrics_stub
+    )
+    response = client.get("/metrics")
+
+    assert response.status_code == 200
+    assert [
+        int(value) for value in re.findall(r'<option value="(\d+)"', response.text)
+    ] == expected
+    selected = min(default, retention)
+    assert f'<option value="{selected}" selected>' in response.text
+    assert f"Up to {retention} days retained" in response.text
+    assert "— Max" in response.text
+    assert "Apply range" in response.text
+    assert response.text.index('id="metricsRange"') > response.text.index(
+        "Internet DNS provider"
+    )
+    assert 'class="form-select form-select-sm"' in response.text
+
+
+@pytest.mark.parametrize("days", [1, 30, 60, 90])
+def test_metrics_selected_range_is_passed_to_dashboard(app, client, monkeypatch, days):
+    monkeypatch.setitem(app.config, "METRICS_RETENTION_DAYS", 90)
+    calls = []
+
+    def dashboard(days):
+        calls.append(days)
+        return _metrics_stub(days)
+
+    monkeypatch.setattr("whatismyip.routes.metrics.get_metrics_dashboard", dashboard)
+    response = client.get(f"/metrics?days={days}")
+
+    assert response.status_code == 200
+    assert calls == [days]
+    assert f'<option value="{days}" selected>' in response.text
+    assert "Today is still in progress" in response.text
+    if days == 1:
+        assert "today so far" in response.text
+        assert "last 1 days" not in response.text
+
+
+@pytest.mark.parametrize(
+    "selection", ["0", "-1", "31", "91", "1000000", "abc", "", "1.5", "30&days=60"]
+)
+def test_metrics_rejects_invalid_range_selections(app, client, monkeypatch, selection):
+    monkeypatch.setitem(app.config, "METRICS_RETENTION_DAYS", 90)
+    monkeypatch.setitem(app.config, "METRICS_TIME_WINDOW_DAYS", 30)
+    calls = []
+    monkeypatch.setattr(
+        "whatismyip.routes.metrics.get_metrics_dashboard",
+        lambda **kwargs: calls.append(kwargs),
+    )
+    response = client.get(f"/metrics?days={selection}")
+
+    assert response.status_code == 400
+    assert "Choose one of the available statistics ranges." in response.text
+    assert calls == []
 
 
 def test_sitemap_includes_core_pages(client):

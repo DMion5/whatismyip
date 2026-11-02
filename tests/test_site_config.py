@@ -73,8 +73,7 @@ def test_load_site_config_validates_map_provider(tmp_path):
 
 def test_load_site_config_applies_qol_sections(tmp_path):
     cfg = tmp_path / "config.toml"
-    cfg.write_text(
-        """
+    cfg.write_text("""
 [campus]
 networks = []
 [status_page]
@@ -92,8 +91,7 @@ name = "eduroam"
 description = "Primary wireless"
 usage = "Campus affiliates"
 expected = true
-"""
-    )
+""")
     from whatismyip.site_config import load_site_config
 
     app = create_app({"TESTING": True, "METRICS_DB_PATH": str(tmp_path / "m.sqlite3")})
@@ -114,6 +112,35 @@ expected = true
     assert app.config["VPN_INSTALL_URL"] == "https://vpn.example.edu/install"
     assert str(app.config["VPN_NETWORKS"][0]) == "198.51.100.0/24"
     assert app.config["SSID_INFO"]["eduroam"]["description"] == "Primary wireless"
+
+
+def test_metrics_default_is_limited_to_retention(tmp_path, monkeypatch):
+    import whatismyip.site_config as sc
+
+    cfg = tmp_path / "config.toml"
+    cfg.write_text("[metrics]\nwindow_days = 30\nretention_days = 14\n")
+    monkeypatch.setattr(sc, "SITE_CONFIG_PATH", str(cfg))
+
+    app = create_app({"TESTING": True})
+
+    assert app.config["METRICS_TIME_WINDOW_DAYS"] == 14
+    assert app.config["METRICS_RETENTION_DAYS"] == 14
+
+
+@pytest.mark.parametrize("window, retention", [(0, 90), (-1, 90), (30, 0), (30, -1)])
+def test_metrics_config_falls_back_when_ranges_are_not_positive(
+    tmp_path, monkeypatch, window, retention
+):
+    import whatismyip.site_config as sc
+
+    cfg = tmp_path / "config.toml"
+    cfg.write_text(f"[metrics]\nwindow_days = {window}\nretention_days = {retention}\n")
+    monkeypatch.setattr(sc, "SITE_CONFIG_PATH", str(cfg))
+
+    app = create_app({"TESTING": True})
+
+    assert app.config["METRICS_TIME_WINDOW_DAYS"] == 30
+    assert app.config["METRICS_RETENTION_DAYS"] == 90
 
 
 # --- Missing config file ---
